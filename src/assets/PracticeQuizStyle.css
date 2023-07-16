@@ -145,3 +145,21 @@
     height: 100%;
     opacity: 0.2;
 }
+
+
+
+/*Topic Study*/
+.topic-study-grade {
+    width: 30%;
+    margin-top: 20px;
+}
+
+.topic-subject {
+    font-size: 26px;
+    margin-left: 30px;
+    color: white;
+    background-color: #85b6ff;
+    border-radius: 15px;
+    padding: 5px 35px;
+    font-weight: 500;
+}
