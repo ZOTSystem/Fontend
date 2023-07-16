@@ -26,6 +26,7 @@ import ManageUser from './Component/Admin/ManageUser'
 import ManageMod from './Component/Admin/ManageMod';
 import ManageQuestion from './Component/Admin/ManageQuestion';
 import ManageTopic from './Component/Admin/ManageTopic';
+import PostProvider from './contexts/PostContext';
 
 function App() {
   return (
@@ -40,7 +41,7 @@ function App() {
           <Route path="/profile" element={<Profile />}></Route>
           <Route path='/testHistory' element={<TestHistory />}></Route>
           <Route path='/news' element={<News />}></Route>
-          <Route path="/forum" element={<Forum />}></Route>
+          <Route path="/forum" element={<PostProvider><Forum /></PostProvider>}></Route>
           <Route path="/takeExam" element={<TakeExam />}></Route>
           <Route path="/exam" element={<Exam />}></Route>
           <Route path="/examResult" element={<ExamResult />}></Route>

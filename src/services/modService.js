@@ -1,44 +1,44 @@
-import Request from "../utils/Request";
+import request from '../utils/request';
 
 export const GetAllModService = async (page) => {
-    try{
-        const respone = await Request({
-            method: 'get', 
+    try {
+        const respone = await request({
+            method: 'get',
             url: `account/getAllMod?page=${page}&pageSize=5`,
             headers: {
-                "Content-Type": "application/json",
-            }, 
+                'Content-Type': 'application/json',
+            },
         });
         return respone.data;
     } catch (e) {
         return e;
     }
-}
+};
 
 export const AddModService = async (data) => {
     try {
-        const respone = await Request({
-            method: "post",
-            url: "account/AddUser",
+        const respone = await request({
+            method: 'post',
+            url: 'account/AddUser',
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
             },
             data: JSON.stringify(data),
         });
         return respone.data;
-    } catch(e){
+    } catch (e) {
         return e;
     }
-}
+};
 
 // export const GetAllEmail = async () => {
 //     try{
-//         const respone = await Request({
-//             method: 'get', 
+//         const respone = await request({
+//             method: 'get',
 //             url: 'account/getAllEmail',
 //             headers: {
 //                 "Content-Type": "application/json",
-//             }, 
+//             },
 //         });
 //         return respone.data;
 //     } catch (e) {
@@ -48,31 +48,31 @@ export const AddModService = async (data) => {
 
 export const ChangeStatusService = async (accountId, string) => {
     try {
-        const respone = await Request({
-            method: "post",
+        const respone = await request({
+            method: 'post',
             url: `account/ChangeStatus?accountId=${accountId}&status=${string}`,
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
             },
         });
         return respone.data;
-    } catch(e){
+    } catch (e) {
         return e;
     }
-}
+};
 
-export const UpdateModService = async (accountId,data) => {
+export const UpdateModService = async (accountId, data) => {
     try {
-        const respone = await Request({
-            method: "post",
+        const respone = await request({
+            method: 'post',
             url: `account/UpdateMod?accountId=${accountId}`,
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
             },
             data: JSON.stringify(data),
         });
         return respone.data;
-    } catch(e){
+    } catch (e) {
         return e;
     }
-}
+};
