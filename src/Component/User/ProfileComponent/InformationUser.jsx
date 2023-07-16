@@ -1,64 +1,309 @@
-import { useState } from "react"
+import { useState, useContext, useEffect, useRef } from "react"
 import "../../../assets/ProfileStyle.css"
-import { Input, Modal, Form, Select, Dropdown } from "antd"
+import "../../../assets/InforUserStyle.css"
+import { Input, Modal, Form, Dropdown, DatePicker, Select, notification } from "antd"
+import { useCookies } from 'react-cookie';
+import { UserContext } from "../../../contexts/UserContext";
+import dayjs from "dayjs";
+import axios from "axios";
+import { storage } from "../../../firebase";
+import { ref, uploadBytes, listAll, getDownloadURL } from "firebase/storage";
+import { v4 } from "uuid";
+
+
+import { UpdateUserService } from "../../../services/UserService";
+import { GetInforByEmailService } from "../../../services/UserService";
+import { handleValidationUpdateUser } from "../../../assets/js/handleValidation";
+import { handleValidationChangePassword } from "../../../assets/js/handleValidation";
+import { ChangePassowrdService } from "../../../services/UserService";
+import { ChangeAvatarService } from "../../../services/UserService";
+
+
+//format datatime
+const formatDate = (dateString) => {
+    const date = new Date(dateString);
+
+    const year = date.getFullYear().toString().padStart(4, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+
+    const formattedDate = `${year}-${month}-${day}`;
+
+    return formattedDate;
+};
+const dayFormat = "YYYY-MM-DD";
+
 
 export default function InformationUser() {
 
-    //hiển thị form chỉnh sửa và quên mật khẩu
+    //#region - Function - Ẩn hiện mật khẩu
+    const [enableDisable, setEnableDisable] = useState("password");
+
+    const onClickDisplayPassword = () => {
+        if (enableDisable == "password") {
+            setEnableDisable("text")
+        } else {
+            setEnableDisable("password");
+        }
+    }
+    //#endregion
+
+    //#region - Function - Hiển thị thông báo
+    const [api, contextHolder] = notification.useNotification();
+    const openNotificationUpdate = (placement) => {
+        api.success({
+            message: `Thông báo`,
+            description: "Chỉnh sửa thành công",
+            placement,
+        });
+    };
+    const openNotificationChangePassword = (placement) => {
+        api.success({
+            message: `Thông báo`,
+            description: "Thay đổi mật khẩu thành công",
+            placement,
+        });
+    };
+    //#endregion
+
+    //#region - Declare - Khai báo các biên sử dụng
     const [showUpdate, setShowUpdate] = useState(false)
     const [showForgotPassword, setShowForgotPassword] = useState(false);
 
-    //option giới tính
-    const itemOfGender = [
-        {
-            key: '1',
-            label: (
-                <>
-                    <input type="text" class="form-control" value="Nam" style={{ marginleft: "0px;", border: 'none' }} />
-                </>
-            )
-        },
-        {
-            key: '2',
-            label: (
-                <input type="text" class="form-control" value="Nữ" style={{ marginleft: "0px;", border: 'none' }} />
-            )
-        }
-    ]
+    const { user, onSetUser } = useContext(UserContext);
+    const [cookies, setCookie, removeCookie] = useCookies([]);
+    const [phoneList, setPhoneList] = useState("");
 
-    //option trường
-    const itemOfTruong = [
-        {
-            key: '1',
-            label: (
-                <>
-                    <input type="text" class="form-control" value="THPT Chuyên Nguyễn Bỉnh Khiêm" style={{ marginleft: "0px;", border: 'none' }} />
-                </>
-            )
-        },
-        {
-            key: '2',
-            label: (
-                <input type="text" class="form-control" value="THPT Lê Quí Đôn" style={{ marginleft: "0px;", border: 'none' }} />
-            )
-        },
-        {
-            key: '3',
-            label: (
-                <input type="text" class="form-control" value="THPT Trần Cao Vân" style={{ marginleft: "0px;", border: 'none' }} />
-            )
-        }
-    ]
+    const [userInfo, setUserInfo] = useState({
+        fullName: user.fullName,
+        email: user.email,
+        phone: user.phone,
+        password: user.password,
+        avatar: user.avatar,
+    });
 
+    const [editData, setEditData] = useState({
+        editUserId: "",
+        editFullName: "",
+        editAvatar: "",
+        editEmail: "",
+        editPhone: "",
+        editBirthDay: "",
+        editGender: "",
+        editSchoolName: "",
+    });
+
+    const [errors, setErrors] = useState({
+        editFullName: "",
+        editPhone: "",
+        editBirthDay: "",
+        editSchoolName: "",
+        inputNewPassword: "",
+        inputComfirmPassword: "",
+    })
+
+    //#endregion
+
+    //#region - FUnction - log out
+    const onLogOut = () => {
+        removeCookie('token', { path: '/' });
+        onSetUser({
+            data: "",
+            token: "",
+        })
+    };
+    //#endregion
+
+    //#region - Function - lấy danh sách số phone
+    const getPhoneList = () => {
+        const url = "https://localhost:7207/api/home/getAllPhone";
+        axios
+            .get(url)
+            .then((result) => {
+                setPhoneList(result.data);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
+
+    useEffect(() => {
+        getPhoneList();
+    }, []);
+    //#endregion
+
+    //#region - Function - Nhận giá trị input
+    const handleInputChange = (event) => {
+        const field = event.target.name;
+        const value = event.target.value;
+
+        setEditData((editData) => ({ ...editData, [field]: value }));
+    };
+
+    const handleInputChangeDate = (date, name) => {
+        setEditData({
+            ...editData,
+            [name]: formatDate(date),
+        });
+    };
+
+    //#endregion
+
+    //#region - Function - Edit user
+    const handleViewUser = async () => {
+        const result = await GetInforByEmailService(user.email);
+        if (result) {
+            setEditData({
+                editUserId: result.result.user.accountId,
+                editFullName: result.result.user.fullName,
+                editAvatar: result.result.user.avatar,
+                editEmail: result.result.user.email,
+                editPhone: result.result.user.phone,
+                editBirthDay: result.result.user.birthDay,
+                editGender: result.result.user.gender,
+                editSchoolName: result.result.user.schoolName,
+            });
+            setShowUpdate(true);
+        }
+    }
+
+    const handleUpdate = async () => {
+        let errors = {};
+        const data = {
+            accountId: editData.editUserId,
+            fullName: editData.editFullName,
+            phone: editData.editPhone,
+            birthDay: editData.editBirthDay,
+            gender: editData.editGender,
+            schoolName: editData.editSchoolName,
+        }
+        handleValidationUpdateUser(editData, errors, phoneList);
+        if (Object.keys(errors).length === 0) {
+            const result = await UpdateUserService(data)
+            if (result) {
+                openNotificationUpdate("topRight");
+                setErrors([]);
+                const response = await GetInforByEmailService(user.email);
+                if (response) {
+                    setEditData({
+                        editUserId: response.result.user.accountId,
+                        editFullName: response.result.user.fullName,
+                        editAvatar: response.result.user.avatar,
+                        editEmail: response.result.user.email,
+                        editPhone: response.result.user.phone,
+                        editBirthDay: response.result.user.birthDay,
+                        editGender: response.result.user.gender,
+                        editSchoolName: response.result.user.schoolName,
+                    });
+                    setUserInfo({
+                        fullName: response.result.user.fullName,
+                        email: response.result.user.email,
+                        phone: response.result.user.phone,
+                        password: response.result.user.password,
+                        avatar: response.result.user.avatar,
+                    })
+                }
+            }
+        } else {
+            setErrors(errors);
+        }
+    }
+    //#endregion
+
+    //#region - Function - Đổi mật khẩu
+    const [newPassword, setNewPassword] = useState({
+        inputNewPassword: "",
+        inputComfirmPassword: "",
+    })
+
+    const handleInputPassword = (event) => {
+        const field = event.target.name;
+        const value = event.target.value;
+
+        setNewPassword((newPassword) => ({ ...newPassword, [field]: value }));
+    };
+
+    const handleChangePassword = async () => {
+        let errors = {};
+        handleValidationChangePassword(newPassword, errors);
+        if (Object.keys(errors).length === 0) {
+            const result = await ChangePassowrdService(user.accountId, newPassword.inputNewPassword)
+            if (result) {
+                openNotificationChangePassword("topRight");
+                setErrors([]);
+                const response = await GetInforByEmailService(user.email);
+                if (response) {
+                    setUserInfo({
+                        fullName: response.result.user.fullName,
+                        email: response.result.user.email,
+                        phone: response.result.user.phone,
+                        password: response.result.user.password,
+                    })
+                }
+                setShowForgotPassword(false);
+                setNewPassword("");
+            }
+        } else {
+            setErrors(errors);
+        }
+    }
+    //#endregion
+
+    //#region - Function - Change Avatar
+    const [imageUpload, setImageUpload] = useState(null);
+    const [image, setImage] = useState([])
+
+    const inputRef = useRef(null);
+
+    const handleSpanClick = () => {
+        inputRef.current.click();
+    };
+
+    const uploadImage = async () => {
+        if (imageUpload == null) return;
+        const storageRef  = ref(storage, `images/${imageUpload.name + v4()}`);
+
+        await uploadBytes(storageRef, imageUpload);
+
+        const downloadURL = await getDownloadURL(storageRef);
+        setImage(downloadURL);
+        console.log(downloadURL);
+
+        const result = await ChangeAvatarService(user.accountId, downloadURL);
+        if (result) {
+            const response = await GetInforByEmailService(user.email);
+            if (response) {
+                setUserInfo({
+                    fullName: response.result.user.fullName,
+                    email: response.result.user.email,
+                    phone: response.result.user.phone,
+                    password: response.result.user.password,
+                })
+            }
+        }
+    };
+
+    const handleClickAllUpdate = () => {
+        uploadImage();
+        handleUpdate();
+    }
+
+    //#endregion
     return (
         <>
+            {contextHolder}
             <div className="sc-dlfnbm sc-eCssSg gwbrfO oDHHe">
                 <div className="sc-jNWZdT jHkXTJ">
                     <div className="sc-gmAETw bitfhh">
                         <div className="sc-jLfdbx jjsGCG">
                             <div className="sc-fEpNni dAnFRi">
-                                <img src="../Image/Avatar_Null.png" alt="avatar" />
-                                <span class="edit" onClick={() => setShowUpdate(true)}>
+                                {user.avatar != null
+                                    ?
+                                    <img src={user.avatar} alt="" />
+                                    :
+                                    <img src="../Image/Avatar_Null.png" alt="avatar" />
+                                }
+                                <span class="edit" onClick={() => handleViewUser()}>
                                     <svg width="50" height="50" viewBox="0 0 50 50" fill="none"><g filter="url(#filter0_d)"><circle cx="25" cy="23" r="23" fill="white"></circle></g><path d="M34.9459 16.369L31.5926 13.0157C31.4438 12.8665 31.267 12.7481 31.0723 12.6673C30.8777 12.5865 30.669 12.5449 30.4582 12.5449C30.2475 12.5449 30.0388 12.5865 29.8442 12.6673C29.6495 12.7481 29.4727 12.8665 29.3239 13.0157L15.6819 26.7373L14.5774 31.5235C14.5303 31.7555 14.5353 31.995 14.5919 32.2249C14.6485 32.4548 14.7553 32.6692 14.9047 32.8529C15.0541 33.0365 15.2423 33.1847 15.4558 33.2869C15.6693 33.3891 15.9029 33.4427 16.1396 33.4439C16.2619 33.4574 16.3854 33.4574 16.5078 33.4439L21.3337 32.3792L34.9459 18.6377C35.0951 18.4889 35.2135 18.3121 35.2943 18.1174C35.3751 17.9228 35.4167 17.7141 35.4167 17.5033C35.4167 17.2926 35.3751 17.0839 35.2943 16.8893C35.2135 16.6946 35.0951 16.5178 34.9459 16.369ZM20.2989 30.5384L16.657 31.3444L17.5028 27.7324L27.7716 17.3939L30.5777 20.1999L20.2989 30.5384ZM31.702 19.0755L28.896 16.2695L30.4383 14.6973L33.2643 17.5232L31.702 19.0755Z" fill="#86B026"></path><defs><filter id="filter0_d" x="0" y="0" width="50" height="50" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
                                         <feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
                                         <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0">
@@ -68,7 +313,7 @@ export default function InformationUser() {
                                 </span>
                             </div>
                             <div className="sc-fBxRkM hbOsiM">
-                                <p>Gia Huy Nguyễn</p>
+                                <p>{userInfo.fullName}</p>
                             </div>
                         </div>
                         <div className="sc-eCVOBu ddbBzc">
@@ -80,8 +325,8 @@ export default function InformationUser() {
                                     <p>Email</p>
                                 </div>
                                 <div className="sc-dYZCcZ dIwkuJ">
-                                    <span class="text">ghuynguyen0311@gmail.com</span>
-                                    <span className="btn-edit" onClick={() => setShowUpdate(true)}>
+                                    <span class="text">{userInfo.email}</span>
+                                    <span className="btn-edit" onClick={() => handleViewUser()}>
                                         <svg width="25" height="25" viewBox="0 0 25 25" fill="none"><path d="M24.3919 4.57225L20.3825 0.56288C20.2046 0.384458 19.9932 0.242897 19.7604 0.146308C19.5277 0.0497186 19.2782 0 19.0262 0C18.7742 0 18.5247 0.0497186 18.292 0.146308C18.0593 0.242897 17.8479 0.384458 17.6699 0.56288L1.35881 16.9692L0.0382209 22.6917C-0.0180395 22.9691 -0.0121252 23.2556 0.0555395 23.5304C0.123204 23.8052 0.250937 24.0617 0.42955 24.2812C0.608163 24.5008 0.833218 24.6781 1.08853 24.8002C1.34383 24.9224 1.62305 24.9865 1.90609 24.9879C2.05238 25.004 2.19999 25.004 2.34628 24.9879L8.11645 23.7149L24.3919 7.28482C24.5703 7.10689 24.7119 6.8955 24.8084 6.66276C24.905 6.43003 24.9547 6.18052 24.9547 5.92854C24.9547 5.67655 24.905 5.42705 24.8084 5.19431C24.7119 4.96158 24.5703 4.75019 24.3919 4.57225ZM6.87913 21.5139L2.52474 22.4776L3.53601 18.1589L15.814 5.79767L19.169 9.15269L6.87913 21.5139ZM20.5134 7.8083L17.1583 4.45328L19.0024 2.57351L22.3812 5.95233L20.5134 7.8083Z" fill="black" fill-opacity="0.25"></path></svg>
                                     </span>
                                 </div>
@@ -94,7 +339,7 @@ export default function InformationUser() {
                                     <p>Số điện thoại</p>
                                 </div>
                                 <div className="sc-dYZCcZ dIwkuJ" onClick={() => setShowUpdate(true)}>
-                                    <span class="text">0328284430</span>
+                                    <span class="text">{userInfo.phone}</span>
                                     <span className="btn-edit">
                                         <svg width="25" height="25" viewBox="0 0 25 25" fill="none"><path d="M24.3919 4.57225L20.3825 0.56288C20.2046 0.384458 19.9932 0.242897 19.7604 0.146308C19.5277 0.0497186 19.2782 0 19.0262 0C18.7742 0 18.5247 0.0497186 18.292 0.146308C18.0593 0.242897 17.8479 0.384458 17.6699 0.56288L1.35881 16.9692L0.0382209 22.6917C-0.0180395 22.9691 -0.0121252 23.2556 0.0555395 23.5304C0.123204 23.8052 0.250937 24.0617 0.42955 24.2812C0.608163 24.5008 0.833218 24.6781 1.08853 24.8002C1.34383 24.9224 1.62305 24.9865 1.90609 24.9879C2.05238 25.004 2.19999 25.004 2.34628 24.9879L8.11645 23.7149L24.3919 7.28482C24.5703 7.10689 24.7119 6.8955 24.8084 6.66276C24.905 6.43003 24.9547 6.18052 24.9547 5.92854C24.9547 5.67655 24.905 5.42705 24.8084 5.19431C24.7119 4.96158 24.5703 4.75019 24.3919 4.57225ZM6.87913 21.5139L2.52474 22.4776L3.53601 18.1589L15.814 5.79767L19.169 9.15269L6.87913 21.5139ZM20.5134 7.8083L17.1583 4.45328L19.0024 2.57351L22.3812 5.95233L20.5134 7.8083Z" fill="black" fill-opacity="0.25"></path></svg>
                                     </span>
@@ -113,7 +358,7 @@ export default function InformationUser() {
                                     </span>
                                 </div>
                             </div>
-                            <div className="sc-ibAmJv cHgnBy">
+                            <div className="sc-ibAmJv cHgnBy" onClick={() => onLogOut()}>
                                 <div className="sc-dOFTbv iBYITo" style={{ marginLeft: '6px' }}>
                                     <svg width="44" height="39" viewBox="0 0 44 39" fill="none"><path d="M41.6538 19.4991L35.0455 27.4299M23.8096 19.4991H41.6538H23.8096ZM41.6538 19.4991L35.0455 11.5684L41.6538 19.4991Z" stroke="black" stroke-opacity="0.5" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path><path d="M25.7923 9.58557V5.96518C25.7922 5.41672 25.6784 4.87422 25.458 4.37198C25.2377 3.86975 24.9155 3.41869 24.5119 3.04732C24.1083 2.67595 23.632 2.39235 23.1132 2.21443C22.5944 2.03652 22.0443 1.96816 21.4978 2.01368L5.63625 3.33415C4.64501 3.41671 3.72099 3.86878 3.04745 4.60071C2.37392 5.33265 2.00005 6.29098 2 7.28565V31.7124C2.00005 32.707 2.37392 33.6654 3.04745 34.3973C3.72099 35.1292 4.64501 35.5813 5.63625 35.6639L21.4978 36.9863C22.0445 37.0319 22.5947 36.9634 23.1137 36.7854C23.6326 36.6074 24.109 36.3236 24.5126 35.952C24.9162 35.5804 25.2384 35.1291 25.4586 34.6267C25.6789 34.1242 25.7925 33.5815 25.7923 33.0328V29.4124" stroke="black" stroke-opacity="0.5" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path></svg>                                                        </div>
                                 <div className="sc-jMlkEa fmBJFo">
@@ -130,17 +375,23 @@ export default function InformationUser() {
                 title={<h2 style={{ color: '#2484ba', fontSize: '20px', fontWeight: 'bold' }}>Chỉnh sửa thông tin</h2>}
                 visible={showUpdate}
                 okText="Lưu"
-                onCancel={() => setShowUpdate(false)}
+                onOk={() => { handleClickAllUpdate(); }}
+                onCancel={() => { setShowUpdate(false); setErrors(""); }}
             >
                 <Form>
                     <div className="modal-header">
                         <h5 className="modal-title">
                             <div className="sc-jcUlvj iXziXU">
-                                <img src="../Image/Avatar_Null.png" alt="" />
-                                <span className="edit">
+                                {editData.editAvatar == null
+                                    ?
+                                    <img src="../Image/Avatar_Null.png" alt="" />
+                                    :
+                                    <img src={editData.editAvatar} alt="" />
+                                }
+                                <span className="edit" onClick={handleSpanClick}>
                                     <svg width="50" height="50" viewBox="0 0 50 50" fill="none"><g filter="url(#filter0_d)"><circle cx="25" cy="23" r="23" fill="white"></circle></g><path d="M34.9459 16.369L31.5926 13.0157C31.4438 12.8665 31.267 12.7481 31.0723 12.6673C30.8777 12.5865 30.669 12.5449 30.4582 12.5449C30.2475 12.5449 30.0388 12.5865 29.8442 12.6673C29.6495 12.7481 29.4727 12.8665 29.3239 13.0157L15.6819 26.7373L14.5774 31.5235C14.5303 31.7555 14.5353 31.995 14.5919 32.2249C14.6485 32.4548 14.7553 32.6692 14.9047 32.8529C15.0541 33.0365 15.2423 33.1847 15.4558 33.2869C15.6693 33.3891 15.9029 33.4427 16.1396 33.4439C16.2619 33.4574 16.3854 33.4574 16.5078 33.4439L21.3337 32.3792L34.9459 18.6377C35.0951 18.4889 35.2135 18.3121 35.2943 18.1174C35.3751 17.9228 35.4167 17.7141 35.4167 17.5033C35.4167 17.2926 35.3751 17.0839 35.2943 16.8893C35.2135 16.6946 35.0951 16.5178 34.9459 16.369ZM20.2989 30.5384L16.657 31.3444L17.5028 27.7324L27.7716 17.3939L30.5777 20.1999L20.2989 30.5384ZM31.702 19.0755L28.896 16.2695L30.4383 14.6973L33.2643 17.5232L31.702 19.0755Z" fill="#86B026"></path><defs><filter id="filter0_d" x="0" y="0" width="50" height="50" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"></feColorMatrix><feOffset dy="2"></feOffset><feGaussianBlur stdDeviation="1"></feGaussianBlur><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0"></feColorMatrix><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"></feBlend><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"></feBlend></filter></defs></svg>
                                 </span>
-                                <input type="file" accept="image/*" class="nrr-updload-file" style={{ display: 'none' }}></input>
+                                <input type="file" ref={inputRef} class="nrr-updload-file" style={{ display: 'none' }} onChange={(event) => setImageUpload(event.target.files[0])} />
                             </div>
                         </h5>
                     </div>
@@ -153,7 +404,15 @@ export default function InformationUser() {
                                         <span class="required">*</span>
                                         :
                                     </span>
-                                    <input type="text" class="form-control" value="Huy Nguyễn Gia" style={{ marginleft: "0px;" }} />
+                                    <Input type="text" class="form-control" name="editFullName" value={editData.editFullName} style={{ marginleft: "0px;" }} onChange={handleInputChange} />
+                                    {errors.editFullName && (
+                                        <div
+                                            className="invalid-feedback"
+                                            style={{ display: "block", color: "red" }}
+                                        >
+                                            {errors.editFullName}
+                                        </div>
+                                    )}
                                 </label>
                             </div>
                             <div className="row-info">
@@ -163,7 +422,7 @@ export default function InformationUser() {
                                         <span class="required">*</span>
                                         :
                                     </span>
-                                    <input type="text" class="form-control" value="ghuynguyen0311@gmail.com" style={{ marginleft: "0px;" }} />
+                                    <input type="text" class="form-control" value={editData.editEmail} style={{ marginleft: "0px;" }} readOnly />
                                 </label>
                             </div>
                             <div className="row-info">
@@ -173,7 +432,15 @@ export default function InformationUser() {
                                         <span class="required">*</span>
                                         :
                                     </span>
-                                    <input type="text" class="form-control" value="0328284430" style={{ marginleft: "0px;" }} />
+                                    <Input type="text" class="form-control" name="editPhone" value={editData.editPhone} style={{ marginleft: "0px;" }} onChange={handleInputChange} />
+                                    {errors.editPhone && (
+                                        <div
+                                            className="invalid-feedback"
+                                            style={{ display: "block", color: "red" }}
+                                        >
+                                            {errors.editPhone}
+                                        </div>
+                                    )}
                                 </label>
                             </div>
                             <div className="row-info">
@@ -183,7 +450,20 @@ export default function InformationUser() {
                                         <span class="required">*</span>
                                         :
                                     </span>
-                                    <input type="text" class="form-control" value="03-11-2001" style={{ marginleft: "0px;" }} />
+                                    <DatePicker
+                                        className="form-control w-100 border-0"
+                                        name="editBirthDay"
+                                        value={editData.editBirthDay ? dayjs(editData.editBirthDay, dayFormat) : null}
+                                        onChange={(date) => handleInputChangeDate(date, "editBirthDay")}
+                                    />
+                                    {errors.editBirthDay && (
+                                        <div
+                                            className="invalid-feedback"
+                                            style={{ display: "block", color: "red" }}
+                                        >
+                                            {errors.editBirthDay}
+                                        </div>
+                                    )}
                                 </label>
                             </div>
                             <div className="row-info">
@@ -193,14 +473,11 @@ export default function InformationUser() {
                                         <span class="required">*</span>
                                         :
                                     </span>
-                                    <Dropdown
-                                        menu={{
-                                            items: itemOfGender,
-                                        }}
-                                        style={{ marginleft: "0px" }}
-                                    >
-                                        <input type="text" class="form-control" value="Nam" style={{ paddingLeft: '12px' }} />
-                                    </Dropdown>
+                                    <select id="cars" className="form-control w-100 select" value={editData.editGender} name="editGender" onChange={handleInputChange}>
+                                        <option value="Nam">Nam</option>
+                                        <option value="Nữ">Nữ</option>
+                                        <option value="Khác">Khác</option>
+                                    </select>
                                 </label>
                             </div>
                             <div className="row-info">
@@ -210,14 +487,7 @@ export default function InformationUser() {
                                         <span class="required">*</span>
                                         :
                                     </span>
-                                    <Dropdown
-                                        menu={{
-                                            items: itemOfTruong,
-                                        }}
-                                        style={{ marginleft: "0px" }}
-                                    >
-                                        <input type="text" class="form-control" value="THPT Phan Bội Châu" style={{ paddingLeft: '12px' }} />
-                                    </Dropdown>
+                                    <input type="text" class="form-control" name="editSchoolName" value={editData.editSchoolName} style={{ marginleft: "0px;" }} onChange={handleInputChange} />
                                 </label>
                             </div>
                         </div>
@@ -230,7 +500,8 @@ export default function InformationUser() {
                 title={<h2 style={{ color: '#2484ba', fontSize: '20px', fontWeight: 'bold', width: '60%' }}>Thay đổi mật khẩu</h2>}
                 visible={showForgotPassword}
                 okText="Lưu"
-                onCancel={() => setShowForgotPassword(false)}
+                onOk={handleChangePassword}
+                onCancel={() => { setShowForgotPassword(false); setErrors(""); setNewPassword("") }}
             >
                 <div className="modal-header">
                     <h5 className="modal-title">
@@ -252,7 +523,7 @@ export default function InformationUser() {
                                                 :
                                             </span>
                                         </label>
-                                        <input type="password" class="form-control" value="1234567" style={{ marginLeft: "0", marginTop: '10px' }} />
+                                        <Input type={enableDisable} class="form-control" value={userInfo.password} style={{ marginLeft: "0", marginTop: '10px' }} onClick={onClickDisplayPassword} />
                                     </div>
                                     <div className="row-info">
                                         <label for="gender">
@@ -262,7 +533,15 @@ export default function InformationUser() {
                                                 :
                                             </span>
                                         </label>
-                                        <input type="password" class="form-control" value="" style={{ marginLeft: "0", marginTop: '10px'}} placeholder="Nhập mật khẩu mới" />
+                                        <Input type="password" class="form-control" value={newPassword.inputNewPassword} name="inputNewPassword" style={{ marginLeft: "0", marginTop: '10px' }} placeholder="Nhập mật khẩu mới" onChange={handleInputPassword} />
+                                        {errors.inputNewPassword && (
+                                            <div
+                                                className="invalid-feedback"
+                                                style={{ display: "block", color: "red" }}
+                                            >
+                                                {errors.inputNewPassword}
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="row-info">
                                         <label for="gender">
@@ -272,7 +551,15 @@ export default function InformationUser() {
                                                 :
                                             </span>
                                         </label>
-                                        <input type="password" class="form-control" value="" style={{ marginLeft: "0", marginTop: '10px' }} placeholder="Nhập lại mật khẩu mới" />
+                                        <Input type="password" class="form-control" value={newPassword.inputComfirmPassword} name="inputComfirmPassword" style={{ marginLeft: "0", marginTop: '10px' }} placeholder="Nhập lại mật khẩu mới" onChange={handleInputPassword} />
+                                        {errors.inputComfirmPassword && (
+                                            <div
+                                                className="invalid-feedback"
+                                                style={{ display: "block", color: "red" }}
+                                            >
+                                                {errors.inputComfirmPassword}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

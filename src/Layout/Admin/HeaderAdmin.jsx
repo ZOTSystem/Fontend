@@ -1,16 +1,16 @@
-import { Fragment, useState, useEffect } from "react";
+import { Fragment, useState, useEffect, useContext } from "react";
 import { UserOutlined, DesktopOutlined, LogoutOutlined } from '@ant-design/icons';
 import { Layout, theme, Dropdown, Space } from 'antd';
+import { UserContext } from "../../contexts/UserContext"; 
+import { useNavigate } from "react-router-dom";
+import { useCookies } from 'react-cookie';
 
 const { Header } = Layout;
 
 export default function HeaderAdmin() {
-    var user = localStorage.getItem('user');
-    // const [avatar, setAvatar] = useState('../Image/Avatar_Null.png');
-
-    // useEffect(() => {
-    //     setAvatar(JSON.parse(user).avatar);
-    // }, [user]);
+    
+    const { user, onSetUser } = useContext(UserContext);
+    const [cookies, setCookie, removeCookie] = useCookies([]);
 
     function getItem(label, key, icon, children) {
         return {
@@ -21,14 +21,16 @@ export default function HeaderAdmin() {
         };
     }
     
-    const onLogOut = () =>{
-        sessionStorage.clear();
-        localStorage.clear();
-        window.location.href = '/login';
-    }
+    const onLogOut = () => {
+        removeCookie('token', { path: '/' });
+        onSetUser({
+            data: "",
+            token: "",
+        })
+    };
+
     const items = [
         getItem(<a href={process.env.REACT_APP_CLIENT_HOST + "/four-season/user-profile"}>View Profile</a>,'1', <UserOutlined />),
-        // getItem('Manager', '2', <DesktopOutlined />),
         getItem(<a onClick={() =>onLogOut()}>Log out</a>, '3', <LogoutOutlined />),
     ];
 
