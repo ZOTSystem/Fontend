@@ -11,7 +11,6 @@ import dayjs from "dayjs";
 import axios from "axios";
 import { GetAllModService } from "../../services/ModService";
 import { AddModService } from "../../services/ModService";
-import { GetAllEmail } from "../../services/ModService";
 import { ChangeStatusService } from "../../services/ModService";
 import { UpdateModService } from "../../services/ModService";
 

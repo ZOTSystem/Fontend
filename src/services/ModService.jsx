@@ -1,10 +1,10 @@
 import Request from "../utils/Request";
 
-export const GetAllModService = async (page) => {
+export const GetAllModService = async () => {
     try{
         const respone = await Request({
             method: 'get', 
-            url: `account/getAllMod?page=${page}&pageSize=5`,
+            url: `account/getAllMod`,
             headers: {
                 "Content-Type": "application/json",
             }, 
@@ -19,7 +19,7 @@ export const AddModService = async (data) => {
     try {
         const respone = await Request({
             method: "post",
-            url: "account/AddUser",
+            url: "account/addMod",
             headers: {
                 "Content-Type": "application/json",
             },
@@ -31,26 +31,12 @@ export const AddModService = async (data) => {
     }
 }
 
-// export const GetAllEmail = async () => {
-//     try{
-//         const respone = await Request({
-//             method: 'get', 
-//             url: 'account/getAllEmail',
-//             headers: {
-//                 "Content-Type": "application/json",
-//             }, 
-//         });
-//         return respone.data;
-//     } catch (e) {
-//         return e;
-//     }
-// }
 
 export const ChangeStatusService = async (accountId, string) => {
     try {
         const respone = await Request({
             method: "post",
-            url: `account/ChangeStatus?accountId=${accountId}&status=${string}`,
+            url: `account/changeStatus?accountId=${accountId}&status=${string}`,
             headers: {
                 "Content-Type": "application/json",
             },
@@ -65,7 +51,7 @@ export const UpdateModService = async (accountId,data) => {
     try {
         const respone = await Request({
             method: "post",
-            url: `account/UpdateMod?accountId=${accountId}`,
+            url: `account/updateMod?accountId=${accountId}`,
             headers: {
                 "Content-Type": "application/json",
             },

@@ -1,17 +1,20 @@
 import "../../assets/HeaderNavStyle.css";
 import 'bootstrap/dist/css/bootstrap.css';
 import { Dropdown } from 'antd';
-import { useState } from "react";
+import { useStat, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../../contexts/UserContext";
 
 export default function Navbar() {
-
+    const {user, onSetUser} = useContext(UserContext);
+    const navigate = useNavigate();
     const itemsOfTuHoc = [
         {
             key: '1',
             label: (
                 <>
                     <div>
-                        <a href="/practiceQuizz" style={{ textDecoration: 'none', color: 'black' }}>
+                        <a style={{ textDecoration: 'none', color: 'black' }} onClick={() => { navigate('/practiceQuizz')}}>
                             <button type="button" tabindex="0" role="menuitem" class="sc-dOSReg lhXIuw dropdown-item" style={{ color: "black" }}>
                                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="#000000" xmlns="http://www.w3.org/2000/svg" class="StyledIconBase-ea9ulj-0 jZGNBW">
                                     <path fill="none" d="M0 0h24v24H0z"></path><path fill="#000000" d="M16.757 3l-7.466 7.466.008 4.247 4.238-.007L21 7.243V20a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1h12.757zm3.728-.9L21.9 3.516l-9.192 9.192-1.412.003-.002-1.417L20.485 2.1z">
@@ -22,14 +25,14 @@ export default function Navbar() {
                         </a>
                     </div>
                 </>
-            ),
+            )
         },
         {
             key: '2',
             label: (
                 <>
                     <div>
-                        <a href="/testSubject" style={{ textDecoration: 'none', color: 'black' }}>
+                        <a  style={{ textDecoration: 'none', color: 'black' }} onClick={() => { navigate('/testSubject');}}>
                             <button type="button" tabindex="0" role="menuitem" class="sc-dOSReg lhXIuw dropdown-item">
                                 <svg width="16" height="20" viewBox="0 0 16 18" fill="none" class="nav-icon">
                                     <path d="M16 2.46154V8.61539C16 9.35897 15.9984 9.90545 15.9952 10.2548C15.992 10.6042 15.9872 11.0641 15.9808 11.6346C15.9744 12.2051 15.9599 12.6282 15.9375 12.9038C15.9151 13.1795 15.8846 13.5272 15.8462 13.9471C15.8077 14.367 15.758 14.6955 15.6971 14.9327C15.6362 15.1699 15.5641 15.4391 15.4808 15.7404C15.3974 16.0417 15.2965 16.3077 15.1779 16.5385C15.0593 16.7692 14.9231 17 14.7692 17.2308H0C0.50641 15.6795 0.838141 14.2452 0.995192 12.9279C1.15224 11.6106 1.23077 9.76282 1.23077 7.38462V2.46154L3.69231 2.48077V8C3.69231 8.55128 3.86218 8.9968 4.20192 9.33654C4.54167 9.67628 4.98718 9.84615 5.53846 9.84615C6.42949 9.84615 7.00641 9.54808 7.26923 8.95192C7.34615 8.77244 7.38462 8.45513 7.38462 8V3.69231H6.15385V8C6.15385 8.25 6.11539 8.41506 6.03846 8.49519C5.96154 8.57532 5.79487 8.61539 5.53846 8.61539C5.32692 8.59615 5.16987 8.54006 5.06731 8.44712C4.96474 8.35417 4.91667 8.20513 4.92308 8V2.46154H16ZM5.06731 1.52885C5.25962 1.20833 5.52244 1.04808 5.85577 1.04808C6.24039 1.04808 6.52885 1.1266 6.72115 1.28365C6.91346 1.44071 7.02564 1.70513 7.05769 2.07692H8.28846C8.28846 1.71795 8.2468 1.43269 8.16346 1.22115C8.03526 0.907051 7.77724 0.625 7.38942 0.375C7.0016 0.125 6.51603 0 5.93269 0C5.29167 0 4.76282 0.176282 4.34615 0.528846C3.91026 0.907051 3.69231 1.37821 3.69231 1.94231V2.46154H4.92308V2.23077L4.93269 1.97115L4.97596 1.76923L5.06731 1.52885Z" fill="#000000">
@@ -56,7 +59,7 @@ export default function Navbar() {
         <>
             <div className="sc-iBaPrD gdARiY d-sm-block d-none">
                 <ul className="sc-eggNIi JiLrb list-inline">
-                    <a className={checkTrangChu ? "isActive" : ""} href="/">
+                    <a className={checkTrangChu ? "isActive" : ""} onClick={() => { navigate('/');}}>
                         <li class="sc-cTkwdZ degoCR list-inline-item" style={{ color: '#000000' }}>
                             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="StyledIconBase-ea9ulj-0 jZGNBW nav-icon">
                                 <g data-name="Layer 2">
@@ -92,13 +95,13 @@ export default function Navbar() {
                             </button>
                         </Dropdown>
                     </div>
-                    <a href="/forum" className={checkForum ? "isActive" : ""}>
+                    <a className={checkForum ? "isActive" : ""} onClick={() => { navigate('/forum');}}>
                         <li class="sc-cTkwdZ degoCR list-inline-item" style={{ color: "black" }}>
                             <img src="../Image/forum-message-svgrepo-com.svg" alt="" style={{ width: '20px' }} className="icon" />
                             Diễn đàn
                         </li>
                     </a>
-                    <a className={checkNews ? "isActive" : ""} href="/news">
+                    <a className={checkNews ? "isActive" : ""} onClick={() => { navigate('/news');}}>
                         <li class="sc-cTkwdZ degoCR list-inline-item" style={{ color: "black" }}>
                             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" class="nav-icon"><path d="M9.52732 1.05469C9.44336 1.05469 8.35953 1.05469 7.94529 1.05469C7.94529 0.472183 7.47311 0 6.8906 0C6.3081 0 5.83592 0.472183 5.83592 1.05469C5.45328 1.05469 5.2377 1.05469 4.25389 1.05469C3.96266 1.05469 3.72655 1.32595 3.72655 1.61718V2.14453C3.72655 2.72703 4.19873 3.19921 4.78123 3.19921H8.99997C9.58248 3.19921 10.0547 2.72703 10.0547 2.14453V1.61718C10.0547 1.32595 9.81855 1.05469 9.52732 1.05469Z" fill="#000000">
                             </path>
@@ -116,7 +119,7 @@ export default function Navbar() {
                     </a>
                     <div className="sc-jNMdTA ewqGCM dropdown">
                         <button type="button" aria-aria-haspopup="true" aria-expanded="false" className="btn btn-secondary">
-                            <a className={checkLichSuOnLuyen ? "isActive" : ""} href="/testHistory">
+                            <a className={checkLichSuOnLuyen ? "isActive" : ""} onClick={() => { navigate('/testHistory')}} >
                                 <li className="sc-cTkwdZ degoCR list-inline-item" style={{ color: "black" }}>
                                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" class="nav-icon">
                                         <path d="M20 16.7017V14.2653L19.0668 14.0268C19.0603 14.0111 19.0538 13.9953 19.0471 13.9798L19.5383 13.1517L17.8155 11.4289L16.9875 11.9202C16.9716 11.9134 16.9558 11.9069 16.9404 11.9005L16.7019 10.9675H14.2655L14.0271 11.9008C14.0113 11.9072 13.9956 11.9137 13.98 11.9205L13.1519 11.4292L11.4291 13.152L11.9204 13.9801C11.9136 13.996 11.9071 14.0117 11.9007 14.0272L10.9677 14.2656V16.702L11.901 16.9405C11.9074 16.9562 11.9139 16.972 11.9207 16.9876L11.4294 17.8156L13.1522 19.5384L13.9803 19.0472C13.9962 19.0539 14.0119 19.0604 14.0274 19.0669L14.2658 19.9998H16.7022L16.9407 19.0665C16.9564 19.0601 16.9722 19.0536 16.9878 19.0469L17.8158 19.5381L19.5387 17.8153L19.0474 16.9872C19.0542 16.9713 19.0606 16.9556 19.0671 16.9402L20 16.7017ZM18.7281 17.7137L17.7139 18.7279L17.0245 18.3188L16.8693 18.393C16.7693 18.4404 16.6671 18.4833 16.5619 18.5205L16.3993 18.5781L16.2013 19.3546H14.7667L14.5687 18.5781L14.4062 18.5205C14.301 18.4836 14.1984 18.4408 14.0987 18.393L13.9436 18.3188L13.2542 18.7279L12.24 17.7137L12.649 17.0243L12.5748 16.8691C12.5274 16.7691 12.4846 16.6669 12.4474 16.5617L12.3897 16.3991L11.6129 16.2011V14.7665L12.3894 14.5685L12.4471 14.406C12.4839 14.3008 12.5268 14.1982 12.5745 14.0985L12.6487 13.9434L12.2396 13.2539L13.2538 12.2397L13.9433 12.6488L14.0984 12.5746C14.1984 12.5272 14.3007 12.4844 14.4059 12.4472L14.5684 12.3895L14.7664 11.6127H16.201L16.399 12.3892L16.5616 12.4469C16.6668 12.4837 16.7693 12.5266 16.869 12.5743L17.0242 12.6485L17.7136 12.2394L18.7278 13.2536L18.3187 13.9431L18.3929 14.0982C18.4403 14.1982 18.4832 14.3004 18.5203 14.4057L18.578 14.5682L19.3548 14.7662V16.2008L18.5783 16.3988L18.5207 16.5613C18.4838 16.6666 18.441 16.7691 18.3932 16.8688L18.3191 17.0239L18.7281 17.7137Z" fill="#000000">
