@@ -66,7 +66,7 @@ export default function CreatePost() {
                 <div className='form'>
                     <Input
                         size='large'
-                        placeholder='What is your mind?'
+                        placeholder='Bạn đang nghĩ gì thế?'
                         prefix={<Avatar src={url} />}
                     />
                     <hr></hr>
@@ -119,21 +119,6 @@ export default function CreatePost() {
                                 <Select.Option value='6'>Địa</Select.Option>
                             </Select>
                         </Form.Item>
-                        <Form.Item
-                            label='Loại câu hỏi'
-                            className='input-form'
-                            name='cauhoi'
-                            rules={[
-                                {
-                                    required: true,
-                                },
-                            ]}
-                        >
-                            <Select>
-                                <Select.Option value='1'>Lý thuyết</Select.Option>
-                                <Select.Option value='2'>Bài tập</Select.Option>
-                            </Select>
-                        </Form.Item>
                         {/* <Avatar src={url} /> */}
                         <Form.Item
                             name='text'
@@ -146,7 +131,7 @@ export default function CreatePost() {
                         >
                             <TextArea
                                 rows={6}
-                                placeholder='What is your mind?'
+                                placeholder='Bạn đang nghĩ gì thế?'
                             />
                         </Form.Item>
                         <Form.Item
