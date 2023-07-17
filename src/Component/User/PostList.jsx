@@ -5,16 +5,16 @@ import Comment from './ForumComponent/Comment';
 const PostList = ({ posts }) => {
     return (
         <div className='post'>
-            {posts.map((post) => {
-                const { postId, subjectId, accountId, postText, postFile, status, createDate } = post;
+            {posts?.map((post) => {
+                const { postId, subjectName, fullName, postText, postFile, status, createDate } = post;
                 return (
                     <div
                         key={postId}
                         className='form-post'
                     >
                         <PostContent
-                            subjectId={subjectId}
-                            accountId={accountId}
+                            subjectName={subjectName}
+                            fullName={fullName}
                             postText={postText}
                             postFile={postFile}
                             status={status}

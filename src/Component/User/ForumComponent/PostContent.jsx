@@ -7,7 +7,7 @@ const url = '../Image/Forum/forum-avatar1.png';
 const luu = '../Image/Forum/luu.png';
 const daluu = '../Image/Forum/daluu.png';
 const baitoan = '../Image/Forum/baitoan.png';
-export default function PostContent({ user, createdTime, subjectId, type, postText, postFile, status }) {
+export default function PostContent({ fullName, createdTime, subjectName, postText, postFile }) {
     const [save, setSave] = useState(false);
     const [saveUrl, setSaveUrl] = useState(luu);
 
@@ -37,13 +37,10 @@ export default function PostContent({ user, createdTime, subjectId, type, postTe
                 <div className='form-mid'>
                     <div className='form-mid-top'>
                         <div>
-                            {user} • {createdTime}
+                            {fullName} • {createdTime}
                         </div>
                         <div className='form-mid-top-subject'>
-                            <p>{subjectId}</p>
-                        </div>
-                        <div className='form-mid-top-type'>
-                            <p>Bài tập</p>
+                            <p>{subjectName}</p>
                         </div>
                     </div>
                     <div className='form-mid-content'>

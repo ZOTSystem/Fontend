@@ -16,7 +16,7 @@ const PostProvider = ({ children }) => {
             const response = await getAllPostService();
             dispatch({
                 type: 'GET_POSTS',
-                payload: response.data,
+                payload: response,
             });
         };
         getAllPost();
