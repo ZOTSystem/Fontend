@@ -7,7 +7,7 @@ import HeaderAdmin from '../../Layout/Admin/HeaderAdmin';
 import hanldeValidationEditUser, { hanldeValidationCreateMod } from '../../assets/js/handleValidation';
 import dayjs from 'dayjs';
 import axios from 'axios';
-import { GetAllModService, AddModService, ChangeStatusService, UpdateModService } from '../../services/ModService';
+import { GetAllModService, AddModService, ChangeStatusService, UpdateModService } from '../../services/modService';
 
 const { Content } = Layout;
 

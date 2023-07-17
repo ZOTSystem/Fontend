@@ -1,10 +1,10 @@
-import Request from '../utils/Request';
+import Request from '../utils/request';
 
-export const GetTopicByGrade = async (grade, subjectId) => {
+export const GetQuestionByTopicId = async (topicId) => {
     try {
         const respone = await Request({
             method: 'get',
-            url: `Topics/getTopicByGrade?grade=${grade}&subjectId=${subjectId}`,
+            url: `Question/getQuestionByTopicId?topicId=${topicId}`,
             headers: {
                 'Content-Type': 'application/json',
             },

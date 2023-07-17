@@ -1,4 +1,4 @@
-import request from '../utils/Request';
+import request from '../utils/request';
 
 export const GetAllModService = async () => {
     try {

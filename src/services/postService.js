@@ -1,4 +1,4 @@
-import request from '../utils/Request';
+import request from '../utils/request';
 
 const END_POINTS = {
     GET_ALL_POST: 'post/getAllPost'
