@@ -1,27 +1,16 @@
 import { PlusOutlined } from '@ant-design/icons';
-import {
-    Avatar,
-    Button,
-    Form,
-    Input,
-    Select,
-    Upload,
-    Modal,
-    Space
-} from 'antd';
+import { Avatar, Button, Form, Input, Select, Upload, Modal, Space } from 'antd';
 import 'bootstrap/dist/css/bootstrap.css';
 import React, { useEffect, useState } from 'react';
-import "../../../assets/Forum.css"
-import '../../../assets/Style.css'
+import '../../../assets/Forum.css';
+import '../../../assets/Style.css';
 import TextArea from 'antd/es/input/TextArea';
 const url = '../Image/Forum/forum-avatar1.png';
 const anh = '../Image/Forum/icon-anh-video.png';
 const monhoc = '../Image/Forum/icon-sach.png';
 const tag = '../Image/Forum/icon-tag.png';
 
-
 export default function CreatePost() {
-
     const [open, setOpen] = useState(false);
 
     const normFile = (e) => {
@@ -35,21 +24,23 @@ export default function CreatePost() {
         const [submittable, setSubmittable] = React.useState(false);
         const values = Form.useWatch([], form);
         React.useEffect(() => {
-            form
-                .validateFields({
-                    validateOnly: true,
-                })
-                .then(
-                    () => {
-                        setSubmittable(true);
-                    },
-                    () => {
-                        setSubmittable(false);
-                    },
-                );
+            form.validateFields({
+                validateOnly: true,
+            }).then(
+                () => {
+                    setSubmittable(true);
+                },
+                () => {
+                    setSubmittable(false);
+                }
+            );
         }, [values]);
         return (
-            <Button  type="primary" htmlType="submit" disabled={!submittable}>
+            <Button
+                type='primary'
+                htmlType='submit'
+                disabled={!submittable}
+            >
                 Đăng
             </Button>
         );
@@ -58,19 +49,26 @@ export default function CreatePost() {
 
     useEffect(() => {
         setOpen();
-    }, [])
+    }, []);
 
     const handleCreatePost = () => {
         console.log(open);
         setOpen(false);
-    }
-
+    };
 
     return (
         <>
-            <div className="createPost" type="primary" onClick={() => setOpen(true)}>
+            <div
+                className='createPost'
+                type='primary'
+                onClick={() => setOpen(true)}
+            >
                 <div className='form'>
-                    <Input size="large" placeholder="What is your mind?" prefix={<Avatar src={url} />} />
+                    <Input
+                        size='large'
+                        placeholder='What is your mind?'
+                        prefix={<Avatar src={url} />}
+                    />
                     <hr></hr>
                     <div className='bottom-form'>
                         <div className='item-bottom-form'>
@@ -89,41 +87,42 @@ export default function CreatePost() {
                 </div>
 
                 <Modal
-                    title="Tạo bài viết"
-                    visible = {open}
-                    okText="Đăng bài"
-                    cancelText="Đóng"
-                    onCancel={() => {setOpen(false);}}
+                    title='Tạo bài viết'
+                    visible={open}
+                    okText='Đăng bài'
+                    cancelText='Đóng'
+                    onCancel={() => {
+                        setOpen(false);
+                    }}
                     onOk={handleCreatePost}
                 >
                     <Form
                         // form={form}
-                        layout="horizontal"
+                        layout='horizontal'
                     >
-
                         <Form.Item
-                            label="Môn học"
+                            label='Môn học'
                             className='input-form'
-                            name="mon"
+                            name='mon'
                             rules={[
                                 {
                                     required: true,
                                 },
                             ]}
                         >
-                            <Select label="Môn học">
-                                <Select.Option value="1">Toán</Select.Option>
-                                <Select.Option value="2">Văn</Select.Option>
-                                <Select.Option value="3">Anh</Select.Option>
-                                <Select.Option value="4">Sinh</Select.Option>
-                                <Select.Option value="5">Sử</Select.Option>
-                                <Select.Option value="6">Địa</Select.Option>
+                            <Select label='Môn học'>
+                                <Select.Option value='1'>Toán</Select.Option>
+                                <Select.Option value='2'>Văn</Select.Option>
+                                <Select.Option value='3'>Anh</Select.Option>
+                                <Select.Option value='4'>Sinh</Select.Option>
+                                <Select.Option value='5'>Sử</Select.Option>
+                                <Select.Option value='6'>Địa</Select.Option>
                             </Select>
                         </Form.Item>
                         <Form.Item
-                            label="Loại câu hỏi"
+                            label='Loại câu hỏi'
                             className='input-form'
-                            name="cauhoi"
+                            name='cauhoi'
                             rules={[
                                 {
                                     required: true,
@@ -131,35 +130,37 @@ export default function CreatePost() {
                             ]}
                         >
                             <Select>
-                                <Select.Option value="1">Lý thuyết</Select.Option>
-                                <Select.Option value="2">Bài tập</Select.Option>
+                                <Select.Option value='1'>Lý thuyết</Select.Option>
+                                <Select.Option value='2'>Bài tập</Select.Option>
                             </Select>
-
                         </Form.Item>
                         {/* <Avatar src={url} /> */}
                         <Form.Item
-                            name="text"
+                            name='text'
                             rules={[
                                 {
                                     required: true,
-                                    message: ""
+                                    message: '',
                                 },
-                            ]}>
+                            ]}
+                        >
                             <TextArea
                                 rows={6}
-                                placeholder="What is your mind?"
-
+                                placeholder='What is your mind?'
                             />
                         </Form.Item>
                         <Form.Item
-                            label="Ảnh/Video"
-                            valuePropName="fileList"
+                            label='Ảnh/Video'
+                            valuePropName='fileList'
                             getValueFromEvent={normFile}
                             style={{
                                 marginTop: 10,
                             }}
                         >
-                            <Upload action="/upload.do" listType="picture-card">
+                            <Upload
+                                action='/upload.do'
+                                listType='picture-card'
+                            >
                                 <div>
                                     <PlusOutlined />
                                 </div>
@@ -169,5 +170,5 @@ export default function CreatePost() {
                 </Modal>
             </div>
         </>
-    )
+    );
 }

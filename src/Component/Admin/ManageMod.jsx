@@ -1,27 +1,22 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext } from 'react';
 
 import { DatePicker, Breadcrumb, Layout, Table, Input, Modal, Form, notification, Button, theme, Select } from 'antd';
-import {
-    SearchOutlined, EditOutlined, PoweroffOutlined,
-} from '@ant-design/icons'
-import SiderAdmin from "../../Layout/Admin/SiderAdmin";
-import HeaderAdmin from "../../Layout/Admin/HeaderAdmin";
-import hanldeValidationEditUser, { hanldeValidationCreateMod } from "../../assets/js/handleValidation";
-import dayjs from "dayjs";
-import axios from "axios";
-import { GetAllModService } from "../../services/ModService";
-import { AddModService } from "../../services/ModService";
-import { ChangeStatusService } from "../../services/ModService";
-import { UpdateModService } from "../../services/ModService";
+import { SearchOutlined, EditOutlined, PoweroffOutlined } from '@ant-design/icons';
+import SiderAdmin from '../../Layout/Admin/SiderAdmin';
+import HeaderAdmin from '../../Layout/Admin/HeaderAdmin';
+import hanldeValidationEditUser, { hanldeValidationCreateMod } from '../../assets/js/handleValidation';
+import dayjs from 'dayjs';
+import axios from 'axios';
+import { GetAllModService, AddModService, ChangeStatusService, UpdateModService } from '../../services/ModService';
 
 const { Content } = Layout;
 
 const formatDate = (dateString) => {
     const date = new Date(dateString);
 
-    const year = date.getFullYear().toString().padStart(4, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
+    const year = date.getFullYear().toString().padStart(4, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
 
     const formattedDate = `${year}-${month}-${day}`;
 
@@ -29,57 +24,55 @@ const formatDate = (dateString) => {
 };
 
 export default function ManageMod() {
-
     //#region - Declare - tên cột trong table
     const columns = [
         {
-            title: "ID",
-            dataIndex: "accountId",
+            title: 'ID',
+            dataIndex: 'accountId',
             key: 1,
-            fixed: "left",
+            fixed: 'left',
         },
         {
-            title: "Avatar",
-            dataIndex: "avatar",
-            key: "avatar",
-            fixed: "left",
+            title: 'Avatar',
+            dataIndex: 'avatar',
+            key: 'avatar',
+            fixed: 'left',
             render: (record) => {
                 return (
                     <>
                         {record && record.avatar != null ? (
                             <img
                                 src={record}
-                                alt="Pic"
+                                alt='Pic'
                                 width={70}
                                 height={70}
-                                style={{ borderRadius: "50%" }}
-                                className="borederRadius50"
+                                style={{ borderRadius: '50%' }}
+                                className='borederRadius50'
                             />
                         ) : (
                             <img
-                                src="../Image/Avatar_Null.png"
-                                alt="Pic"
+                                src='../Image/Avatar_Null.png'
+                                alt='Pic'
                                 width={70}
                                 height={70}
-                                style={{ borderRadius: "50%" }}
-                                className="borederRadius50"
+                                style={{ borderRadius: '50%' }}
+                                className='borederRadius50'
                             />
-                        )
-                        }
+                        )}
                     </>
-                )
+                );
             },
         },
         {
-            title: "Tên mod",
-            dataIndex: "fullName",
+            title: 'Tên mod',
+            dataIndex: 'fullName',
             key: 3,
-            fixed: "left",
+            fixed: 'left',
             filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
                 return (
                     <Input
                         autoFocus
-                        placeholder="Nhập tên"
+                        placeholder='Nhập tên'
                         value={selectedKeys[0]}
                         onChange={(e) => {
                             setSelectedKeys(e.target.value ? [e.target.value] : []);
@@ -103,14 +96,14 @@ export default function ManageMod() {
             },
         },
         {
-            title: "Email",
-            dataIndex: "email",
+            title: 'Email',
+            dataIndex: 'email',
             key: 4,
             filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
                 return (
                     <Input
                         autoFocus
-                        placeholder="Nhập email"
+                        placeholder='Nhập email'
                         value={selectedKeys[0]}
                         onChange={(e) => {
                             setSelectedKeys(e.target.value ? [e.target.value] : []);
@@ -132,16 +125,16 @@ export default function ManageMod() {
             },
         },
         {
-            title: "Số điện thoại",
+            title: 'Số điện thoại',
             // width: 100,
-            dataIndex: "phone",
+            dataIndex: 'phone',
             key: 1,
-            fixed: "left",
+            fixed: 'left',
             filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
                 return (
                     <Input
                         autoFocus
-                        placeholder="Nhập số điện thoại"
+                        placeholder='Nhập số điện thoại'
                         value={selectedKeys[0]}
                         onChange={(e) => {
                             setSelectedKeys(e.target.value ? [e.target.value] : []);
@@ -163,39 +156,39 @@ export default function ManageMod() {
             },
         },
         {
-            title: "Trạng thái",
+            title: 'Trạng thái',
             // width: 100,
-            dataIndex: "status",
+            dataIndex: 'status',
             key: 1,
-            fixed: "left",
+            fixed: 'left',
         },
         {
-            title: "Điều hướng",
+            title: 'Điều hướng',
             // width: 100,
             key: 1,
-            fixed: "left",
+            fixed: 'left',
             render: (record) => {
                 return (
                     <>
                         <Button
                             onClick={() => handleEdit(record)}
-                            type="primary"
+                            type='primary'
                             icon={<EditOutlined />}
-                        ></Button>{" "}
+                        ></Button>{' '}
                         &nbsp;
-                        {record.status == "Đang hoạt động" ? (
+                        {record.status == 'Đang hoạt động' ? (
                             <Button
                                 onClick={() => handleChangeStatusDeActivate(record)}
-                                style={{ color: "white", backgroundColor: "red" }}
+                                style={{ color: 'white', backgroundColor: 'red' }}
                                 icon={<PoweroffOutlined />}
                             ></Button>
                         ) : (
                             <></>
                         )}
-                        {record.status == "Đang khóa" ? (
+                        {record.status == 'Đang khóa' ? (
                             <Button
                                 onClick={() => handleChangeStatusActivate(record)}
-                                style={{ color: "white", backgroundColor: "green" }}
+                                style={{ color: 'white', backgroundColor: 'green' }}
                                 icon={<PoweroffOutlined />}
                             ></Button>
                         ) : (
@@ -205,15 +198,15 @@ export default function ManageMod() {
                 );
             },
         },
-    ]
+    ];
     //#endregion
 
     //#region - Declare - các biến dùng
-    const dayFormat = "YYYY-MM-DD";
+    const dayFormat = 'YYYY-MM-DD';
     const [dataSource, setDataSource] = useState('');
     const [show, setShow] = useState(false);
     const [showCreate, setShowCreate] = useState(false);
-    const [emailList, setEmailList] = useState("");
+    const [emailList, setEmailList] = useState('');
     const {
         token: { colorBgContainer },
     } = theme.useToken();
@@ -225,32 +218,32 @@ export default function ManageMod() {
 
     //#region - Declare - input và lỗi của mỗi input
     const [errors, setErrors] = useState({
-        editFullName: "",
-        editPhoneNumber: "",
-        editBirthDay: "",
-        createFullName: "",
-        createEmail: "",
-        createPhoneNumber: "",
-        createBirthDay: "",
-        createGender: "",
+        editFullName: '',
+        editPhoneNumber: '',
+        editBirthDay: '',
+        createFullName: '',
+        createEmail: '',
+        createPhoneNumber: '',
+        createBirthDay: '',
+        createGender: '',
     });
 
     const [editData, setEditData] = useState({
-        editUserId: "",
-        editAvatar: "",
-        editEmail: "",
-        editPhoneNumber: "",
-        editGender: "",
-        editBirthDay: "",
+        editUserId: '',
+        editAvatar: '',
+        editEmail: '',
+        editPhoneNumber: '',
+        editGender: '',
+        editBirthDay: '',
     });
 
     const [createData, setCreateData] = useState({
-        createFullName: "",
-        createEmail: "",
-        createPhoneNumber: "",
-        createGender: "",
-        createBirthDay: "",
-    })
+        createFullName: '',
+        createEmail: '',
+        createPhoneNumber: '',
+        createGender: '',
+        createBirthDay: '',
+    });
 
     //#endregion
 
@@ -259,21 +252,21 @@ export default function ManageMod() {
     const openNotificationCreate = (placement) => {
         api.success({
             message: `Notification`,
-            description: "Create Successfully",
+            description: 'Create Successfully',
             placement,
         });
     };
     const openNotificationUpdate = (placement) => {
         api.success({
             message: `Notification`,
-            description: "Update Successfully",
+            description: 'Update Successfully',
             placement,
         });
     };
     const openNotificationEnable = (placement) => {
         api.success({
             message: `Notification`,
-            description: "Change Status Successfully",
+            description: 'Change Status Successfully',
             placement,
         });
     };
@@ -289,14 +282,14 @@ export default function ManageMod() {
         } catch (error) {
             console.error('Error fetching mod service:', error);
         }
-    }
+    };
 
     useEffect(() => {
         handleGetData();
     }, []);
 
     const getEmailList = () => {
-        const url = "https://localhost:7207/api/account/getAllEmail";
+        const url = 'https://localhost:7207/api/account/getAllEmail';
         axios
             .get(url)
             .then((result) => {
@@ -316,37 +309,37 @@ export default function ManageMod() {
     //#region - Function - Deactivate/Activate tài khoản của mod
     const handleChangeStatusDeActivate = (record) => {
         Modal.confirm({
-            title: "Bạn có muốn khóa tài khoản: " + record.email + " ?",
-            okText: "Khóa",
-            okType: "danger",
+            title: 'Bạn có muốn khóa tài khoản: ' + record.email + ' ?',
+            okText: 'Khóa',
+            okType: 'danger',
             onOk: async () => {
-                const result = await ChangeStatusService(record.accountId, "Đang khóa");
+                const result = await ChangeStatusService(record.accountId, 'Đang khóa');
                 if (result) {
                     handleGetData();
-                    openNotificationEnable("topRight");
+                    openNotificationEnable('topRight');
                 }
             },
-            cancelText: "Hủy",
-            onCancel: () => { },
+            cancelText: 'Hủy',
+            onCancel: () => {},
         });
-    }
+    };
 
     const handleChangeStatusActivate = (record) => {
         Modal.confirm({
-            title: "Bạn có muốn mở khóa tài khoản này: " + record.email + " ?",
-            okText: "Mở",
-            okType: "default",
+            title: 'Bạn có muốn mở khóa tài khoản này: ' + record.email + ' ?',
+            okText: 'Mở',
+            okType: 'default',
             onOk: async () => {
-                const result = await ChangeStatusService(record.accountId, "Đang hoạt động");
+                const result = await ChangeStatusService(record.accountId, 'Đang hoạt động');
                 if (result) {
                     handleGetData();
-                    openNotificationEnable("topRight");
+                    openNotificationEnable('topRight');
                 }
             },
-            cancelText: "Hủy",
-            onCancel: () => { },
+            cancelText: 'Hủy',
+            onCancel: () => {},
         });
-    }
+    };
     //#endregion
 
     //#region - Function - nhận giá trị trong ô input
@@ -414,7 +407,7 @@ export default function ManageMod() {
             editGender: record.gender,
         });
         setShow(true);
-    }
+    };
 
     const handleFunctionEdit = async () => {
         let errors = {};
@@ -424,22 +417,22 @@ export default function ManageMod() {
             phone: editData.editPhoneNumber,
             gender: editData.editGender,
             birthDay: editData.editBirthDay,
-        }
+        };
         hanldeValidationEditUser(editData, errors);
         if (Object.keys(errors).length === 0) {
-            const result = await UpdateModService(data.accountId, data)
+            const result = await UpdateModService(data.accountId, data);
             console.log(result);
             if (result) {
                 handleGetData();
-                openNotificationUpdate("topRight");
+                openNotificationUpdate('topRight');
                 setErrors([]);
                 setShow(false);
-                setEditData("");
+                setEditData('');
             }
         } else {
             setErrors(errors);
         }
-    }
+    };
     //#endregion
 
     //#region - Function - Thêm mod
@@ -451,45 +444,41 @@ export default function ManageMod() {
             birthDay: createData.createBirthDay,
             phone: createData.createPhoneNumber,
             gender: createData.createGender,
-        }
+        };
         hanldeValidationCreateMod(createData, errors, emailList);
         if (Object.keys(errors).length === 0) {
             const result = await AddModService(data);
             if (result) {
                 handleGetData();
                 setErrors([]);
-                openNotificationCreate("topRight");
+                openNotificationCreate('topRight');
                 setShowCreate(false);
-                setCreateData("");
+                setCreateData('');
             }
         } else {
             setErrors(errors);
         }
-    }
+    };
     //#endregion
 
     return (
-        <Layout
-            style={{ minHeight: '100vh' }}
-        >
+        <Layout style={{ minHeight: '100vh' }}>
             <SiderAdmin />
-            <Layout className="site-layout">
+            <Layout className='site-layout'>
                 <HeaderAdmin />
                 {contextHolder}
 
                 <Content
                     style={{
-                        margin: "0 16px",
+                        margin: '0 16px',
                     }}
                 >
                     <Breadcrumb
                         style={{
-                            margin: "16px 0",
+                            margin: '16px 0',
                         }}
                     >
-                        <Breadcrumb.Item>
-                            Trang chủ
-                        </Breadcrumb.Item>
+                        <Breadcrumb.Item>Trang chủ</Breadcrumb.Item>
                         <Breadcrumb.Item>Quản lý</Breadcrumb.Item>
                         <Breadcrumb.Item>Mod</Breadcrumb.Item>
                     </Breadcrumb>
@@ -503,15 +492,21 @@ export default function ManageMod() {
                         <div>
                             <h1
                                 style={{
-                                    textAlign: "center",
-                                    fontSize: "30px",
-                                    marginBottom: "20px",
+                                    textAlign: 'center',
+                                    fontSize: '30px',
+                                    marginBottom: '20px',
                                 }}
                             >
                                 Danh sách Mod
                             </h1>
                         </div>
-                        <Button type="primary" onClick={() => { setShowCreate(true); }} style={{ marginBottom: '20px', marginRight: '10px' }}>
+                        <Button
+                            type='primary'
+                            onClick={() => {
+                                setShowCreate(true);
+                            }}
+                            style={{ marginBottom: '20px', marginRight: '10px' }}
+                        >
                             Tạo mới mod
                         </Button>
                         <Table
@@ -521,49 +516,53 @@ export default function ManageMod() {
                         />
                         {/* Form Edit */}
                         <Modal
-                            title="Chỉnh sửa thông tin mod"
+                            title='Chỉnh sửa thông tin mod'
                             visible={show}
-                            okText="Lưu"
-                            cancelText="Đóng"
-                            onCancel={() => { setShow(false); setErrors([]); setEditData(""); }}
+                            okText='Lưu'
+                            cancelText='Đóng'
+                            onCancel={() => {
+                                setShow(false);
+                                setErrors([]);
+                                setEditData('');
+                            }}
                             onOk={() => handleFunctionEdit()}
                         >
                             <div
                                 style={{
-                                    width: "100%",
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    marginBottom: "20px",
+                                    width: '100%',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    marginBottom: '20px',
                                 }}
                             >
                                 <div>
                                     <p
                                         style={{
-                                            textAlign: "center",
-                                            marginBottom: "10px",
-                                            fontSize: "15px",
-                                            fontWeight: "600",
+                                            textAlign: 'center',
+                                            marginBottom: '10px',
+                                            fontSize: '15px',
+                                            fontWeight: '600',
                                         }}
                                     >
                                         Avatar
                                     </p>
-                                    {editData.editAvatar != null ?
+                                    {editData.editAvatar != null ? (
                                         <img
                                             src={editData.editAvatar}
-                                            alt="Pic"
+                                            alt='Pic'
                                             width={70}
                                             height={70}
-                                            className="borederRadius50"
-                                        /> :
-                                        <img
-                                            src="../Image/Avatar_Null.png"
-                                            alt="Pic"
-                                            width={70}
-                                            height={70}
-                                            className="borederRadius50"
+                                            className='borederRadius50'
                                         />
-                                    }
-
+                                    ) : (
+                                        <img
+                                            src='../Image/Avatar_Null.png'
+                                            alt='Pic'
+                                            width={70}
+                                            height={70}
+                                            className='borederRadius50'
+                                        />
+                                    )}
                                 </div>
                             </div>
 
@@ -571,17 +570,17 @@ export default function ManageMod() {
                                 <Form.Item>
                                     <label>Tên</label>
                                     <Input
-                                        type="text"
-                                        placeholder="Nhập tên"
-                                        className="form-control"
+                                        type='text'
+                                        placeholder='Nhập tên'
+                                        className='form-control'
                                         value={editData.editFullName}
-                                        name="editFullName"
+                                        name='editFullName'
                                         onChange={handleInputChange}
                                     />
                                     {errors.editFullName && (
                                         <div
-                                            className="invalid-feedback"
-                                            style={{ display: "block", color: "red" }}
+                                            className='invalid-feedback'
+                                            style={{ display: 'block', color: 'red' }}
                                         >
                                             {errors.editFullName}
                                         </div>
@@ -590,11 +589,11 @@ export default function ManageMod() {
                                 <Form.Item>
                                     <label>Email</label>
                                     <Input
-                                        type="email"
-                                        placeholder="Nhập email"
-                                        className="form-control"
+                                        type='email'
+                                        placeholder='Nhập email'
+                                        className='form-control'
                                         value={editData.editEmail}
-                                        name="editEmail"
+                                        name='editEmail'
                                         onChange={handleInputChange}
                                         disabled
                                     />
@@ -602,17 +601,17 @@ export default function ManageMod() {
                                 <Form.Item>
                                     <label>Số điện thoại</label>
                                     <Input
-                                        type="phonenumber"
-                                        placeholder="Nhập số điện thoại"
-                                        className="form-control"
+                                        type='phonenumber'
+                                        placeholder='Nhập số điện thoại'
+                                        className='form-control'
                                         value={editData.editPhoneNumber}
-                                        name="editPhoneNumber"
+                                        name='editPhoneNumber'
                                         onChange={handleInputChange}
                                     />
                                     {errors.editPhoneNumber && (
                                         <div
-                                            className="invalid-feedback"
-                                            style={{ display: "block", color: "red" }}
+                                            className='invalid-feedback'
+                                            style={{ display: 'block', color: 'red' }}
                                         >
                                             {errors.editPhoneNumber}
                                         </div>
@@ -622,8 +621,8 @@ export default function ManageMod() {
                                     <label style={{ display: 'block' }}>Giới tính</label>
                                     <Select
                                         value={editData.editGender}
-                                        name="editGender"
-                                        style={{ width: "100%" }}
+                                        name='editGender'
+                                        style={{ width: '100%' }}
                                         onChange={handleInputChangeGender}
                                         options={[
                                             { value: 'Nam', label: 'Nam' },
@@ -635,16 +634,16 @@ export default function ManageMod() {
                                 <Form.Item>
                                     <label>Ngày sinh:</label>
                                     <DatePicker
-                                        className="form-control"
-                                        style={{ width: "100%" }}
-                                        name="editBirthDay"
+                                        className='form-control'
+                                        style={{ width: '100%' }}
+                                        name='editBirthDay'
                                         value={editData.editBirthDay ? dayjs(editData.editBirthDay, dayFormat) : null}
-                                        onChange={(date) => handleInputChangeDate(date, "editBirthDay")}
+                                        onChange={(date) => handleInputChangeDate(date, 'editBirthDay')}
                                     />
                                     {errors.editBirthDay && (
                                         <div
-                                            className="invalid-feedback"
-                                            style={{ display: "block", color: "red" }}
+                                            className='invalid-feedback'
+                                            style={{ display: 'block', color: 'red' }}
                                         >
                                             {errors.editBirthDay}
                                         </div>
@@ -655,28 +654,32 @@ export default function ManageMod() {
 
                         {/* Create form */}
                         <Modal
-                            title="Thêm mới mod"
+                            title='Thêm mới mod'
                             visible={showCreate}
-                            okText="Thêm mới"
-                            cancelText="Đóng"
-                            onCancel={() => { setShowCreate(false); setErrors([]); setCreateData("") }}
+                            okText='Thêm mới'
+                            cancelText='Đóng'
+                            onCancel={() => {
+                                setShowCreate(false);
+                                setErrors([]);
+                                setCreateData('');
+                            }}
                             onOk={() => handleSubmitCreate()}
                         >
                             <Form>
                                 <Form.Item>
                                     <label>Tên</label>
                                     <Input
-                                        type="text"
-                                        placeholder="Nhập tên"
-                                        className="form-control"
+                                        type='text'
+                                        placeholder='Nhập tên'
+                                        className='form-control'
                                         value={createData.createFullName}
-                                        name="createFullName"
+                                        name='createFullName'
                                         onChange={handleInputChangeCreate}
                                     />
                                     {errors.createFullName && (
                                         <div
-                                            className="invalid-feedback"
-                                            style={{ display: "block", color: "red" }}
+                                            className='invalid-feedback'
+                                            style={{ display: 'block', color: 'red' }}
                                         >
                                             {errors.createFullName}
                                         </div>
@@ -685,17 +688,17 @@ export default function ManageMod() {
                                 <Form.Item>
                                     <label>Email</label>
                                     <Input
-                                        type="email"
-                                        placeholder="Nhập email"
-                                        className="form-control"
+                                        type='email'
+                                        placeholder='Nhập email'
+                                        className='form-control'
                                         value={createData.createEmail}
-                                        name="createEmail"
+                                        name='createEmail'
                                         onChange={handleInputChangeCreate}
                                     />
                                     {errors.createEmail && (
                                         <div
-                                            className="invalid-feedback"
-                                            style={{ display: "block", color: "red" }}
+                                            className='invalid-feedback'
+                                            style={{ display: 'block', color: 'red' }}
                                         >
                                             {errors.createEmail}
                                         </div>
@@ -704,17 +707,17 @@ export default function ManageMod() {
                                 <Form.Item>
                                     <label>Số điện thoại</label>
                                     <Input
-                                        type="phonenumber"
-                                        placeholder="Nhập số điện thoại"
-                                        className="form-control"
+                                        type='phonenumber'
+                                        placeholder='Nhập số điện thoại'
+                                        className='form-control'
                                         value={createData.createPhoneNumber}
-                                        name="createPhoneNumber"
+                                        name='createPhoneNumber'
                                         onChange={handleInputChangeCreate}
                                     />
                                     {errors.createPhoneNumber && (
                                         <div
-                                            className="invalid-feedback"
-                                            style={{ display: "block", color: "red" }}
+                                            className='invalid-feedback'
+                                            style={{ display: 'block', color: 'red' }}
                                         >
                                             {errors.createPhoneNumber}
                                         </div>
@@ -723,9 +726,9 @@ export default function ManageMod() {
                                 <Form.Item>
                                     <label style={{ display: 'block' }}>Giới tính</label>
                                     <Select
-                                        placeholder="Chọn giới tính"
-                                        name="createGender"
-                                        style={{ width: "100%" }}
+                                        placeholder='Chọn giới tính'
+                                        name='createGender'
+                                        style={{ width: '100%' }}
                                         onChange={handleInputChangeCreateGender}
                                         options={[
                                             { value: 'Nam', label: 'Nam' },
@@ -735,8 +738,8 @@ export default function ManageMod() {
                                     />
                                     {errors.createGender && (
                                         <div
-                                            className="invalid-feedback"
-                                            style={{ display: "block", color: "red" }}
+                                            className='invalid-feedback'
+                                            style={{ display: 'block', color: 'red' }}
                                         >
                                             {errors.createGender}
                                         </div>
@@ -746,27 +749,26 @@ export default function ManageMod() {
                                     <label>Ngày sinh:</label>
 
                                     <DatePicker
-                                        className="form-control"
-                                        style={{ width: "100%" }}
-                                        name="createBirthDay"
-                                        placeholder="Chọn ngày"
-                                        onChange={(date) => handleInputChangeDateCreate(date, "createBirthDay")}
+                                        className='form-control'
+                                        style={{ width: '100%' }}
+                                        name='createBirthDay'
+                                        placeholder='Chọn ngày'
+                                        onChange={(date) => handleInputChangeDateCreate(date, 'createBirthDay')}
                                     />
                                     {errors.createBirthDay && (
                                         <div
-                                            className="invalid-feedback"
-                                            style={{ display: "block", color: "red" }}
+                                            className='invalid-feedback'
+                                            style={{ display: 'block', color: 'red' }}
                                         >
                                             {errors.createBirthDay}
                                         </div>
                                     )}
                                 </Form.Item>
-
                             </Form>
                         </Modal>
                     </div>
                 </Content>
             </Layout>
         </Layout>
-    )
+    );
 }

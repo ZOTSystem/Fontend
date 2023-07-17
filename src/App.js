@@ -30,6 +30,7 @@ import ManageUser from './Component/Admin/ManageUser'
 import ManageMod from './Component/Admin/ManageMod';
 import ManageQuestion from './Component/Admin/ManageQuestion';
 import ManageTopic from './Component/Admin/ManageTopic';
+import PostProvider from './contexts/PostContext';
 
 
 
@@ -39,7 +40,7 @@ import Testfirebase from './Testfirebase';
 function App() {
   const { token, user } = useContext(UserContext);
   // console.log(token, user);
-  
+
 
   return (
     <Fragment>
@@ -48,7 +49,7 @@ function App() {
           {!token ? (
             <>
               <Route path="/login" element={<Login />}></Route>
-              <Route path="/forum" element={<Forum />}></Route>
+              <Route path="/forum" element={<PostProvider><Forum /></PostProvider>}></Route>
               <Route path="/news" element={<News />}></Route>
               <Route path="/" element={<HomePage />}></Route>
               <Route path="/login" element={<Login />}></Route>
@@ -60,7 +61,7 @@ function App() {
             </>
           ) : (
             <>
-              { user?.roleId == "4" ? (
+              {user?.roleId == "4" ? (
                 <>
                   {/* Router của người dùng */}
                   <Route path="/" element={<HomePage />}></Route>
@@ -69,7 +70,7 @@ function App() {
                   <Route path="/profile" element={<Profile />}></Route>
                   <Route path='/testHistory' element={<TestHistory />}></Route>
                   <Route path='/news' element={<News />}></Route>
-                  <Route path="/forum" element={<Forum />}></Route>
+                  <Route path="/forum" element={<PostProvider><Forum /></PostProvider>}></Route>
                   <Route path="/takeExam" element={<TakeExam />}></Route>
                   <Route path="/exam" element={<Exam />}></Route>
                   <Route path="/examResult" element={<ExamResult />}></Route>
@@ -78,7 +79,7 @@ function App() {
                   <Route path="/topicStudy" element={<TopicStudy />}></Route>
                   <Route path="/*" element={<Navigate to="/" />} />
                 </>
-                ) : (
+              ) : (
                 <>
                   {/* Router của quản trị */}
                   <Route path="/admin/manageUser" element={<ManageUser />}></Route>
