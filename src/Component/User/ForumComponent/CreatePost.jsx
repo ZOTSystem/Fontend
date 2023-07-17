@@ -1,17 +1,20 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { Avatar, Button, Form, Input, Select, Upload, Modal, Space } from 'antd';
 import 'bootstrap/dist/css/bootstrap.css';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import '../../../assets/Forum.css';
 import '../../../assets/Style.css';
 import TextArea from 'antd/es/input/TextArea';
+import { useContext } from 'react';
+import { SubjectContext } from '../../../contexts/SubjectContext';
 const url = '../Image/Forum/forum-avatar1.png';
 const anh = '../Image/Forum/icon-anh-video.png';
 const monhoc = '../Image/Forum/icon-sach.png';
 const tag = '../Image/Forum/icon-tag.png';
 
-export default function CreatePost() {
+export default function CreatePost({ onCreate }) {
     const [open, setOpen] = useState(false);
+    const { subjects } = useContext(SubjectContext);
 
     const normFile = (e) => {
         if (Array.isArray(e)) {
@@ -21,9 +24,9 @@ export default function CreatePost() {
     };
 
     const SubmitButton = ({ form }) => {
-        const [submittable, setSubmittable] = React.useState(false);
+        const [submittable, setSubmittable] = useState(false);
         const values = Form.useWatch([], form);
-        React.useEffect(() => {
+        useEffect(() => {
             form.validateFields({
                 validateOnly: true,
             }).then(
@@ -47,14 +50,14 @@ export default function CreatePost() {
     };
     // const [form] = Form.useForm();
 
-    useEffect(() => {
-        setOpen();
-    }, []);
+    // useEffect(() => {
+    //     setOpen();
+    // }, []);
 
-    const handleCreatePost = () => {
-        console.log(open);
-        setOpen(false);
-    };
+    // const handleCreatePost = () => {
+    //     console.log(open);
+    //     setOpen(false);
+    // };
 
     return (
         <>
@@ -94,7 +97,7 @@ export default function CreatePost() {
                     onCancel={() => {
                         setOpen(false);
                     }}
-                    onOk={handleCreatePost}
+                    onOk={onCreate}
                 >
                     <Form
                         // form={form}
@@ -111,12 +114,14 @@ export default function CreatePost() {
                             ]}
                         >
                             <Select label='Môn học'>
-                                <Select.Option value='1'>Toán</Select.Option>
-                                <Select.Option value='2'>Văn</Select.Option>
-                                <Select.Option value='3'>Anh</Select.Option>
-                                <Select.Option value='4'>Sinh</Select.Option>
-                                <Select.Option value='5'>Sử</Select.Option>
-                                <Select.Option value='6'>Địa</Select.Option>
+                                {subjects?.map((subject) => (
+                                    <Select.Option
+                                        key={subject.subjectId}
+                                        value={subject.subjectId}
+                                    >
+                                        {subject.subjectName}
+                                    </Select.Option>
+                                ))}
                             </Select>
                         </Form.Item>
                         {/* <Avatar src={url} /> */}

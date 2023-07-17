@@ -1,6 +1,6 @@
 import { Component, useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import { GetAllSubjectService } from '../../services/subjectService';
+import { getAllSubjectService } from '../../services/subjectService';
 import '../../assets/PracticeQuizStyle.css';
 import '../../assets/Style.css';
 import Header from '../../Layout/User/Header';
@@ -10,7 +10,7 @@ export default function PracticeQuizzes() {
 
     const handleGetData = async () => {
         try {
-            const result = await GetAllSubjectService();
+            const result = await getAllSubjectService();
             console.log(result.data);
             if (result.status === 200) {
                 setSubjectAll(result.data);

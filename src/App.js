@@ -35,6 +35,7 @@ import PostProvider from './contexts/PostContext';
 
 
 import Testfirebase from './Testfirebase';
+import SubjectProvider from './contexts/SubjectContext';
 
 
 function App() {
@@ -49,7 +50,7 @@ function App() {
           {!token ? (
             <>
               <Route path="/login" element={<Login />}></Route>
-              <Route path="/forum" element={<PostProvider><Forum /></PostProvider>}></Route>
+              <Route path="/forum" element={<PostProvider><SubjectProvider><Forum /></SubjectProvider></PostProvider>}></Route>
               <Route path="/news" element={<News />}></Route>
               <Route path="/" element={<HomePage />}></Route>
               <Route path="/login" element={<Login />}></Route>
@@ -70,7 +71,7 @@ function App() {
                   <Route path="/profile" element={<Profile />}></Route>
                   <Route path='/testHistory' element={<TestHistory />}></Route>
                   <Route path='/news' element={<News />}></Route>
-                  <Route path="/forum" element={<PostProvider><Forum /></PostProvider>}></Route>
+                  <Route path="/forum" element={<PostProvider><SubjectProvider><Forum /></SubjectProvider></PostProvider>}></Route>
                   <Route path="/takeExam" element={<TakeExam />}></Route>
                   <Route path="/exam" element={<Exam />}></Route>
                   <Route path="/examResult" element={<ExamResult />}></Route>

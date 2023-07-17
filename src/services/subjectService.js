@@ -1,16 +1,7 @@
-import Request from '../utils/request';
+import request from '../utils/request';
 
-export const GetAllSubjectService = async () => {
-    try {
-        const respone = await Request({
-            method: 'get',
-            url: `Subject/getAllSubject`,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-        return respone.data;
-    } catch (e) {
-        return e;
-    }
-};
+const END_POINTS = {
+    GET_ALL_SUBJECT: 'Subject/getAllSubject'
+}
+
+export const getAllSubjectService = async () => await request.get(END_POINTS.GET_ALL_SUBJECT)
