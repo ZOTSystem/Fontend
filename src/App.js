@@ -31,7 +31,7 @@ import ManageMod from './Component/Admin/ManageMod';
 import ManageQuestion from './Component/Admin/ManageQuestion';
 import ManageTopic from './Component/Admin/ManageTopic';
 import PostProvider from './contexts/PostContext';
-
+import Statistical from './Component/Admin/Statistical/Statistical';
 
 
 import Testfirebase from './Testfirebase';
@@ -58,7 +58,7 @@ function App() {
               <Route path="/practiceQuizz" element={<PracticeQuizzes />}></Route>
               <Route path="/testSubject" element={<TestSubject />}></Route>
               <Route path="/test" element={<Testfirebase />}></Route>
-              <Route path="/*" element={<Navigate to="/" />} />
+              <Route path="/*" element={<Navigate to="/" />} />          
             </>
           ) : (
             <>
@@ -88,6 +88,7 @@ function App() {
                   <Route path="/admin/manageQuestion" element={<ManageQuestion />}></Route>
                   <Route path="/admin/manageTopic" element={<ManageTopic />}></Route>
                   <Route path="/*" element={<Navigate to="/admin/manageUser" />} />
+                  <Route path="/admin/statistical" element={<Statistical/>}></Route>
                 </>
               )}
             </>
