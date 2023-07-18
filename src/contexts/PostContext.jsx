@@ -4,6 +4,7 @@ import postReducer from '../reducers/postReducer';
 
 const initialState = {
     posts: [],
+    handleAddPost: () => {},
 };
 
 export const PostContext = createContext(null);
@@ -28,6 +29,7 @@ const PostProvider = ({ children }) => {
     const handleAddPost = async (data) => {
         try {
             await addPostService(data);
+            console.log(data);
             const newPosts = await getAllPostService();
             dispatch({
                 type: 'GET_POSTS',

@@ -7,15 +7,17 @@ import '../../../assets/Style.css';
 import TextArea from 'antd/es/input/TextArea';
 import { useContext } from 'react';
 import { SubjectContext } from '../../../contexts/SubjectContext';
+import { PostContext } from '../../../contexts/PostContext';
 const url = '../Image/Forum/forum-avatar1.png';
 const anh = '../Image/Forum/icon-anh-video.png';
 const monhoc = '../Image/Forum/icon-sach.png';
 const tag = '../Image/Forum/icon-tag.png';
 
-export default function CreatePost({ onCreate }) {
+export default function CreatePost() {
     const [open, setOpen] = useState(false);
+    const [formValue, setFormValue] = useState({ subjectId: null, postText: null });
     const { subjects } = useContext(SubjectContext);
-
+    const { handleAddPost } = useContext(PostContext);
     const normFile = (e) => {
         if (Array.isArray(e)) {
             return e;
@@ -97,7 +99,7 @@ export default function CreatePost({ onCreate }) {
                     onCancel={() => {
                         setOpen(false);
                     }}
-                    onOk={onCreate}
+                    onOk={() => handleAddPost(formValue)}
                 >
                     <Form
                         // form={form}
@@ -113,7 +115,10 @@ export default function CreatePost({ onCreate }) {
                                 },
                             ]}
                         >
-                            <Select label='Môn học'>
+                            <Select
+                                label='Môn học'
+                                onChange={(subjectValue) => setFormValue({ ...formValue, subjectId: subjectValue })}
+                            >
                                 {subjects?.map((subject) => (
                                     <Select.Option
                                         key={subject.subjectId}
@@ -124,7 +129,6 @@ export default function CreatePost({ onCreate }) {
                                 ))}
                             </Select>
                         </Form.Item>
-                        {/* <Avatar src={url} /> */}
                         <Form.Item
                             name='text'
                             rules={[
@@ -133,6 +137,7 @@ export default function CreatePost({ onCreate }) {
                                     message: '',
                                 },
                             ]}
+                            onChange={(e) => setFormValue({ ...formValue, postText: e.target.value })}
                         >
                             <TextArea
                                 rows={6}
