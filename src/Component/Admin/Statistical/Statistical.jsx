@@ -21,6 +21,7 @@ import {
 } from "antd";
 import { Content } from "antd/es/layout/layout";
 import Filter from "./Filter";
+import LineChart from "./LineChart";
 
 const Statistical = () => {
   const {
@@ -28,19 +29,33 @@ const Statistical = () => {
   } = theme.useToken();
 
   const [subjects, setSubjects] = useState([]);
+  const [chartData, setChartData] = useState([]);
 
   //này là vì a k biết data tụi e lấy ren nên tự tạo json tự tạo server ảo tự fetch dề
+  const fetchDataSubject = async () => {
+    try {
+      const response = await fetch(" http://localhost:8080/Subjects");
+      const data = await response.json();
+      setSubjects(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const fetchDataTestDetail = async () => {
+    try {
+      const response = await fetch("https://gw.alipayobjects.com/os/antfincdn/3PtP0m%26VuK/trend-data.json");
+      const data = await response.json();
+      setChartData(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(" http://localhost:8080/Subjects");
-        const data = await response.json();
-        setSubjects(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchData();
+    fetchDataSubject();
+    fetchDataTestDetail();
   }, []);
   
   console.log(subjects);
@@ -67,10 +82,12 @@ const Statistical = () => {
           <div
             style={{
               padding: 24,
-              minHeight: 360,
+              minHeight: 600,
               background: colorBgContainer,
             }}
-          ></div>
+          >
+            <LineChart/>
+          </div>
         </Content>
       </Layout>
     </Layout>
