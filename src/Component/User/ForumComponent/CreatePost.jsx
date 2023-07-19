@@ -15,7 +15,8 @@ const tag = '../Image/Forum/icon-tag.png';
 
 export default function CreatePost() {
     const [open, setOpen] = useState(false);
-    const [formValue, setFormValue] = useState({ subjectId: null, postText: null });
+    const [form] = Form.useForm();
+    const [formValue, setFormValue] = useState({ subjectId: null, postText: '' });
     const { subjects } = useContext(SubjectContext);
     const { handleAddPost } = useContext(PostContext);
     const normFile = (e) => {
@@ -23,6 +24,20 @@ export default function CreatePost() {
             return e;
         }
         return e?.fileList;
+    };
+
+    const showModal = () => {
+        setOpen(true);
+    };
+
+    const cancelModal = () => {
+        setOpen(false);
+        form.resetFields();
+    };
+
+    const handleSubmitAddPostForm = () => {
+        handleAddPost(formValue);
+        cancelModal();
     };
 
     const SubmitButton = ({ form }) => {
@@ -41,16 +56,11 @@ export default function CreatePost() {
             );
         }, [values]);
         return (
-            <Button
-                type='primary'
-                htmlType='submit'
-                disabled={!submittable}
-            >
+            <Button type="primary" htmlType="submit" disabled={!submittable}>
                 Đăng
             </Button>
         );
     };
-    // const [form] = Form.useForm();
 
     // useEffect(() => {
     //     setOpen();
@@ -63,28 +73,25 @@ export default function CreatePost() {
 
     return (
         <>
-            <div
-                className='createPost'
-                type='primary'
-                onClick={() => setOpen(true)}
-            >
-                <div className='form'>
+            <div className="createPost" type="primary">
+                <div className="form">
                     <Input
-                        size='large'
-                        placeholder='Bạn đang nghĩ gì thế?'
+                        onClick={showModal}
+                        size="large"
+                        placeholder="Bạn đang nghĩ gì thế?"
                         prefix={<Avatar src={url} />}
                     />
                     <hr></hr>
-                    <div className='bottom-form'>
-                        <div className='item-bottom-form'>
+                    <div className="bottom-form">
+                        <div className="item-bottom-form">
                             <img src={anh}></img>
                             <label>Ảnh/Video</label>
                         </div>
-                        <div className='item-bottom-form'>
+                        <div className="item-bottom-form">
                             <img src={tag}></img>
                             <label>Tag</label>
                         </div>
-                        <div className='item-bottom-form'>
+                        <div className="item-bottom-form">
                             <img src={monhoc}></img>
                             <label>Môn học</label>
                         </div>
@@ -92,70 +99,55 @@ export default function CreatePost() {
                 </div>
 
                 <Modal
-                    title='Tạo bài viết'
-                    visible={open}
-                    okText='Đăng bài'
-                    cancelText='Đóng'
-                    onCancel={() => {
-                        setOpen(false);
-                    }}
-                    onOk={() => handleAddPost(formValue)}
-                >
-                    <Form
-                        // form={form}
-                        layout='horizontal'
-                    >
+                    title="Tạo bài viết"
+                    open={open}
+                    okText="Đăng bài"
+                    cancelText="Đóng"
+                    onCancel={cancelModal}
+                    onOk={handleSubmitAddPostForm}>
+                    <Form form={form} layout="horizontal" initialValues={formValue}>
                         <Form.Item
-                            label='Môn học'
-                            className='input-form'
-                            name='mon'
+                            label="Môn học"
+                            className="input-form"
+                            name="mon"
                             rules={[
                                 {
                                     required: true,
                                 },
-                            ]}
-                        >
+                            ]}>
                             <Select
-                                label='Môn học'
-                                onChange={(subjectValue) => setFormValue({ ...formValue, subjectId: subjectValue })}
-                            >
+                                label="Môn học"
+                                onChange={(subjectValue) => setFormValue({ ...formValue, subjectId: subjectValue })}>
+                                <Select.Option defaultValue={null}>-- Vui lòng chọn môn học --</Select.Option>
                                 {subjects?.map((subject) => (
-                                    <Select.Option
-                                        key={subject.subjectId}
-                                        value={subject.subjectId}
-                                    >
+                                    <Select.Option key={subject.subjectId} value={subject.subjectId}>
                                         {subject.subjectName}
                                     </Select.Option>
                                 ))}
                             </Select>
                         </Form.Item>
                         <Form.Item
-                            name='text'
+                            name="text"
                             rules={[
                                 {
                                     required: true,
                                     message: '',
                                 },
-                            ]}
-                            onChange={(e) => setFormValue({ ...formValue, postText: e.target.value })}
-                        >
+                            ]}>
                             <TextArea
                                 rows={6}
-                                placeholder='Bạn đang nghĩ gì thế?'
+                                placeholder="Bạn đang nghĩ gì thế?"
+                                onChange={(e) => setFormValue({ ...formValue, postText: e.target.value })}
                             />
                         </Form.Item>
                         <Form.Item
-                            label='Ảnh/Video'
-                            valuePropName='fileList'
+                            label="Ảnh/Video"
+                            valuePropName="fileList"
                             getValueFromEvent={normFile}
                             style={{
                                 marginTop: 10,
-                            }}
-                        >
-                            <Upload
-                                action='/upload.do'
-                                listType='picture-card'
-                            >
+                            }}>
+                            <Upload action="/upload.do" listType="picture-card">
                                 <div>
                                     <PlusOutlined />
                                 </div>
