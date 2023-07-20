@@ -1,8 +1,8 @@
-import Request from "../utils/Request"
+import request from "../utils/request"
 
 export const LoginService = async (data) => {
     try {
-        const respone = await Request({
+        const respone = await request({
             method: "post",
             url: `home/login`,
             headers: {
@@ -18,7 +18,7 @@ export const LoginService = async (data) => {
 
 export const GetInforService = async (token) => {
     try {
-        const response = await Request({
+        const response = await request({
             method: "get",
             url: `user/info?token=${token}`,
             headers: {
@@ -136,7 +136,7 @@ export const ChangePassowrdService = async (accountId, newPassword) => {
             },
         });
         return response.data;
-    } catch(e){
+    } catch (e) {
         return e;
     }
 }

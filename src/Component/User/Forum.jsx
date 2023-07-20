@@ -5,7 +5,7 @@ import Header from '../../Layout/User/Header';
 import CreatePost from './ForumComponent/CreatePost';
 import PostList from './PostList';
 import { useContext } from 'react';
-import { PostContext } from '../../contexts/PostContext';
+import PostProvider, { PostContext } from '../../contexts/PostContext';
 import FilterPost from './ForumComponent/FilterPost';
 
 export default function Forum() {
@@ -14,11 +14,11 @@ export default function Forum() {
     return (
         <>
             <Header />
-            <div className="body-forum">
-                <div className="container">
+            <div className='body-forum'>
+                <div className='container'>
                     <CreatePost />
                     <FilterPost />
-                    <div className="post-container">
+                    <div className='post-container'>
                         <PostList posts={posts} />
                     </div>
                 </div>
