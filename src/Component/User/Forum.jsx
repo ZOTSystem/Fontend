@@ -1,13 +1,15 @@
 import 'bootstrap/dist/css/bootstrap.css';
-import Header from "../../Layout/User/Header";
-import React, { useState } from 'react';
-import "../../assets/Forum.css"
-import '../../assets/Style.css'
+import '../../assets/Forum.css';
+import '../../assets/Style.css';
+import Header from '../../Layout/User/Header';
 import CreatePost from './ForumComponent/CreatePost';
-import PostContent from './ForumComponent/PostContent';
-import SendComment from './ForumComponent/SendComment';
-import Comment from './ForumComponent/Comment';
+import PostList from './PostList';
+import { useContext } from 'react';
+import { PostContext } from '../../contexts/PostContext';
+import FilterPost from './ForumComponent/FilterPost';
+
 export default function Forum() {
+    const { posts } = useContext(PostContext);
 
     return (
         <>
@@ -15,29 +17,12 @@ export default function Forum() {
             <div className="body-forum">
                 <div className="container">
                     <CreatePost />
-                    <div className='post-container'>
-                        <div className="post">
-                            <div className='form-post'>
-                                <PostContent />
-                                <SendComment />
-                                <Comment />
-                            </div>
-
-                            <div className='form-post'>
-                                <PostContent />
-                                <SendComment />
-                                <Comment />
-                            </div>
-
-                            <div className='form-post'>
-                                <PostContent />
-                                <SendComment />
-                                <Comment />
-                            </div>
-                        </div>
+                    <FilterPost />
+                    <div className="post-container">
+                        <PostList posts={posts} />
                     </div>
                 </div>
             </div>
         </>
-    )
+    );
 }

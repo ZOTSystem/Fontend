@@ -1,20 +1,39 @@
 import { Component, useState, useEffect } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
-import { getAllSubjectService } from '../../services/subjectService';
+import { Routes, Route, useNavigate, useLocation, Await } from 'react-router-dom';
+import { GetAllSubjectService } from '../../services/subjectService';
 import '../../assets/PracticeQuizStyle.css';
 import '../../assets/Style.css';
 import Header from '../../Layout/User/Header';
+import { hover } from '@testing-library/user-event/dist/hover';
+import { GetTopicByGrade } from '../../services/topicService';
 
-export default function PracticeQuizzes() {
-    const [subjectAll, setSubjectAll] = useState([]);
+export default function TopicStudy() {
+    //#region take subjectId
+    const location = useLocation();
+    let subjectId = location.state.subjectId;
+    let subjectName = location.state.subjectName;
+    //#endregion
 
-    const handleGetData = async () => {
+    //#region move to study screen
+    const navigate = useNavigate();
+
+    const handleClick = (topicId) => {
+        navigate('/study', {
+            state: {
+                topicId: topicId,
+            },
+        });
+    };
+    //#endregion
+
+    //#region  get topic list by grade and subjecId
+    const [topicStudy, setTopicStudy] = useState([]);
+    const handleGetData = async (grade, subjectId) => {
+        console.log('1');
         try {
-            const result = await getAllSubjectService();
-            console.log(result.data);
+            const result = await GetTopicByGrade(grade, subjectId);
             if (result.status === 200) {
-                setSubjectAll(result.data);
-                console.log(result.data);
+                setTopicStudy(result.data);
             }
         } catch (error) {
             console.error('Error fetching mod service:', error);
@@ -24,19 +43,9 @@ export default function PracticeQuizzes() {
     useEffect(() => {
         handleGetData();
     }, []);
+    //#endregion
 
-    const navigate = useNavigate();
-
-    const handleClick = (subjectId, subjectName) => {
-        navigate('/topicStudy', {
-            state: {
-                subjectId: subjectId,
-                subjectName: subjectName,
-            },
-        });
-        console.log('subject: ' + subjectId);
-    };
-
+    console.log(topicStudy);
     return (
         <>
             <Header />
@@ -60,35 +69,39 @@ export default function PracticeQuizzes() {
                                             fill='#000000'
                                         ></path>
                                     </svg>
-                                    <span>Tự học/Luyện thi trắc nghiệm</span>
+                                    <span>Luyện tập trắc nghiệm</span>
+                                    <span className='topic-subject'>{subjectName}</span>
                                 </h2>
                             </div>
-                            <div className='sc-gGTGfU fSjCQg'>
-                                <div className='sc-gsTCUz gQRQLT'>
-                                    {subjectAll.map((item) => (
-                                        <div
-                                            className='sc-dlfnbm sc-eCssSg fnjxoh ddsNTO'
-                                            onClick={() => handleClick(item.subjectId, item.subjectName)}
-                                        >
-                                            <div className='sc-dcwrBW kLSqMv'>
-                                                <div className='sc-ehsPrw ciEbjT'>
-                                                    <div
-                                                        className='sc-dwqbIM iLQQSn'
-                                                        aria-setsize={70}
-                                                    ></div>
-                                                    <p>{item.subjectName}</p>
-                                                </div>
-                                                <div className='sc-ehsPrw fqtCF'>
-                                                    <img
-                                                        alt=''
-                                                        src='../Image/physics-svgrepo-com.svg'
-                                                        className='icon'
-                                                    ></img>
-                                                </div>
-                                            </div>
+                            <div
+                                className='topic-study-grade'
+                                style={{ display: 'flex' }}
+                            >
+                                <select
+                                    class='form-select form-select-lg mb-3'
+                                    aria-label='.form-select-lg example'
+                                    onChange={(e) => handleGetData(e.target.value, subjectId)}
+                                >
+                                    <option selected>Chọn khối</option>
+                                    <option value='10'>Khối 10</option>
+                                    <option value='11'>Khối 11</option>
+                                    <option value='12'>Khối 12</option>
+                                </select>
+                            </div>
+                            <div
+                                className='exam-detail'
+                                style={{ width: '100%', height: 'auto' }}
+                            >
+                                {topicStudy.map((item, index) => (
+                                    <div
+                                        className='exam-item'
+                                        onClick={() => handleClick(item.topicId)}
+                                    >
+                                        <div className='exam-item-fixed'>
+                                            <div className='exam-item-title'>{item.topicName}</div>
                                         </div>
-                                    ))}
-                                </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
