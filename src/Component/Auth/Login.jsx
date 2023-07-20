@@ -50,7 +50,7 @@ export default function Login() {
     const [showQuenMatKhau, setQuenMatKhau] = useState(false);
 
     const [cookies, setCookie] = useCookies([]);
-    const { token, user, onSetUser } = useContext(UserContext);
+    const { token, user, render, onSetRender, onSetUser } = useContext(UserContext);
     const navigate = useNavigate();
 
     const [loginInput, setLoginInput] = useState({
@@ -96,7 +96,7 @@ export default function Login() {
 
     useEffect(() => {
         getEmailList();
-    }, []);
+    }, [render]);
 
     const getPhoneList = () => {
         const url = "https://localhost:7207/api/home/getAllPhone";
@@ -112,7 +112,7 @@ export default function Login() {
 
     useEffect(() => {
         getPhoneList();
-    }, []);
+    }, [render]);
     //#endregion
 
 
@@ -176,6 +176,7 @@ export default function Login() {
                 setErrors([]);
                 setShowDangKy(false);
                 setRegisterInput("");
+                onSetRender();
             }
         } else {
             setErrors(errors);
@@ -198,7 +199,11 @@ export default function Login() {
         if (result.status === 200) {
             onSetUser(result);
             handleSetCookie(result.token);
-            navigate('/');
+            if(result.roleId === 4){
+                navigate('/');
+            } else if (result.roleId === 1) {
+                navigate('/admin/manageUser');
+            }
         } else {
             openNotificationLoginFailly("topRight");
         }
@@ -217,6 +222,7 @@ export default function Login() {
                 setErrors([]);
                 setQuenMatKhau(false);
                 setEmaiForgot("");
+                onSetRender();
             }
         } else {
             setErrors(errors);
@@ -243,10 +249,15 @@ export default function Login() {
             } else if (result.status === 200) {
                 onSetUser(result);
                 handleSetCookie(result.token);
-                navigate('/');
+                if(result.roleId === 4){
+                    navigate('/');
+                } else if (result.roleId === 1) {
+                    navigate('/admin/manageUser');
+                }
             } else {
                 openNotificationLoginFailly("topRight");
             }
+            onSetRender();
         } catch (error) {
             console.error("Token decoding error:", error);
         }

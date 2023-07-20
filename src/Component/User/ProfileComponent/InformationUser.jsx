@@ -7,7 +7,7 @@ import { UserContext } from "../../../contexts/UserContext";
 import dayjs from "dayjs";
 import axios from "axios";
 import { storage } from "../../../firebase";
-import { ref, uploadBytes, listAll, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 } from "uuid";
 
 
@@ -16,7 +16,6 @@ import { GetInforByEmailService } from "../../../services/UserService";
 import { handleValidationUpdateUser } from "../../../assets/js/handleValidation";
 import { handleValidationChangePassword } from "../../../assets/js/handleValidation";
 import { ChangePassowrdService } from "../../../services/UserService";
-import { ChangeAvatarService } from "../../../services/UserService";
 
 
 //format datatime
@@ -67,10 +66,11 @@ export default function InformationUser() {
     //#endregion
 
     //#region - Declare - Khai báo các biên sử dụng
+    const [imageUpload, setImageUpload] = useState(null);
     const [showUpdate, setShowUpdate] = useState(false)
     const [showForgotPassword, setShowForgotPassword] = useState(false);
 
-    const { user, onSetUser } = useContext(UserContext);
+    const {token, user, onSetUser, render, onSetRender} = useContext(UserContext);
     const [cookies, setCookie, removeCookie] = useCookies([]);
     const [phoneList, setPhoneList] = useState("");
 
@@ -129,7 +129,7 @@ export default function InformationUser() {
 
     useEffect(() => {
         getPhoneList();
-    }, []);
+    }, [render]);
     //#endregion
 
     //#region - Function - Nhận giá trị input
@@ -152,11 +152,13 @@ export default function InformationUser() {
     //#region - Function - Edit user
     const handleViewUser = async () => {
         const result = await GetInforByEmailService(user.email);
+        const currentAvatar = result.result.user.avatar
+        setImageUpload(currentAvatar);
         if (result) {
             setEditData({
                 editUserId: result.result.user.accountId,
                 editFullName: result.result.user.fullName,
-                editAvatar: result.result.user.avatar,
+                editAvatar: currentAvatar,
                 editEmail: result.result.user.email,
                 editPhone: result.result.user.phone,
                 editBirthDay: result.result.user.birthDay,
@@ -176,6 +178,7 @@ export default function InformationUser() {
             birthDay: editData.editBirthDay,
             gender: editData.editGender,
             schoolName: editData.editSchoolName,
+            avatar: imageUpload,
         }
         handleValidationUpdateUser(editData, errors, phoneList);
         if (Object.keys(errors).length === 0) {
@@ -185,10 +188,12 @@ export default function InformationUser() {
                 setErrors([]);
                 const response = await GetInforByEmailService(user.email);
                 if (response) {
+                    const updatedImageUpload = response.result.user.avatar;
+                    setImageUpload(updatedImageUpload);
                     setEditData({
                         editUserId: response.result.user.accountId,
                         editFullName: response.result.user.fullName,
-                        editAvatar: response.result.user.avatar,
+                        editAvatar: updatedImageUpload,
                         editEmail: response.result.user.email,
                         editPhone: response.result.user.phone,
                         editBirthDay: response.result.user.birthDay,
@@ -201,7 +206,8 @@ export default function InformationUser() {
                         phone: response.result.user.phone,
                         password: response.result.user.password,
                         avatar: response.result.user.avatar,
-                    })
+                    });
+                    onSetRender();
                 }
             }
         } else {
@@ -238,10 +244,12 @@ export default function InformationUser() {
                         email: response.result.user.email,
                         phone: response.result.user.phone,
                         password: response.result.user.password,
-                    })
+                        avatar: response.result.user.avatar 
+                    });
                 }
                 setShowForgotPassword(false);
                 setNewPassword("");
+                onSetRender();
             }
         } else {
             setErrors(errors);
@@ -250,8 +258,6 @@ export default function InformationUser() {
     //#endregion
 
     //#region - Function - Change Avatar
-    const [imageUpload, setImageUpload] = useState(null);
-    const [image, setImage] = useState([])
 
     const inputRef = useRef(null);
 
@@ -259,36 +265,22 @@ export default function InformationUser() {
         inputRef.current.click();
     };
 
-    const uploadImage = async () => {
-        if (imageUpload == null) return;
-        const storageRef  = ref(storage, `images/${imageUpload.name + v4()}`);
 
-        await uploadBytes(storageRef, imageUpload);
-
-        const downloadURL = await getDownloadURL(storageRef);
-        setImage(downloadURL);
-        console.log(downloadURL);
-
-        const result = await ChangeAvatarService(user.accountId, downloadURL);
-        if (result) {
-            const response = await GetInforByEmailService(user.email);
-            if (response) {
-                setUserInfo({
-                    fullName: response.result.user.fullName,
-                    email: response.result.user.email,
-                    phone: response.result.user.phone,
-                    password: response.result.user.password,
-                })
-            }
+    const handleInputFile = async (event) => {
+        const file = event.target.files[0];
+      
+        const imgRef = ref(storage, `images/${editData.editEmail + v4()}`);
+        try {
+          const snapshot = await uploadBytes(imgRef, file);
+          const url = await getDownloadURL(snapshot.ref);
+          setImageUpload(url);
+        } catch (error) {
+          console.error("Error uploading file:", error);
         }
-    };
-
-    const handleClickAllUpdate = () => {
-        uploadImage();
-        handleUpdate();
-    }
+      };
 
     //#endregion
+
     return (
         <>
             {contextHolder}
@@ -299,7 +291,7 @@ export default function InformationUser() {
                             <div className="sc-fEpNni dAnFRi">
                                 {user.avatar != null
                                     ?
-                                    <img src={user.avatar} alt="" />
+                                    <img src={userInfo.avatar} alt="" style={{objectFit: "cover"}}/>
                                     :
                                     <img src="../Image/Avatar_Null.png" alt="avatar" />
                                 }
@@ -375,7 +367,7 @@ export default function InformationUser() {
                 title={<h2 style={{ color: '#2484ba', fontSize: '20px', fontWeight: 'bold' }}>Chỉnh sửa thông tin</h2>}
                 visible={showUpdate}
                 okText="Lưu"
-                onOk={() => { handleClickAllUpdate(); }}
+                onOk={() => { handleUpdate(); }}
                 onCancel={() => { setShowUpdate(false); setErrors(""); }}
             >
                 <Form>
@@ -386,12 +378,14 @@ export default function InformationUser() {
                                     ?
                                     <img src="../Image/Avatar_Null.png" alt="" />
                                     :
-                                    <img src={editData.editAvatar} alt="" />
+                                    <>
+                                    {imageUpload && <img src={imageUpload} alt="" style={{objectFit: "cover"}}/>}
+                                    </>
                                 }
                                 <span className="edit" onClick={handleSpanClick}>
                                     <svg width="50" height="50" viewBox="0 0 50 50" fill="none"><g filter="url(#filter0_d)"><circle cx="25" cy="23" r="23" fill="white"></circle></g><path d="M34.9459 16.369L31.5926 13.0157C31.4438 12.8665 31.267 12.7481 31.0723 12.6673C30.8777 12.5865 30.669 12.5449 30.4582 12.5449C30.2475 12.5449 30.0388 12.5865 29.8442 12.6673C29.6495 12.7481 29.4727 12.8665 29.3239 13.0157L15.6819 26.7373L14.5774 31.5235C14.5303 31.7555 14.5353 31.995 14.5919 32.2249C14.6485 32.4548 14.7553 32.6692 14.9047 32.8529C15.0541 33.0365 15.2423 33.1847 15.4558 33.2869C15.6693 33.3891 15.9029 33.4427 16.1396 33.4439C16.2619 33.4574 16.3854 33.4574 16.5078 33.4439L21.3337 32.3792L34.9459 18.6377C35.0951 18.4889 35.2135 18.3121 35.2943 18.1174C35.3751 17.9228 35.4167 17.7141 35.4167 17.5033C35.4167 17.2926 35.3751 17.0839 35.2943 16.8893C35.2135 16.6946 35.0951 16.5178 34.9459 16.369ZM20.2989 30.5384L16.657 31.3444L17.5028 27.7324L27.7716 17.3939L30.5777 20.1999L20.2989 30.5384ZM31.702 19.0755L28.896 16.2695L30.4383 14.6973L33.2643 17.5232L31.702 19.0755Z" fill="#86B026"></path><defs><filter id="filter0_d" x="0" y="0" width="50" height="50" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"></feColorMatrix><feOffset dy="2"></feOffset><feGaussianBlur stdDeviation="1"></feGaussianBlur><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0"></feColorMatrix><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"></feBlend><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"></feBlend></filter></defs></svg>
                                 </span>
-                                <input type="file" ref={inputRef} class="nrr-updload-file" style={{ display: 'none' }} onChange={(event) => setImageUpload(event.target.files[0])} />
+                                <input type="file" ref={inputRef} onChange={handleInputFile} class="nrr-updload-file" style={{ display: 'none' }} />
                             </div>
                         </h5>
                     </div>

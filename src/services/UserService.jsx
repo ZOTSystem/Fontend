@@ -20,7 +20,7 @@ export const GetInforService = async (token) => {
     try {
         const response = await Request({
             method: "get",
-            url: `home/info?token=${token}`,
+            url: `user/info?token=${token}`,
             headers: {
                 "Content-Type": "application/json",
             }
@@ -77,37 +77,6 @@ export const ForgorPasswordService = async (email) => {
     }
 }
 
-// export const LoginByGoogleService = async (user) => {
-//     try {
-//         const response = await Request({
-//             method: "get",
-//             url: `home/search?email=${user.email}`,
-//             headers: {
-//                 "Content-Type": "application/json",
-//             },
-//         });
-//         if (response.data.status === 200) {
-//             const data = {
-//                 email: response.data.user.email,
-//                 password: response.data.user.password
-//             };
-//             return await LoginService(data);
-//         }
-//         const result = await RegisterService(user);
-//         console.log(result);
-//         if (result.status === 200) {
-//             console.log("123");
-//             const data = {
-//                 email: response.data.user.email,
-//                 password: response.data.user.password
-//             };
-//             return await LoginService(data);
-//         }
-//     } catch (e) {
-//         return e;
-//     }
-// }
-
 export const LoginByGoogleService = async (data) => {
     try {
         const response = await Request({
@@ -129,7 +98,7 @@ export const UpdateUserService = async (data) => {
     try {
         const response = await Request({
             method: "post",
-            url: "home/updateUser",
+            url: "user/updateUser",
             headers: {
                 "Content-Type": "application/json",
             },
@@ -161,22 +130,7 @@ export const ChangePassowrdService = async (accountId, newPassword) => {
     try {
         const response = await Request({
             method: "post",
-            url: `home/changePassword?accountId=${accountId}&newPassword=${newPassword}`,
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
-        return response.data;
-    } catch(e){
-        return e;
-    }
-}
-
-export const ChangeAvatarService = async (accountId, newAvatar) => {
-    try {
-        const response = await Request({
-            method: "post",
-            url: `home/changeAvatar?accountId=${accountId}&newAvatar=${newAvatar}`,
+            url: `user/changePassword?accountId=${accountId}&newPassword=${newPassword}`,
             headers: {
                 "Content-Type": "application/json",
             },

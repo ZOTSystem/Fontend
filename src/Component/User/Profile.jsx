@@ -1,13 +1,13 @@
 import "../../assets/ProfileStyle.css"
 import '../../assets/Style.css'
 
-
 import Header from "../../Layout/User/Header"
 import ActivityUser from "./ProfileComponent/ActivityUser"
 import InformationUser from "./ProfileComponent/InformationUser"
 
 
 export default function Profile() {
+
     return (
         <>
             <Header />

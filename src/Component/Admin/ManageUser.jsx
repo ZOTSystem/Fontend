@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-
+import { useEffect, useState, useContext } from "react";
 import { DatePicker, Dropdown, Breadcrumb, Layout, Table, Input, Modal, Form, notification, Button, theme, Card, Timeline, Tooltip, Select } from 'antd';
 import {
     SearchOutlined, ClockCircleOutlined, CheckCircleOutlined,
@@ -8,77 +7,14 @@ import {
 import SiderAdmin from "../../Layout/Admin/SiderAdmin";
 import HeaderAdmin from "../../Layout/Admin/HeaderAdmin";
 import moment from 'moment';
-import hanldeValidationEditUser from "../../assets/js/handleValidation";
 import dayjs from "dayjs";
+
+import { UserContext } from "../../contexts/UserContext";
+import hanldeValidationEditUser from "../../assets/js/handleValidation";
+import { GetAllAccountUser } from "../../services/AccountUserService";
 
 const { Content } = Layout;
 
-
-// dữ liệu test
-const data = [
-    {
-        userId: 1,
-        avatar: '../Image/Avatar_Null.png',
-        fullName: 'Nguyễn Gia Huy',
-        email: 'ghuynguyen0311@gmail.com',
-        phoneNumber: '0328284430',
-        status: "1",
-        gender: "1",
-        birthDay: "2001/11/03",
-        schoolName: "ĐH FPT",
-        createDate: "2023/06/25"
-    },
-    {
-        userId: 2,
-        avatar: '../Image/Avatar_Null.png',
-        fullName: 'Trương Huỳnh Phước Hùng',
-        email: 'hung@gmail.com',
-        phoneNumber: '0379535503',
-        status: "1",
-        gender: "1",
-        birthDay: "2001/03/11",
-        schoolName: "ĐH FPT",
-        createDate: "2023/06/25"
-    },
-    {
-        userId: 3,
-        avatar: '../Image/Avatar_Null.png',
-        fullName: 'Ngô Lương Văn Dần',
-        email: 'dan@gmail.com',
-        phoneNumber: '0376472715',
-        status: "0",
-        gender: "1",
-        birthDay: "1989/10/04",
-        schoolName: "ĐH FPT",
-        createDate: "25/06/2023"
-    },
-    ,
-    {
-        userId: 4,
-        avatar: '../Image/Avatar_Null.png',
-        fullName: 'Nguyễn Hữu Nhật Minh',
-        email: 'Minh@gmail.com',
-        phoneNumber: '0394878049',
-        status: "1",
-        gender: "1",
-        birthDay: "2001/01/01",
-        schoolName: "ĐH FPT",
-        createDate: "2023/06/25"
-    },
-    ,
-    {
-        userId: 5,
-        avatar: '../Image/Avatar_Null.png',
-        fullName: 'Trần Phước Chương',
-        email: 'chuong@gmail.com',
-        phoneNumber: '0394878049',
-        status: "0",
-        gender: "1",
-        birthDay: "2001/06/24",
-        schoolName: "ĐH FPT",
-        createDate: "2023/06/25"
-    },
-]
 
 export default function ManageUser() {
 
@@ -91,7 +27,7 @@ export default function ManageUser() {
         {
             title: "ID",
             // width: 30,
-            dataIndex: "userId",
+            dataIndex: "accountId",
             key: 1,
             fixed: "left",
         },
@@ -101,16 +37,18 @@ export default function ManageUser() {
             dataIndex: "avatar",
             key: "avatar",
             fixed: "left",
-            render: (record) => (
-                <img
-                    src={record}
-                    alt="Pic"
-                    width={70}
-                    height={70}
-                    style={{ borderRadius: "50%" }}
-                    className="borederRadius50"
-                />
-            ),
+            render: (record) => {
+                return (
+                    <img
+                        src={record}
+                        alt="Pic"
+                        width={70}
+                        height={70}
+                        style={{ borderRadius: "50%" }}
+                        className="borederRadius50"
+                    />
+                );
+            },
         },
         {
             title: "Tên người dùng",
@@ -178,7 +116,7 @@ export default function ManageUser() {
         {
             title: "Số điện thoại",
             // width: 100,
-            dataIndex: "phoneNumber",
+            dataIndex: "phone",
             key: 1,
             fixed: "left",
             filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
@@ -263,6 +201,8 @@ export default function ManageUser() {
     const dayFormat = "YYYY-MM-DD";
     const [dataSource, setDataSource] = useState('');
     const [show, setShow] = useState(false);
+    const { render, onSetRender } = useContext(UserContext);
+
     //#endregion
 
     //#region - Declare - input và lỗi của mỗi input  
@@ -486,6 +426,25 @@ export default function ManageUser() {
 
     //#endregion
 
+
+    //#region - Function - lấy list User
+    const handleGetAllAccountUser = async () => {
+        try {
+            const result = await GetAllAccountUser();
+            if (result.status === 200) {
+                setDataSource(result.userList);
+            }
+        } catch (error) {
+            console.error('Error fetching testdetail service:', error);
+        }
+    }
+
+    useEffect(() => {
+        handleGetAllAccountUser();
+    }, [render]);
+    //#endregion
+
+
     return (
         <Layout
             style={{ minHeight: '100vh' }}
@@ -531,11 +490,7 @@ export default function ManageUser() {
                         </div>
                         <Table
                             columns={columns}
-                            dataSource={data}
-                            scroll={{
-                                x: 1500,
-                                y: 1000,
-                            }}
+                            dataSource={dataSource}
                             components={{
                                 body: {
                                     row: CustomRow,
@@ -545,7 +500,7 @@ export default function ManageUser() {
 
                         {/* Form Edit */}
                         <Modal
-                            title="Update Guest's Information"
+                            title="Chỉnh sửa thôi tin người dùng"
                             visible={show}
                             okText="Save Change"
                             onCancel={() => { setShow(false); setErrors([]); }}

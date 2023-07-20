@@ -9,10 +9,11 @@ const UserContextProvider = (props) => {
     const [token, setToken] = useState(cookies?.token
         ? cookies.token
         : "");
+    const [render, setRender] = useState("");
     const HandleGetInfo = async () => {
         const result = await GetInforService(token);
-        if (result.status === 200) {
-            setUser(result.data);
+        if (result.result.result.status === 200) {
+            setUser(result.result.result.data);
         }
     };
 
@@ -20,17 +21,19 @@ const UserContextProvider = (props) => {
         if (token) {
             HandleGetInfo();
         }
-    }, [token]);
+    }, [render]);
 
     const onSetUser = (value) => {
         setUser(value.data);
         setToken(value.token);
     };
 
-
-
     const onSetToken = (value) => {
         setToken(value);
+    };
+
+    const onSetRender = () => {
+        setRender(!render);
     };
 
     return (
@@ -38,6 +41,8 @@ const UserContextProvider = (props) => {
             value={{
                 user,
                 token,
+                render,
+                onSetRender,
                 onSetUser,
                 onSetToken
             }}

@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 
 import { DatePicker, Breadcrumb, Layout, Table, Input, Modal, Form, notification, Button, theme, Select } from 'antd';
 import {
@@ -218,8 +218,8 @@ export default function ManageMod() {
         token: { colorBgContainer },
     } = theme.useToken();
     const pagination = {
-        pageSize: 5, // Số lượng bản ghi hiển thị trên mỗi trang
-        total: dataSource.length, // Tổng số bản ghi
+        pageSize: 5, 
+        total: dataSource.length, 
     };
     //#endregion
 

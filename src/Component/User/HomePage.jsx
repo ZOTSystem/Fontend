@@ -27,7 +27,7 @@ export default function HomePage() {
             <span>
                 <div className='body fade-appear-active' style={{ background: '#f9f9f9'}}>
                     <div className='sc-cOajty jAnegm dashboard' style={{ marginLeft: '50px' }}>
-                        <div className='sc-hKgILt gTLZXx container-fluid'>
+                        <div className='sc-hKgILt gTLZXx container-fluid' style={{width: '80%'}}>
 
                             {/* Chọn môn học */}
                             <ChooseSubject />

@@ -11,6 +11,7 @@ export default function HeaderAdmin() {
     
     const { user, onSetUser } = useContext(UserContext);
     const [cookies, setCookie, removeCookie] = useCookies([]);
+    const navigate = useNavigate();
 
     function getItem(label, key, icon, children) {
         return {
@@ -27,6 +28,7 @@ export default function HeaderAdmin() {
             data: "",
             token: "",
         })
+        navigate("/");
     };
 
     const items = [
