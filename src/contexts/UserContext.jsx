@@ -1,15 +1,13 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
-import { GetInforService } from "../services/userService";
+import { GetInforService } from '../services/userService';
 
 export const UserContext = createContext();
 const UserContextProvider = (props) => {
     const [cookies] = useCookies(['token']);
-    const [user, setUser] = useState("");
-    const [token, setToken] = useState(cookies?.token
-        ? cookies.token
-        : "");
-    const [render, setRender] = useState("");
+    const [user, setUser] = useState('');
+    const [token, setToken] = useState(cookies?.token ? cookies.token : '');
+    const [render, setRender] = useState('');
     const HandleGetInfo = async () => {
         const result = await GetInforService(token);
         if (result.result.result.status === 200) {
@@ -44,7 +42,7 @@ const UserContextProvider = (props) => {
                 render,
                 onSetRender,
                 onSetUser,
-                onSetToken
+                onSetToken,
             }}
         >
             {props.children}

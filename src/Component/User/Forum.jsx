@@ -14,11 +14,11 @@ export default function Forum() {
     return (
         <>
             <Header />
-            <div className="body-forum">
-                <div className="container">
+            <div className='body-forum'>
+                <div className='container'>
                     <CreatePost />
                     <FilterPost />
-                    <div className="post-container">
+                    <div className='post-container'>
                         <PostList posts={posts} />
                     </div>
                 </div>

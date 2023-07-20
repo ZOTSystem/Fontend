@@ -30,6 +30,8 @@ import ManageQuestion from './Component/Admin/ManageQuestion';
 import ManageTopic from './Component/Admin/ManageTopic';
 
 import Testfirebase from './Testfirebase';
+import PostProvider from './contexts/PostContext';
+import SubjectProvider from './contexts/SubjectContext';
 
 function App() {
   const { token, user } = useContext(UserContext);
@@ -41,7 +43,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />}></Route>
           <Route path="/login" element={<Login />}></Route>
-          <Route path="/forum" element={<Forum />}></Route>
+          <Route path="/forum" element={<PostProvider><SubjectProvider><Forum /></SubjectProvider></PostProvider>}></Route>
           <Route path="/news" element={<News />}></Route>
           <Route path="confirm/:email" element={<ConfirmEmail />} />
           <Route path="/practiceQuizz" element={<PracticeQuizzes />}></Route>
@@ -58,7 +60,7 @@ function App() {
               <Route path='/testHistory' element={<TestHistory />}></Route>
               <Route path="/takeExam" element={<TakeExam />}></Route>
               <Route path="/exam" element={<Exam />}></Route>
-              <Route path="/forum" element={<Forum />}></Route>
+              <Route path="/forum" element={<PostProvider><SubjectProvider><Forum /></SubjectProvider></PostProvider>}></Route>
               <Route path="/news" element={<News />}></Route>
               <Route path="/examResult" element={<ExamResult />}></Route>
               <Route path="/study" element={<Study />}></Route>
