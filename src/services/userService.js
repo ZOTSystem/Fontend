@@ -1,4 +1,4 @@
-import Request from "../utils/Request"
+import Request from "../utils/request"
 
 export const LoginService = async (data) => {
     try {
@@ -10,7 +10,7 @@ export const LoginService = async (data) => {
             },
             data: JSON.stringify(data),
         });
-        return respone.data;
+        return respone;
     } catch (e) {
         return (e);
     }
@@ -25,7 +25,7 @@ export const GetInforService = async (token) => {
                 "Content-Type": "application/json",
             }
         });
-        return response.data;
+        return response;
     } catch (e) {
         return e;
     }
@@ -41,7 +41,7 @@ export const RegisterService = async (data) => {
             },
             data: JSON.stringify(data),
         });
-        return respone.data;
+        return respone;
     } catch (e) {
         return e;
     }
@@ -56,7 +56,7 @@ export const ConfirmAccountService = async (email) => {
                 "Content-Type": "application/json",
             },
         });
-        return respone.data;
+        return respone;
     } catch (e) {
         return e;
     }
@@ -71,7 +71,8 @@ export const ForgorPasswordService = async (email) => {
                 "Content-Type": "application/json",
             }
         });
-        return respone.data;
+        console.log(respone);
+        return respone;
     } catch (e) {
         return e;
     }
@@ -95,6 +96,7 @@ export const LoginByGoogleService = async (data) => {
 
 
 export const UpdateUserService = async (data) => {
+    console.log(data);
     try {
         const response = await Request({
             method: "post",
@@ -104,7 +106,7 @@ export const UpdateUserService = async (data) => {
             },
             data: JSON.stringify(data),
         })
-        return response.data;
+        return response;
     } catch (e) {
         return e;
     }
@@ -119,7 +121,7 @@ export const GetInforByEmailService = async (email) => {
                 "Content-Type": "application/json",
             },
         });
-        return response.data;
+        return response;
     } catch (e) {
         return e;
     }
@@ -135,7 +137,7 @@ export const ChangePassowrdService = async (accountId, newPassword) => {
                 "Content-Type": "application/json",
             },
         });
-        return response.data;
+        return response;
     } catch(e){
         return e;
     }

@@ -8,12 +8,13 @@ import { UserContext } from "../../contexts/UserContext";
 import jwt_decode from "jwt-decode";
 import axios from "axios";
 
-import { LoginService } from '../../services/UserService';
+
+import { LoginService } from '../../services/userService';
 import { handleValidationRegister } from '../../assets/js/handleValidation';
-import { RegisterService } from '../../services/UserService';
-import { ForgorPasswordService } from '../../services/UserService';
+import { RegisterService } from '../../services/userService';
+import { ForgorPasswordService } from '../../services/userService';
 import { handleValidationForgotPassword } from '../../assets/js/handleValidation';
-import { LoginByGoogleService } from '../../services/UserService';
+import { LoginByGoogleService } from '../../services/userService';
 
 //# Css form login
 const headerStyle = {
@@ -45,6 +46,7 @@ const DangNhapButton = {
 
 export default function Login() {
 
+    
     //#region - Declare - khai báo biến
     const [showDangKy, setShowDangKy] = useState(false);
     const [showQuenMatKhau, setQuenMatKhau] = useState(false);
@@ -380,7 +382,7 @@ export default function Login() {
                 visible={showQuenMatKhau}
                 okText="Gửi"
                 onOk={handleForgorPassword}
-                onCancel={() => setQuenMatKhau(false)}
+                onCancel={() => {setQuenMatKhau(false); setErrors(""); setEmaiForgot(""); onSetRender();}}
             >
                 <div className='mainAuth'>
                     <Form
@@ -392,14 +394,8 @@ export default function Login() {
                     >
                         <Form.Item
                             name="email"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Please input your email!',
-                                },
-                            ]}
                         >
-                            <Input placeholder="Enter email" type='email' value={emailforgot} onChange={(e) => setEmaiForgot(e.target.value)} />
+                            <Input placeholder="Nhập email" type='email' value={emailforgot} onChange={(e) => setEmaiForgot(e.target.value)} />
                             {errors.emailforgot && (
                                 <div
                                     className="invalid-feedback"

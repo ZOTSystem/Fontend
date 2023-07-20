@@ -21,7 +21,7 @@ import Exam from './Component/User/Exam';
 import ExamResult from './Component/User/ExamResult';
 import Study from './Component/User/Study';
 import ExamFinish from './Component/User/ExamFinish';
-
+import TopicStudy from './Component/User/TopicStudy';
 
 //#Region Admin Routes
 import ManageUser from './Component/Admin/ManageUser'
@@ -34,7 +34,7 @@ import Testfirebase from './Testfirebase';
 function App() {
   const { token, user } = useContext(UserContext);
 
-  
+
   return (
     <Fragment>
       <BrowserRouter>
@@ -64,6 +64,8 @@ function App() {
               <Route path="/study" element={<Study />}></Route>
               <Route path="/examFinish" element={<ExamFinish />}></Route>
               <Route path="/" element={<HomePage />}></Route>
+              <Route path="topicStudy" element={<TopicStudy />}></Route>
+
             </Fragment>
           )}
 

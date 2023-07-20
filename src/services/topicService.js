@@ -9,7 +9,7 @@ export const GetTopicByGrade = async (grade, subjectId) => {
                 'Content-Type': 'application/json',
             },
         });
-        return respone.data;
+        return respone;
     } catch (e) {
         return e;
     }

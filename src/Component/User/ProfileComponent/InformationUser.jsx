@@ -9,13 +9,15 @@ import axios from "axios";
 import { storage } from "../../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 } from "uuid";
+import { useNavigate } from "react-router-dom";
 
 
-import { UpdateUserService } from "../../../services/UserService";
-import { GetInforByEmailService } from "../../../services/UserService";
+
+import { UpdateUserService } from "../../../services/userService";
+import { GetInforByEmailService } from "../../../services/userService";
 import { handleValidationUpdateUser } from "../../../assets/js/handleValidation";
 import { handleValidationChangePassword } from "../../../assets/js/handleValidation";
-import { ChangePassowrdService } from "../../../services/UserService";
+import { ChangePassowrdService } from "../../../services/userService";
 
 
 //format datatime
@@ -73,7 +75,8 @@ export default function InformationUser() {
     const {token, user, onSetUser, render, onSetRender} = useContext(UserContext);
     const [cookies, setCookie, removeCookie] = useCookies([]);
     const [phoneList, setPhoneList] = useState("");
-
+    const navigate = useNavigate();
+    
     const [userInfo, setUserInfo] = useState({
         fullName: user.fullName,
         email: user.email,
@@ -111,6 +114,7 @@ export default function InformationUser() {
             data: "",
             token: "",
         })
+        navigate("/");
     };
     //#endregion
 
@@ -495,7 +499,7 @@ export default function InformationUser() {
                 visible={showForgotPassword}
                 okText="Lưu"
                 onOk={handleChangePassword}
-                onCancel={() => { setShowForgotPassword(false); setErrors(""); setNewPassword("") }}
+                onCancel={() => { setShowForgotPassword(false); setErrors(""); setNewPassword(""); }}
             >
                 <div className="modal-header">
                     <h5 className="modal-title">

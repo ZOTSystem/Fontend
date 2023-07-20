@@ -9,10 +9,10 @@ import HeaderAdmin from "../../Layout/Admin/HeaderAdmin";
 import hanldeValidationEditUser, { hanldeValidationCreateMod } from "../../assets/js/handleValidation";
 import dayjs from "dayjs";
 import axios from "axios";
-import { GetAllModService } from "../../services/ModService";
-import { AddModService } from "../../services/ModService";
-import { ChangeStatusService } from "../../services/ModService";
-import { UpdateModService } from "../../services/ModService";
+import { GetAllModService } from "../../services/modService";
+import { AddModService } from "../../services/modService";
+import { ChangeStatusService } from "../../services/modService";
+import { UpdateModService } from "../../services/modService";
 
 const { Content } = Layout;
 

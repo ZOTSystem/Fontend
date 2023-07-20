@@ -1,4 +1,4 @@
-import Request from "../utils/Request";
+import Request from "../utils/request";
 
 export const GetTestDetailService = async (accountId) => {
     try {
@@ -9,7 +9,7 @@ export const GetTestDetailService = async (accountId) => {
                 "Content-Type": "application/json",
             },
         });
-        return respone.data;
+        return respone;
     } catch (e) {
         return e;
     }
@@ -24,7 +24,7 @@ export const GetAllSubject = async () => {
                 "Content-Type": "application/json",
             },
         });
-        return response.data;
+        return response;
     } catch (e) {
         return e;
     }
@@ -39,7 +39,7 @@ export const StatictisService = async (accountId, subjectName) => {
                 "Content-Type": "application/json",
             },
         });
-        return response.data;
+        return response;
     } catch (e) {
         return e;
     }

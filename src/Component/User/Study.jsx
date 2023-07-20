@@ -13,7 +13,6 @@ export default function Study() {
     //#region take topicId
     const location = useLocation();
     let topicId = location.state.topicId;
-    console.log(topicId);
     //#endregion
 
     //#region get question
@@ -22,8 +21,6 @@ export default function Study() {
     const handleGetData = async () => {
         try {
             const result = await GetQuestionByTopicId(topicId);
-            console.log('topic: ' + topicId);
-            console.log(result.data);
             if (result.status === 200) {
                 setQuestions(result.data);
             }
@@ -41,7 +38,6 @@ export default function Study() {
 
     const [current, setCurrent] = useState(0);
     const length = questions.length;
-    console.log(questions.length);
     function nextQuestion() {
         setResetQuestion(true);
         setDisableChoose(false);
@@ -62,7 +58,6 @@ export default function Study() {
             setCurrent(current === length - 1 ? 0 : current + 1);
         }
 
-        console.log('current: ' + current);
     }
 
     function prevQuestion() {
