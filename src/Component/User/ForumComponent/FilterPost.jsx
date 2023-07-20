@@ -33,19 +33,35 @@ const FilterPost = () => {
     };
 
     return (
-        <Form layout="horizontal" form={form} onFinish={handleSubmitFilterForm} id="filter-post-form">
-            <Form.Item className="select-box">
-                <Select label="Môn học" onChange={(subjectValue) => handleSelectionChange(subjectValue)}>
-                    <Select.Option defaultValue={0}>-- Tất cả môn học --</Select.Option>
+        <Form
+            layout='horizontal'
+            form={form}
+            onFinish={handleSubmitFilterForm}
+            id='filter-post-form'
+        >
+            <Form.Item className='select-box'>
+                <Select
+                    label='Môn học'
+                    defaultValue={0}
+                    onChange={(subjectValue) => handleSelectionChange(subjectValue)}
+                >
+                    <Select.Option value={0}>-- Tất cả môn học --</Select.Option>
                     {subjects?.map((subject) => (
-                        <Select.Option key={subject.subjectId} value={subject.subjectId} ref={subjectNameRef}>
+                        <Select.Option
+                            key={subject.subjectId}
+                            value={subject.subjectId}
+                            ref={subjectNameRef}
+                        >
                             {subject.subjectName}
                         </Select.Option>
                     ))}
                 </Select>
             </Form.Item>
             <Form.Item>
-                <Button type="primary" htmlType="submit">
+                <Button
+                    type='primary'
+                    htmlType='submit'
+                >
                     Lọc
                 </Button>
             </Form.Item>

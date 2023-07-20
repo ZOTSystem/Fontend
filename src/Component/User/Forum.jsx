@@ -5,7 +5,7 @@ import Header from '../../Layout/User/Header';
 import CreatePost from './ForumComponent/CreatePost';
 import PostList from './PostList';
 import { useContext } from 'react';
-import PostProvider, { PostContext } from '../../contexts/PostContext';
+import { PostContext } from '../../contexts/PostContext';
 import FilterPost from './ForumComponent/FilterPost';
 
 export default function Forum() {

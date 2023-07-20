@@ -72,7 +72,11 @@ export default function CreatePost() {
             );
         }, [values]);
         return (
-            <Button type="primary" htmlType="submit" disabled={!submittable}>
+            <Button
+                type='primary'
+                htmlType='submit'
+                disabled={!submittable}
+            >
                 Đăng
             </Button>
         );
@@ -89,25 +93,28 @@ export default function CreatePost() {
 
     return (
         <>
-            <div className="createPost" type="primary">
-                <div className="form">
+            <div
+                className='createPost'
+                type='primary'
+            >
+                <div className='form'>
                     <Input
                         onClick={showModal}
-                        size="large"
-                        placeholder="Bạn đang nghĩ gì thế?"
+                        size='large'
+                        placeholder='Bạn đang nghĩ gì thế?'
                         prefix={<Avatar src={url} />}
                     />
                     <hr></hr>
-                    <div className="bottom-form">
-                        <div className="item-bottom-form">
+                    <div className='bottom-form'>
+                        <div className='item-bottom-form'>
                             <img src={anh}></img>
                             <label>Ảnh/Video</label>
                         </div>
-                        <div className="item-bottom-form">
+                        <div className='item-bottom-form'>
                             <img src={tag}></img>
                             <label>Tag</label>
                         </div>
-                        <div className="item-bottom-form">
+                        <div className='item-bottom-form'>
                             <img src={monhoc}></img>
                             <label>Môn học</label>
                         </div>
@@ -115,55 +122,71 @@ export default function CreatePost() {
                 </div>
 
                 <Modal
-                    title="Tạo bài viết"
+                    title='Tạo bài viết'
                     open={open}
-                    okText="Đăng bài"
-                    cancelText="Đóng"
+                    okText='Đăng bài'
+                    cancelText='Đóng'
                     onCancel={cancelModal}
-                    onOk={handleSubmitAddPostForm}>
-                    <Form form={form} layout="horizontal" initialValues={formValue}>
+                    onOk={handleSubmitAddPostForm}
+                >
+                    <Form
+                        form={form}
+                        layout='horizontal'
+                        initialValues={formValue}
+                    >
                         <Form.Item
-                            label="Môn học"
-                            className="input-form"
-                            name="mon"
+                            label='Môn học'
+                            className='input-form'
+                            name='mon'
                             rules={[
                                 {
                                     required: true,
                                 },
-                            ]}>
+                            ]}
+                        >
                             <Select
-                                label="Môn học"
-                                onChange={(subjectValue) => setFormValue({ ...formValue, subjectId: subjectValue })}>
-                                <Select.Option defaultValue={null}>-- Vui lòng chọn môn học --</Select.Option>
+                                label='Môn học'
+                                onChange={(subjectValue) => setFormValue({ ...formValue, subjectId: subjectValue })}
+                                defaultValue={0}
+                            >
+                                <Select.Option value={0}>-- Vui lòng chọn môn học --</Select.Option>
                                 {subjects?.map((subject) => (
-                                    <Select.Option key={subject.subjectId} value={subject.subjectId}>
+                                    <Select.Option
+                                        key={subject.subjectId}
+                                        value={subject.subjectId}
+                                    >
                                         {subject.subjectName}
                                     </Select.Option>
                                 ))}
                             </Select>
                         </Form.Item>
                         <Form.Item
-                            name="text"
+                            name='text'
                             rules={[
                                 {
                                     required: true,
                                     message: '',
                                 },
-                            ]}>
+                            ]}
+                        >
                             <TextArea
                                 rows={6}
-                                placeholder="Bạn đang nghĩ gì thế?"
+                                placeholder='Bạn đang nghĩ gì thế?'
                                 onChange={(e) => setFormValue({ ...formValue, postText: e.target.value })}
                             />
                         </Form.Item>
                         <Form.Item
-                            label="Ảnh/Video"
-                            valuePropName="fileList"
+                            label='Ảnh/Video'
+                            valuePropName='fileList'
                             getValueFromEvent={normFile}
                             style={{
                                 marginTop: 10,
-                            }}>
-                            <Upload listType="picture-card" onChange={(file) => setFileUpload(file)}>
+                            }}
+                        >
+                            <Upload
+                                listType='picture-card'
+                                onChange={(file) => setFileUpload(file)}
+                            >
                                 <div>
                                     <PlusOutlined />
                                 </div>
