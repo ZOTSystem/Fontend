@@ -23,38 +23,28 @@ export default function PostContent({ fullName, createdTime, subjectName, postTe
 
     return (
         <>
-            <div className='form-info'>
-                <div className='form-left'>
-                    <Avatar
-                        src={
-                            <img
-                                src={url}
-                                alt='avatar'
-                            />
-                        }
-                    />
+            <div className="form-info">
+                <div className="form-left">
+                    <Avatar src={<img src={url} alt="avatar" />} />
                 </div>
-                <div className='form-mid'>
-                    <div className='form-mid-top'>
+                <div className="form-mid">
+                    <div className="form-mid-top">
                         <div>
                             {fullName} • {createdTime}
                         </div>
-                        <div className='form-mid-top-subject'>
+                        <div className="form-mid-top-subject">
                             <p>{subjectName}</p>
                         </div>
                     </div>
-                    <div className='form-mid-content'>
+                    <div className="form-mid-content">
                         <div>
                             <p>{postText}</p>
                         </div>
-                        {postFile && <img src={postFile}></img>}
+                        {postFile && <img src={postFile} alt="post"></img>}
                     </div>
                 </div>
-                <div className='form-right'>
-                    <img
-                        onClick={savePost}
-                        src={saveUrl}
-                    ></img>
+                <div className="form-right">
+                    <img onClick={savePost} src={saveUrl}></img>
                 </div>
             </div>
         </>

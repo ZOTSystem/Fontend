@@ -8,6 +8,9 @@ import TextArea from 'antd/es/input/TextArea';
 import { useContext } from 'react';
 import { SubjectContext } from '../../../contexts/SubjectContext';
 import { PostContext } from '../../../contexts/PostContext';
+import { storage } from '../../../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { v4 } from 'uuid';
 const url = '../Image/Forum/forum-avatar1.png';
 const anh = '../Image/Forum/icon-anh-video.png';
 const monhoc = '../Image/Forum/icon-sach.png';
@@ -16,7 +19,9 @@ const tag = '../Image/Forum/icon-tag.png';
 export default function CreatePost() {
     const [open, setOpen] = useState(false);
     const [form] = Form.useForm();
-    const [formValue, setFormValue] = useState({ subjectId: null, postText: '' });
+    const [formValue, setFormValue] = useState({ subjectId: null, postText: '', postFile: '' });
+    const [fileUpload, setFileUpload] = useState(null);
+    const [fileUrl, setFileUrl] = useState('');
     const { subjects } = useContext(SubjectContext);
     const { handleAddPost } = useContext(PostContext);
     const normFile = (e) => {
@@ -34,9 +39,20 @@ export default function CreatePost() {
         setOpen(false);
         form.resetFields();
     };
+    const uploadImage = () => {
+        if (fileUpload == null) return;
+        const fileRef = ref(storage, `images/${fileUpload.name + v4()}`);
+        uploadBytes(fileRef, fileUpload).then((snapshot) => {
+            getDownloadURL(snapshot.ref).then((url) => {
+                setFileUrl(url);
+            });
+        });
+    };
 
-    const handleSubmitAddPostForm = () => {
-        handleAddPost(formValue);
+    const handleSubmitAddPostForm = async () => {
+        uploadImage();
+        handleAddPost({ ...formValue, postFile: fileUrl });
+        setFileUrl('');
         cancelModal();
     };
 
@@ -147,7 +163,7 @@ export default function CreatePost() {
                             style={{
                                 marginTop: 10,
                             }}>
-                            <Upload action="/upload.do" listType="picture-card">
+                            <Upload listType="picture-card" onChange={(file) => setFileUpload(file)}>
                                 <div>
                                     <PlusOutlined />
                                 </div>
