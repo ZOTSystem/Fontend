@@ -19,7 +19,7 @@ export default function SendComment({ postId }) {
         setIsModalOpen(true);
     };
 
-    const handleCancel = () => {
+    const cancelModal = () => {
         setIsModalOpen(false);
     };
 
@@ -35,37 +35,21 @@ export default function SendComment({ postId }) {
 
     return (
         <>
-            <div className='form-bottom'>
-                <div className='form-like'>
-                    <img
-                        onClick={likePost}
-                        src={likeUrl}
-                    ></img>
+            <div className="form-bottom">
+                <div className="form-like">
+                    <img onClick={likePost} src={likeUrl}></img>
                     <p>155</p>
-                    <img
-                        src={comment}
-                        onClick={showModal}
-                    ></img>
+                    <img src={comment} onClick={showModal}></img>
                     <p>15</p>
                 </div>
-                <div className='form-comment'>
-                    <div className='form-comment-left'>
-                        <Avatar
-                            src={
-                                <img
-                                    src={url}
-                                    alt='avatar'
-                                />
-                            }
-                        />
+                <div className="form-comment">
+                    <div className="form-comment-left">
+                        <Avatar src={<img src={url} alt="avatar" />} />
                     </div>
-                    <div className='form-comment-midle'>
-                        <TextArea
-                            placeholder='Viết bình luận...'
-                            autoSize
-                        ></TextArea>
+                    <div className="form-comment-midle">
+                        <TextArea placeholder="Viết bình luận..." autoSize></TextArea>
                     </div>
-                    <div className='form-comment-right'>
+                    <div className="form-comment-right">
                         <img src={upload}></img>
                         <img src={send}></img>
                     </div>
@@ -74,12 +58,11 @@ export default function SendComment({ postId }) {
 
             {isModalOpen && (
                 <Modal
-                    title='Bình luận'
-                    cancelText='Đóng'
+                    title="Bình luận"
+                    cancelText="Đóng"
                     okButtonProps={{ style: { display: 'none' } }}
                     open={isModalOpen}
-                    onCancel={handleCancel}
-                >
+                    onCancel={cancelModal}>
                     <p>Đây là bình luận của bài viết {postId}</p>
                 </Modal>
             )}

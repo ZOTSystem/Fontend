@@ -53,12 +53,6 @@ hr {
     margin-right: 5px;
 }
 
-
-
-
-
-
-
 /*Post*/
 
 .post {
@@ -73,6 +67,16 @@ hr {
     padding: 10px;
     margin-bottom: 40px;
     border-radius: 15px;
+}
+
+#filter-post-form {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.select-box {
+    flex: 0 0 20%;
+    margin-right: 16px;
 }
 
 .form-info img {
@@ -98,11 +102,11 @@ hr {
 .form-mid-top {
     height: 30px;
     margin-top: 5px;
-    color: #656C6A;
+    color: #656c6a;
 }
 
 .form-mid-top-subject {
-    background-color: #FD7070;
+    background-color: #fd7070;
     padding: 2px 15px;
     text-align: center;
     border-radius: 10px;
@@ -112,7 +116,7 @@ hr {
 }
 
 .form-mid-top-type {
-    background-color: #707EFD;
+    background-color: #707efd;
     padding: 2px 15px;
     text-align: center;
     border-radius: 10px;
@@ -188,7 +192,7 @@ hr {
 .comment-right {
     width: 95%;
     font-size: 13px;
-    color: #656C6A;
+    color: #656c6a;
     margin-top: 7px;
 }
 
@@ -205,7 +209,7 @@ hr {
 
 .comment-action-edit-delete {
     display: flex;
-    color: #656C6A;
+    color: #656c6a;
     font-size: 13px;
     margin-left: 30px;
 }
