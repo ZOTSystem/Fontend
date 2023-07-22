@@ -1,10 +1,14 @@
-import { createContext, useEffect, useReducer } from 'react';
-import { getAllPostService, addPostService, getPostBySubjectService } from '../services/postService';
+import { createContext, useReducer } from 'react';
+import {
+    getAllPostService,
+    addPostService,
+    getPostBySubjectService,
+    getPostByStatusService,
+} from '../services/postService';
 import postReducer from '../reducers/postReducer';
 
 const initialState = {
     posts: [],
-    handleAddPost: () => {},
 };
 
 export const PostContext = createContext(null);
@@ -24,11 +28,7 @@ const PostProvider = ({ children }) => {
         }
     };
 
-    useEffect(() => {
-        getAllPost();
-    }, []);
-
-    const handleAddPost = async (data) => {
+    const addPost = async (data) => {
         try {
             await addPostService(data);
             const newPosts = await getAllPostService();
@@ -53,8 +53,20 @@ const PostProvider = ({ children }) => {
         }
     };
 
+    const getPostByStatus = async (status) => {
+        try {
+            const response = await getPostByStatusService(status);
+            dispatch({
+                type: 'GET_POSTS',
+                payload: response,
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     return (
-        <PostContext.Provider value={{ posts: state.posts, handleAddPost, getAllPost, getPostBySubject }}>
+        <PostContext.Provider value={{ posts: state.posts, addPost, getAllPost, getPostBySubject, getPostByStatus }}>
             {children}
         </PostContext.Provider>
     );

@@ -61,6 +61,11 @@ hr {
     margin-top: 20px;
 }
 
+.post-empty {
+    text-align: center;
+    color: #1677ff;
+}
+
 .form-post {
     background-color: #fff;
     margin: auto;
@@ -232,7 +237,7 @@ hr {
 
 .post-tab-item {
     padding: 8px 15px;
-    margin: 0 24px;
+    margin: 0 12px;
     border-radius: 10px;
     border: none;
     background-color: #fff;
@@ -242,7 +247,10 @@ hr {
     background-color: #99ccff;
 }
 
-.post-tab-item:first-child,
+.post-tab-item:first-child {
+    margin-left: 0;
+}
+
 .post-tab-item:last-child {
-    margin: unset;
+    margin-right: 0;
 }

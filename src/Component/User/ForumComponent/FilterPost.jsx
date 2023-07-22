@@ -14,6 +14,7 @@ const FilterPost = () => {
     const subjectNameRef = useRef(null);
 
     const [searchParams, setSearchParams] = useSearchParams();
+    const statusQueryParams = searchParams.get('status');
 
     const handleSelectionChange = (subjectValue) => {
         setSelectionValue(subjectValue);
@@ -24,11 +25,13 @@ const FilterPost = () => {
     const handleSubmitFilterForm = () => {
         if (subjectNameRef.current) {
             getPostBySubject(selectionValue);
-            setSearchParams({ subject: `${subjectNameRef.current}` });
+            statusQueryParams
+                ? setSearchParams({ status: statusQueryParams, subject: `${subjectNameRef.current}` })
+                : setSearchParams({ subject: `${subjectNameRef.current}` });
         } else {
             getAllPost();
             searchParams.delete('subject');
-            setSearchParams({});
+            statusQueryParams ? setSearchParams({ status: statusQueryParams }) : setSearchParams({});
         }
     };
 

@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Avatar, Button, Form, Input, Select, Upload, Modal, Space } from 'antd';
+import { Avatar, Button, Form, Input, Select, Upload, Modal, Space, notification } from 'antd';
 import 'bootstrap/dist/css/bootstrap.css';
 import { useEffect, useState } from 'react';
 import '../../../assets/Forum.css';
@@ -11,6 +11,8 @@ import { PostContext } from '../../../contexts/PostContext';
 import { storage } from '../../../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { v4 } from 'uuid';
+import { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 const url = '../Image/Forum/forum-avatar1.png';
 const anh = '../Image/Forum/icon-anh-video.png';
 const monhoc = '../Image/Forum/icon-sach.png';
@@ -18,12 +20,14 @@ const tag = '../Image/Forum/icon-tag.png';
 
 export default function CreatePost() {
     const [open, setOpen] = useState(false);
+    const navigate = useNavigate();
     const [form] = Form.useForm();
     const [formValue, setFormValue] = useState({ subjectId: null, postText: '', postFile: '' });
-    const [fileUpload, setFileUpload] = useState(null);
-    const [fileUrl, setFileUrl] = useState('');
+    const [imageUpload, setImageUpload] = useState(null);
     const { subjects } = useContext(SubjectContext);
-    const { handleAddPost } = useContext(PostContext);
+    const { addPost, getPostByStatus } = useContext(PostContext);
+    const imageUrlRef = useRef('');
+    let imageUrlUpload = '';
     const normFile = (e) => {
         if (Array.isArray(e)) {
             return e;
@@ -39,21 +43,41 @@ export default function CreatePost() {
         setOpen(false);
         form.resetFields();
     };
-    const uploadImage = () => {
-        if (fileUpload == null) return;
-        const fileRef = ref(storage, `images/${fileUpload.name + v4()}`);
-        uploadBytes(fileRef, fileUpload).then((snapshot) => {
-            getDownloadURL(snapshot.ref).then((url) => {
-                setFileUrl(url);
-            });
+
+    console.log(imageUpload?.file.name);
+    const uploadImage = async () => {
+        if (imageUpload == null) return;
+        const imageRef = ref(storage, `images/${imageUpload?.file.name + v4()}`);
+        try {
+            const snapshot = await uploadBytes(imageRef, imageUpload);
+            const url = await getDownloadURL(snapshot.ref);
+            imageUrlRef.current = url;
+            imageUrlUpload = imageUrlRef.current;
+            console.log('Url in upload function: ', imageUrlUpload);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    //Display notification
+    const [api, contextHolder] = notification.useNotification();
+    const openNotificationAddPostSuccess = (placement) => {
+        api.success({
+            message: 'Thông báo',
+            description: 'Bài viết của bạn đang chờ được phê duyệt !',
+            placement,
         });
     };
 
     const handleSubmitAddPostForm = async () => {
-        uploadImage();
-        handleAddPost({ ...formValue, postFile: fileUrl });
-        setFileUrl('');
+        await uploadImage();
+        // console.log('Image ref: ', imageUrlRef.current);
+        // console.log('Image upload: ', imageUrlUpload);
+        await addPost({ ...formValue, postFile: imageUrlUpload });
         cancelModal();
+        openNotificationAddPostSuccess('topRight');
+        await getPostByStatus('Pending');
+        navigate('/forum?status=Pending');
     };
 
     const SubmitButton = ({ form }) => {
@@ -82,17 +106,9 @@ export default function CreatePost() {
         );
     };
 
-    // useEffect(() => {
-    //     setOpen();
-    // }, []);
-
-    // const handleCreatePost = () => {
-    //     console.log(open);
-    //     setOpen(false);
-    // };
-
     return (
         <>
+            {contextHolder}
             <div
                 className='createPost'
                 type='primary'
@@ -185,7 +201,7 @@ export default function CreatePost() {
                         >
                             <Upload
                                 listType='picture-card'
-                                onChange={(file) => setFileUpload(file)}
+                                onChange={(file) => setImageUpload(file)}
                             >
                                 <div>
                                     <PlusOutlined />

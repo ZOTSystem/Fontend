@@ -7,36 +7,43 @@ import PostList from './PostList';
 import { useContext, useEffect } from 'react';
 import { PostContext } from '../../contexts/PostContext';
 import FilterPost from './ForumComponent/FilterPost';
-import { useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
 import PostStatusTab from './ForumComponent/PostStatusTab';
 
 export default function Forum() {
-    const { posts } = useContext(PostContext);
+    const { posts, getAllPost, getPostByStatus } = useContext(PostContext);
     const { user } = useContext(UserContext);
-    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const statusQueryParam = searchParams.get('status');
 
     const statusList = [
         {
             id: 1,
+            title: 'Tất cả bài viết',
+        },
+        {
+            id: 2,
             name: 'Approved',
             title: 'Bài viết của tôi',
         },
         {
-            id: 2,
+            id: 3,
             name: 'Pending',
             title: 'Chờ phê duyệt',
         },
         {
-            id: 3,
+            id: 4,
             name: 'Rejected',
             title: 'Bị từ chối',
         },
     ];
 
+    //get post list
     useEffect(() => {
-        user?.roleId == '4' && navigate('?status=Approved');
-    }, [user.roleId]);
+        if (statusQueryParam) getPostByStatus(statusQueryParam);
+        else getAllPost();
+    }, [statusQueryParam]);
 
     return (
         <>
