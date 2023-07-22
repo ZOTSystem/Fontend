@@ -39,7 +39,7 @@ const FilterPost = () => {
             onFinish={handleSubmitFilterForm}
             id='filter-post-form'
         >
-            <Form.Item className='select-box'>
+            <Form.Item className='select-box form-item'>
                 <Select
                     label='Môn học'
                     defaultValue={0}
@@ -57,7 +57,7 @@ const FilterPost = () => {
                     ))}
                 </Select>
             </Form.Item>
-            <Form.Item>
+            <Form.Item className='form-item'>
                 <Button
                     type='primary'
                     htmlType='submit'

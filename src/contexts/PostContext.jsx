@@ -20,7 +20,7 @@ const PostProvider = ({ children }) => {
                 payload: response,
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
         }
     };
 
@@ -37,7 +37,7 @@ const PostProvider = ({ children }) => {
                 payload: newPosts,
             });
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
         }
     };
 

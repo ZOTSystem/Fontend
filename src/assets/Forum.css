@@ -71,7 +71,12 @@ hr {
 
 #filter-post-form {
     display: flex;
+    flex: 1;
     justify-content: flex-end;
+}
+
+#filter-post-form .form-item {
+    margin-bottom: 0;
 }
 
 .select-box {
@@ -217,4 +222,27 @@ hr {
 .comment-action-edit-delete p {
     margin: 0px;
     margin-left: 10px;
+}
+
+.post-filter-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.post-tab-item {
+    padding: 8px 15px;
+    margin: 0 24px;
+    border-radius: 10px;
+    border: none;
+    background-color: #fff;
+}
+
+.post-tab-item.active {
+    background-color: #99ccff;
+}
+
+.post-tab-item:first-child,
+.post-tab-item:last-child {
+    margin: unset;
 }

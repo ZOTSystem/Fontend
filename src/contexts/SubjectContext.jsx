@@ -16,7 +16,7 @@ const SubjectProvider = ({ children }) => {
             const response = await getAllSubjectService();
             dispatch({
                 type: 'GET_SUBJECTS',
-                payload: response.data,
+                payload: response?.data,
             });
         };
         getAllSubject();
