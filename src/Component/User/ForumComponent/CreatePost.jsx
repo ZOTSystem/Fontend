@@ -11,8 +11,6 @@ import { storage } from '../../../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { v4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
-import { MdCloudUpload, MdDelete } from 'react-icons/md';
-import { AiFillFileImage } from 'react-icons/ai';
 const url = '../Image/Forum/forum-avatar1.png';
 const anh = '../Image/Forum/icon-anh-video.png';
 const monhoc = '../Image/Forum/icon-sach.png';
