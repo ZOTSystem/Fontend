@@ -10,13 +10,13 @@ import FilterPost from './ForumComponent/FilterPost';
 import { useSearchParams } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
 import PostStatusTab from './ForumComponent/PostStatusTab';
+import Spinner from '../common/Spinner/Spinner';
 
 export default function Forum() {
-    const { posts, getAllPost, getPostByStatus } = useContext(PostContext);
+    const { loading, posts, getAllPost, getPostByStatus } = useContext(PostContext);
     const { user } = useContext(UserContext);
     const [searchParams] = useSearchParams();
     const statusQueryParam = searchParams.get('status');
-
     const statusList = [
         {
             id: 1,
@@ -55,9 +55,7 @@ export default function Forum() {
                         {user && <PostStatusTab statusList={statusList} />}
                         <FilterPost />
                     </div>
-                    <div className='post-container'>
-                        <PostList posts={posts} />
-                    </div>
+                    <div className='post-container'>{loading ? <Spinner /> : <PostList posts={posts} />}</div>
                 </div>
             </div>
         </>

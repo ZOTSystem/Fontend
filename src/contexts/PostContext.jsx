@@ -9,6 +9,7 @@ import {
 import postReducer from '../reducers/postReducer';
 
 const initialState = {
+    loading: true,
     posts: [],
 };
 
@@ -23,6 +24,7 @@ const PostProvider = ({ children }) => {
             dispatch({
                 type: 'GET_POSTS',
                 payload: response,
+                loading: false,
             });
         } catch (error) {
             console.log(error);
@@ -36,6 +38,7 @@ const PostProvider = ({ children }) => {
             dispatch({
                 type: 'GET_POSTS',
                 payload: newPosts,
+                loading: false,
             });
         } catch (error) {
             console.log(error);
@@ -48,6 +51,7 @@ const PostProvider = ({ children }) => {
             dispatch({
                 type: 'GET_POSTS',
                 payload: response,
+                loading: false,
             });
         } catch (error) {
             console.log(error);
@@ -60,6 +64,7 @@ const PostProvider = ({ children }) => {
             dispatch({
                 type: 'GET_POSTS',
                 payload: response,
+                loading: false,
             });
         } catch (error) {
             console.log(error);
@@ -72,6 +77,7 @@ const PostProvider = ({ children }) => {
             dispatch({
                 type: 'GET_POSTS',
                 payload: response,
+                loading: false,
             });
         } catch (error) {
             console.log(error);
@@ -82,6 +88,7 @@ const PostProvider = ({ children }) => {
         <PostContext.Provider
             value={{
                 posts: state.posts,
+                loading: state.loading,
                 addPost,
                 getAllPost,
                 getPostBySubject,
