@@ -1,18 +1,18 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { Avatar, Button, Form, Input, Select, Upload, Modal, Space, notification } from 'antd';
 import 'bootstrap/dist/css/bootstrap.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext, useRef } from 'react';
 import '../../../assets/Forum.css';
 import '../../../assets/Style.css';
 import TextArea from 'antd/es/input/TextArea';
-import { useContext } from 'react';
 import { SubjectContext } from '../../../contexts/SubjectContext';
 import { PostContext } from '../../../contexts/PostContext';
 import { storage } from '../../../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { v4 } from 'uuid';
-import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { MdCloudUpload, MdDelete } from 'react-icons/md';
+import { AiFillFileImage } from 'react-icons/ai';
 const url = '../Image/Forum/forum-avatar1.png';
 const anh = '../Image/Forum/icon-anh-video.png';
 const monhoc = '../Image/Forum/icon-sach.png';
@@ -43,17 +43,15 @@ export default function CreatePost() {
         setOpen(false);
         form.resetFields();
     };
-
-    console.log(imageUpload?.file.name);
     const uploadImage = async () => {
         if (imageUpload == null) return;
-        const imageRef = ref(storage, `images/${imageUpload?.file.name + v4()}`);
+        const imageRef = ref(storage, `images/${imageUpload.name + v4()}`);
         try {
             const snapshot = await uploadBytes(imageRef, imageUpload);
             const url = await getDownloadURL(snapshot.ref);
             imageUrlRef.current = url;
             imageUrlUpload = imageUrlRef.current;
-            console.log('Url in upload function: ', imageUrlUpload);
+            return imageUrlUpload;
         } catch (error) {
             console.log(error);
         }
@@ -70,41 +68,39 @@ export default function CreatePost() {
     };
 
     const handleSubmitAddPostForm = async () => {
-        await uploadImage();
-        // console.log('Image ref: ', imageUrlRef.current);
-        // console.log('Image upload: ', imageUrlUpload);
-        await addPost({ ...formValue, postFile: imageUrlUpload });
+        const postFile = await uploadImage();
+        await addPost({ ...formValue, postFile });
         cancelModal();
         openNotificationAddPostSuccess('topRight');
         await getPostByStatus('Pending');
         navigate('/forum?status=Pending');
     };
 
-    const SubmitButton = ({ form }) => {
-        const [submittable, setSubmittable] = useState(false);
-        const values = Form.useWatch([], form);
-        useEffect(() => {
-            form.validateFields({
-                validateOnly: true,
-            }).then(
-                () => {
-                    setSubmittable(true);
-                },
-                () => {
-                    setSubmittable(false);
-                }
-            );
-        }, [values]);
-        return (
-            <Button
-                type='primary'
-                htmlType='submit'
-                disabled={!submittable}
-            >
-                Đăng
-            </Button>
-        );
-    };
+    // const SubmitButton = ({ form }) => {
+    //     const [submittable, setSubmittable] = useState(false);
+    //     const values = Form.useWatch([], form);
+    //     useEffect(() => {
+    //         form.validateFields({
+    //             validateOnly: true,
+    //         }).then(
+    //             () => {
+    //                 setSubmittable(true);
+    //             },
+    //             () => {
+    //                 setSubmittable(false);
+    //             }
+    //         );
+    //     }, [values]);
+    //     return (
+    //         <Button
+    //             type='primary'
+    //             htmlType='submit'
+    //             disabled={!submittable}
+    //         >
+    //             Đăng
+    //         </Button>
+    //     );
+    // };
 
     return (
         <>
@@ -198,15 +194,21 @@ export default function CreatePost() {
                             style={{
                                 marginTop: 10,
                             }}
+                            className='form-item upload-image'
                         >
-                            <Upload
+                            <input
+                                type='file'
+                                accept='image/*'
+                                onChange={(event) => setImageUpload(event.target.files[0])}
+                            />
+                            {/* <Upload
                                 listType='picture-card'
                                 onChange={(file) => setImageUpload(file)}
                             >
                                 <div>
                                     <PlusOutlined />
                                 </div>
-                            </Upload>
+                            </Upload> */}
                         </Form.Item>
                     </Form>
                 </Modal>

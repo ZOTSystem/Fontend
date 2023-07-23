@@ -189,7 +189,7 @@ export default function Navbar() {
                     <a
                         className={checkForum ? 'isActive' : ''}
                         onClick={() => {
-                            !user ? navigate('/forum') : navigate('/forum?status=Approved');
+                            navigate('/forum');
                         }}
                     >
                         <li

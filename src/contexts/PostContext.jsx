@@ -4,6 +4,7 @@ import {
     addPostService,
     getPostBySubjectService,
     getPostByStatusService,
+    getPostBySubjectAndStatusService,
 } from '../services/postService';
 import postReducer from '../reducers/postReducer';
 
@@ -65,8 +66,29 @@ const PostProvider = ({ children }) => {
         }
     };
 
+    const getPostBySubjectAndStatus = async (subjectId, status) => {
+        try {
+            const response = await getPostBySubjectAndStatusService(subjectId, status);
+            dispatch({
+                type: 'GET_POSTS',
+                payload: response,
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     return (
-        <PostContext.Provider value={{ posts: state.posts, addPost, getAllPost, getPostBySubject, getPostByStatus }}>
+        <PostContext.Provider
+            value={{
+                posts: state.posts,
+                addPost,
+                getAllPost,
+                getPostBySubject,
+                getPostByStatus,
+                getPostBySubjectAndStatus,
+            }}
+        >
             {children}
         </PostContext.Provider>
     );

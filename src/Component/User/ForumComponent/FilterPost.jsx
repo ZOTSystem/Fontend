@@ -10,7 +10,7 @@ const FilterPost = () => {
     const [selectionValue, setSelectionValue] = useState(null);
 
     const { subjects } = useContext(SubjectContext);
-    const { getAllPost, getPostBySubject } = useContext(PostContext);
+    const { getAllPost, getPostBySubject, getPostByStatus, getPostBySubjectAndStatus } = useContext(PostContext);
     const subjectNameRef = useRef(null);
 
     const [searchParams, setSearchParams] = useSearchParams();
@@ -22,16 +22,35 @@ const FilterPost = () => {
         subjectNameRef.current = subjectFound ? subjectFound.subjectName : null;
     };
 
+    console.log(subjectNameRef.current);
+    console.log(statusQueryParams);
+
+    //Handle filter
+    const filterConditions = [
+        { type: 'both', condition: statusQueryParams && subjectNameRef.current },
+        { type: 'subject', condition: !statusQueryParams && subjectNameRef.current },
+        { type: 'status', condition: statusQueryParams && !subjectNameRef.current },
+    ];
+
+    const filterType = filterConditions.find((c) => c.condition)?.type;
+
     const handleSubmitFilterForm = () => {
-        if (subjectNameRef.current) {
-            getPostBySubject(selectionValue);
-            statusQueryParams
-                ? setSearchParams({ status: statusQueryParams, subject: `${subjectNameRef.current}` })
-                : setSearchParams({ subject: `${subjectNameRef.current}` });
-        } else {
-            getAllPost();
-            searchParams.delete('subject');
-            statusQueryParams ? setSearchParams({ status: statusQueryParams }) : setSearchParams({});
+        switch (filterType) {
+            case 'both':
+                getPostBySubjectAndStatus(selectionValue, statusQueryParams);
+                setSearchParams({ status: statusQueryParams, subject: `${subjectNameRef.current}` });
+                break;
+            case 'subject':
+                getPostBySubject(selectionValue);
+                setSearchParams({ subject: `${subjectNameRef.current}` });
+                break;
+            case 'status':
+                getPostByStatus(statusQueryParams);
+                setSearchParams({ status: statusQueryParams });
+                break;
+            default:
+                getAllPost();
+                setSearchParams({});
         }
     };
 

@@ -1,8 +1,12 @@
 import PostContent from './ForumComponent/PostContent';
 import SendComment from './ForumComponent/SendComment';
 import Comment from './ForumComponent/Comment';
+import { useSearchParams } from 'react-router-dom';
 
 const PostList = ({ posts }) => {
+    const [searchParams] = useSearchParams();
+    const statusQueryParams = searchParams.get('status');
+
     return (
         <div className='post'>
             {posts.length > 0 ? (
@@ -21,8 +25,12 @@ const PostList = ({ posts }) => {
                                 status={status}
                                 createDate={createDate}
                             />
-                            <SendComment postId={postId} />
-                            {/* <Comment /> */}
+                            {(!statusQueryParams || statusQueryParams === 'Approved') && (
+                                <>
+                                    <SendComment postId={postId} />
+                                    {/* <Comment /> */}
+                                </>
+                            )}
                         </div>
                     );
                 })
