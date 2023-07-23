@@ -10,30 +10,20 @@ const PostList = ({ posts }) => {
     return (
         <div className='post'>
             {posts.length > 0 ? (
-                posts.map((post) => {
-                    const { postId, subjectName, fullName, postText, postFile, status, createDate } = post;
-                    return (
-                        <div
-                            key={postId}
-                            className='form-post'
-                        >
-                            <PostContent
-                                subjectName={subjectName}
-                                fullName={fullName}
-                                postText={postText}
-                                postFile={postFile}
-                                status={status}
-                                createDate={createDate}
-                            />
-                            {(!statusQueryParams || statusQueryParams === 'Approved') && (
-                                <>
-                                    <SendComment postId={postId} />
-                                    {/* <Comment /> */}
-                                </>
-                            )}
-                        </div>
-                    );
-                })
+                posts.map((post) => (
+                    <div
+                        key={post.postId}
+                        className='form-post'
+                    >
+                        <PostContent post={post} />
+                        {(!statusQueryParams || statusQueryParams === 'Approved') && (
+                            <>
+                                <SendComment postId={post.postId} />
+                                {/* <Comment /> */}
+                            </>
+                        )}
+                    </div>
+                ))
             ) : (
                 <h3 className='post-empty'>Không tìm thấy bài viết nào !</h3>
             )}

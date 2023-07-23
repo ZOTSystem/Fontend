@@ -7,7 +7,8 @@ const url = '../Image/Forum/forum-avatar1.png';
 const luu = '../Image/Forum/luu.png';
 const daluu = '../Image/Forum/daluu.png';
 const baitoan = '../Image/Forum/baitoan.png';
-export default function PostContent({ fullName, createdTime, subjectName, postText, postFile }) {
+export default function PostContent({ post }) {
+    const { fullName, createdTime, subjectName, postText, postFile } = post;
     const [save, setSave] = useState(false);
     const [saveUrl, setSaveUrl] = useState(luu);
 
@@ -23,28 +24,43 @@ export default function PostContent({ fullName, createdTime, subjectName, postTe
 
     return (
         <>
-            <div className="form-info">
-                <div className="form-left">
-                    <Avatar src={<img src={url} alt="avatar" />} />
+            <div className='form-info'>
+                <div className='form-left'>
+                    <Avatar
+                        src={
+                            <img
+                                src={url}
+                                alt='avatar'
+                            />
+                        }
+                    />
                 </div>
-                <div className="form-mid">
-                    <div className="form-mid-top">
+                <div className='form-mid'>
+                    <div className='form-mid-top'>
                         <div>
                             {fullName} • {createdTime}
                         </div>
-                        <div className="form-mid-top-subject">
+                        <div className='form-mid-top-subject'>
                             <p>{subjectName}</p>
                         </div>
                     </div>
-                    <div className="form-mid-content">
+                    <div className='form-mid-content'>
                         <div>
                             <p>{postText}</p>
                         </div>
-                        {postFile && <img src={postFile} alt="post"></img>}
+                        {postFile && (
+                            <img
+                                src={postFile}
+                                alt='post'
+                            ></img>
+                        )}
                     </div>
                 </div>
-                <div className="form-right">
-                    <img onClick={savePost} src={saveUrl}></img>
+                <div className='form-right'>
+                    <img
+                        onClick={savePost}
+                        src={saveUrl}
+                    ></img>
                 </div>
             </div>
         </>
