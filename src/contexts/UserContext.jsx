@@ -43,8 +43,7 @@ const UserContextProvider = (props) => {
                 onSetRender,
                 onSetUser,
                 onSetToken,
-            }}
-        >
+            }}>
             {props.children}
         </UserContext.Provider>
     );

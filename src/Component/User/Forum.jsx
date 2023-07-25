@@ -43,7 +43,7 @@ export default function Forum() {
     useEffect(() => {
         if (statusQueryParam) getPostByStatus(statusQueryParam);
         else getAllPost();
-    }, [statusQueryParam, getPostByStatus, getAllPost]);
+    }, [statusQueryParam]);
 
     return (
         <>

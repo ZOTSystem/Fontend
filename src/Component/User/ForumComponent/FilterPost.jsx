@@ -22,9 +22,6 @@ const FilterPost = () => {
         subjectNameRef.current = subjectFound ? subjectFound.subjectName : null;
     };
 
-    console.log(subjectNameRef.current);
-    console.log(statusQueryParams);
-
     //Handle filter
     const filterConditions = [
         { type: 'both', condition: statusQueryParams && subjectNameRef.current },
@@ -55,35 +52,22 @@ const FilterPost = () => {
     };
 
     return (
-        <Form
-            layout='horizontal'
-            form={form}
-            onFinish={handleSubmitFilterForm}
-            id='filter-post-form'
-        >
-            <Form.Item className='select-box form-item'>
+        <Form layout="horizontal" form={form} onFinish={handleSubmitFilterForm} id="filter-post-form">
+            <Form.Item className="select-box form-item">
                 <Select
-                    label='Môn học'
+                    label="Môn học"
                     defaultValue={0}
-                    onChange={(subjectValue) => handleSelectionChange(subjectValue)}
-                >
+                    onChange={(subjectValue) => handleSelectionChange(subjectValue)}>
                     <Select.Option value={0}>-- Tất cả môn học --</Select.Option>
                     {subjects?.map((subject) => (
-                        <Select.Option
-                            key={subject.subjectId}
-                            value={subject.subjectId}
-                            ref={subjectNameRef}
-                        >
+                        <Select.Option key={subject.subjectId} value={subject.subjectId} ref={subjectNameRef}>
                             {subject.subjectName}
                         </Select.Option>
                     ))}
                 </Select>
             </Form.Item>
-            <Form.Item className='form-item'>
-                <Button
-                    type='primary'
-                    htmlType='submit'
-                >
+            <Form.Item className="form-item">
+                <Button type="primary" htmlType="submit">
                     Lọc
                 </Button>
             </Form.Item>
