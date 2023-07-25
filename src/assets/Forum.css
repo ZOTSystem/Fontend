@@ -190,43 +190,68 @@ hr {
     height: 35px;
 }
 
-.comment {
+.comment-wrapper {
     display: flex;
-    margin-top: 10px;
-}
-
-.comment-left {
-    width: 5%;
+    margin: 12px 0;
 }
 
 .comment-right {
-    width: 95%;
     font-size: 13px;
     color: #656c6a;
-    margin-top: 7px;
+    margin-left: 20px;
+    flex: 0 0 85%;
+}
+
+.comment-content {
+    padding: 8px;
+    margin-bottom: 8px;
+    background-color: #f5f6f7;
+    border-radius: 10px;
 }
 
 .comment-right p {
     color: black;
-    font-size: 24px;
-    margin: 0px;
+    font-size: 14px;
+    margin-bottom: 0;
 }
 
 .comment-right img {
     height: auto;
-    width: 80%;
 }
 
-.comment-action-edit-delete {
+.comment-action {
     display: flex;
     color: #656c6a;
-    font-size: 13px;
-    margin-left: 30px;
 }
 
-.comment-action-edit-delete p {
-    margin: 0px;
-    margin-left: 10px;
+.comment-action-btn {
+    font-size: 12px;
+    border: none;
+    outline: none;
+    padding: 0;
+    background-color: transparent;
+}
+
+.comment-action-btn:first-child {
+    margin-right: 12px;
+}
+
+.comment-modal .ant-modal-body {
+    max-height: 70vh;
+    overflow-x: hidden;
+}
+
+.comment-modal .ant-modal-body::-webkit-scrollbar {
+    width: 4px;
+    border-radius: 10px;
+}
+
+.comment-modal .ant-modal-body::-webkit-scrollbar-track {
+    background-color: #f5f6f7;
+}
+
+.comment-modal .ant-modal-body::-webkit-scrollbar-thumb {
+    background-color: #99ccff;
 }
 
 .post-filter-container {

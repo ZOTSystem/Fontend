@@ -24,7 +24,7 @@ import ExamFinish from './Component/User/ExamFinish';
 import TopicStudy from './Component/User/TopicStudy';
 
 //#Region Admin Routes
-import ManageUser from './Component/Admin/ManageUser'
+import ManageUser from './Component/Admin/ManageUser';
 import ManageMod from './Component/Admin/ManageMod';
 import ManageQuestion from './Component/Admin/ManageQuestion';
 import ManageTopic from './Component/Admin/ManageTopic';
@@ -32,60 +32,77 @@ import ManageTopic from './Component/Admin/ManageTopic';
 import Testfirebase from './Testfirebase';
 import PostProvider from './contexts/PostContext';
 import SubjectProvider from './contexts/SubjectContext';
+import CommentProvider from './contexts/CommentContext';
 
 function App() {
-  const { token, user } = useContext(UserContext);
+    const { token, user } = useContext(UserContext);
 
+    return (
+        <Fragment>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" element={<HomePage />}></Route>
+                    <Route path="/login" element={<Login />}></Route>
+                    <Route
+                        path="/forum"
+                        element={
+                            <PostProvider>
+                                <SubjectProvider>
+                                    <CommentProvider>
+                                        <Forum />
+                                    </CommentProvider>
+                                </SubjectProvider>
+                            </PostProvider>
+                        }></Route>
+                    <Route path="/news" element={<News />}></Route>
+                    <Route path="confirm/:email" element={<ConfirmEmail />} />
+                    <Route path="/practiceQuizz" element={<PracticeQuizzes />}></Route>
+                    <Route path="/testSubject" element={<TestSubject />}></Route>
+                    <Route path="/test" element={<Testfirebase />}></Route>
 
-  return (
-    <Fragment>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<HomePage />}></Route>
-          <Route path="/login" element={<Login />}></Route>
-          <Route path="/forum" element={<PostProvider><SubjectProvider><Forum /></SubjectProvider></PostProvider>}></Route>
-          <Route path="/news" element={<News />}></Route>
-          <Route path="confirm/:email" element={<ConfirmEmail />} />
-          <Route path="/practiceQuizz" element={<PracticeQuizzes />}></Route>
-          <Route path="/testSubject" element={<TestSubject />}></Route>
-          <Route path="/test" element={<Testfirebase />}></Route>
+                    {token && user?.roleId == '4' && (
+                        <Fragment>
+                            {/* Router của người dùng */}
+                            <Route path="/practiceQuizz" element={<PracticeQuizzes />}></Route>
+                            <Route path="/testSubject" element={<TestSubject />}></Route>
+                            <Route path="/profile" element={<Profile />}></Route>
+                            <Route path="/testHistory" element={<TestHistory />}></Route>
+                            <Route path="/takeExam" element={<TakeExam />}></Route>
+                            <Route path="/exam" element={<Exam />}></Route>
+                            <Route
+                                path="/forum"
+                                element={
+                                    <PostProvider>
+                                        <SubjectProvider>
+                                            <CommentProvider>
+                                                <Forum />
+                                            </CommentProvider>
+                                        </SubjectProvider>
+                                    </PostProvider>
+                                }></Route>
+                            <Route path="/news" element={<News />}></Route>
+                            <Route path="/examResult" element={<ExamResult />}></Route>
+                            <Route path="/study" element={<Study />}></Route>
+                            <Route path="/examFinish" element={<ExamFinish />}></Route>
+                            <Route path="/" element={<HomePage />}></Route>
+                            <Route path="topicStudy" element={<TopicStudy />}></Route>
+                        </Fragment>
+                    )}
 
+                    {token && user?.roleId == '1' && (
+                        <Fragment>
+                            <Route path="/admin/manageUser" element={<ManageUser />} />
+                            <Route path="/admin/manageMod" element={<ManageMod />} />
+                            <Route path="/admin/manageQuestion" element={<ManageQuestion />} />
+                            <Route path="/admin/manageTopic" element={<ManageTopic />} />
+                        </Fragment>
+                    )}
 
-          {token && user?.roleId == "4" && (
-            <Fragment>
-              {/* Router của người dùng */}
-              <Route path="/practiceQuizz" element={<PracticeQuizzes />}></Route>
-              <Route path="/testSubject" element={<TestSubject />}></Route>
-              <Route path="/profile" element={<Profile />}></Route>
-              <Route path='/testHistory' element={<TestHistory />}></Route>
-              <Route path="/takeExam" element={<TakeExam />}></Route>
-              <Route path="/exam" element={<Exam />}></Route>
-              <Route path="/forum" element={<PostProvider><SubjectProvider><Forum /></SubjectProvider></PostProvider>}></Route>
-              <Route path="/news" element={<News />}></Route>
-              <Route path="/examResult" element={<ExamResult />}></Route>
-              <Route path="/study" element={<Study />}></Route>
-              <Route path="/examFinish" element={<ExamFinish />}></Route>
-              <Route path="/" element={<HomePage />}></Route>
-              <Route path="topicStudy" element={<TopicStudy />}></Route>
-
-            </Fragment>
-          )}
-
-          {token && user?.roleId == "1" && (
-            <Fragment>
-              <Route path="/admin/manageUser" element={<ManageUser />} />
-              <Route path="/admin/manageMod" element={<ManageMod />} />
-              <Route path="/admin/manageQuestion" element={<ManageQuestion />} />
-              <Route path="/admin/manageTopic" element={<ManageTopic />} />
-            </Fragment>
-          )}
-
-          {/* <Route path="/*" element={<Navigate to="/" />} /> */}
-
-        </Routes>
-      </BrowserRouter>
-    </Fragment >
-  );
+                    {/* <Route path="/*" element={<Navigate to="/" />} /> */}
+                </Routes>
+            </BrowserRouter>
+        </Fragment>
+    );
 }
 
 export default App;

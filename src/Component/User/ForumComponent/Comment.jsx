@@ -1,35 +1,30 @@
-import {
-    Avatar,
-} from 'antd';
+import { Avatar } from 'antd';
 import 'bootstrap/dist/css/bootstrap.css';
 import React, { useState } from 'react';
 const url = '../Image/Forum/forum-avatar1.png';
 const baitoan = '../Image/Forum/baitoan.png';
-export default function Comment() {
+
+export default function Comment({ comment }) {
+    const { fullName, content } = comment;
 
     return (
-        <>
-            <div className='comment'>
-                <div className='comment-left'>
-                    <Avatar src={<img src={url} alt="avatar" />} />
-                </div>
-                <div className='comment-right'>
-                    <div>Chuong Tran • 15 giờ trước</div>
+        <div className="comment-wrapper">
+            <div className="comment-left">
+                <Avatar src={<img src={url} alt="avatar" />} />
+            </div>
+            <div className="comment-right">
+                <div className="comment-content">
+                    <div>{fullName} • 15 giờ trước</div>
                     <div>
-                        <p>
-                            Tham khảo cách này nka
-                        </p>
+                        <p>{content}</p>
                     </div>
-                    <img src={baitoan}></img>
+                </div>
+                {/* <img src={baitoan}></img> */}
+                <div className="comment-action">
+                    <button className="comment-action-btn">Chỉnh sửa</button>
+                    <button className="comment-action-btn">Xóa</button>
                 </div>
             </div>
-            <div className='comment-action'>
-                <div className='comment-action-edit-delete'>
-                    <p>Edit</p>
-                    <p>Delete</p>
-                </div>
-            </div>
-
-        </>
-    )
+        </div>
+    );
 }
