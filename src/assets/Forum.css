@@ -213,6 +213,11 @@ hr {
     color: black;
     font-size: 14px;
     margin-bottom: 0;
+    max-width: 380px;
+}
+
+.comment-right p[contenteditable='true'] {
+    padding: 8px;
 }
 
 .comment-right img {
