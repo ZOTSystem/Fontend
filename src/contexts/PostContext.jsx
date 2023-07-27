@@ -5,12 +5,14 @@ import {
     getPostBySubjectService,
     getPostByStatusService,
     getPostBySubjectAndStatusService,
+    getPostByIdService,
 } from '../services/postService';
 import postReducer from '../reducers/postReducer';
 
 const initialState = {
     loading: true,
     posts: [],
+    currentPost: {},
 };
 
 export const PostContext = createContext(null);
@@ -18,11 +20,26 @@ export const PostContext = createContext(null);
 const PostProvider = ({ children }) => {
     const [state, dispatch] = useReducer(postReducer, initialState);
 
+    const { loading, posts, currentPost } = state;
+
     const getAllPost = async () => {
         try {
             const response = await getAllPostService();
             dispatch({
                 type: 'GET_POSTS',
+                payload: response,
+                loading: false,
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const getPostById = async (postId) => {
+        try {
+            const response = await getPostByIdService(postId);
+            dispatch({
+                type: 'GET_POST_DETAILS',
                 payload: response,
                 loading: false,
             });
@@ -87,15 +104,16 @@ const PostProvider = ({ children }) => {
     return (
         <PostContext.Provider
             value={{
-                posts: state.posts,
-                loading: state.loading,
+                posts,
+                loading,
+                currentPost,
                 addPost,
                 getAllPost,
+                getPostById,
                 getPostBySubject,
                 getPostByStatus,
                 getPostBySubjectAndStatus,
-            }}
-        >
+            }}>
             {children}
         </PostContext.Provider>
     );

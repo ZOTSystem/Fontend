@@ -3,6 +3,8 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { useState, useEffect, useContext } from 'react';
 import { CommentContext } from '../../../contexts/CommentContext';
 import CommentList from '../CommentList';
+import { PostContext } from '../../../contexts/PostContext';
+import PostDetails from './PostDetails';
 
 const url = '../Image/Forum/forum-avatar1.png';
 const luu = '../Image/Forum/luu.png';
@@ -18,7 +20,10 @@ export default function PostContent({ post }) {
     const [saveUrl, setSaveUrl] = useState(luu);
     const [likeClick, setLike] = useState(false);
     const [likeUrl, setLikeUrl] = useState(like);
+    const { currentPost, getPostById } = useContext(PostContext);
     const { comments, getCommentsByPost } = useContext(CommentContext);
+
+    console.log(currentPost);
 
     const savePost = () => {
         if (save == true) {
@@ -44,6 +49,7 @@ export default function PostContent({ post }) {
 
     const showModal = (postId) => {
         setIsModalOpen(true);
+        getPostById(postId);
         getCommentsByPost(postId);
     };
 
@@ -86,12 +92,14 @@ export default function PostContent({ post }) {
 
             {isModalOpen && (
                 <Modal
-                    title="Bình luận"
+                    title={`Bài viết của ${fullName}`}
                     cancelText="Đóng"
                     okButtonProps={{ style: { display: 'none' } }}
                     open={isModalOpen}
                     onCancel={cancelModal}
                     className="comment-modal">
+                    <PostDetails data={currentPost} />
+                    <h6 className="comment-title">Bình luận</h6>
                     <CommentList comments={comments} />
                 </Modal>
             )}

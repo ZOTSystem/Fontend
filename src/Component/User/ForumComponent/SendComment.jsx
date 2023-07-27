@@ -4,6 +4,8 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { useContext, useState } from 'react';
 import { CommentContext } from '../../../contexts/CommentContext';
 import CommentList from '../CommentList';
+import PostDetails from './PostDetails';
+import { PostContext } from '../../../contexts/PostContext';
 
 const url = '../Image/Forum/forum-avatar1.png';
 const like = '../Image/Forum/like.png';

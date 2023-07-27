@@ -1,6 +1,6 @@
 import { createContext, useReducer } from 'react';
 import commentReducer from '../reducers/commentReducer';
-import { addCommentService, getCommentsByPostService } from '../services/commentService';
+import { addCommentService, editCommentService, getCommentsByPostService } from '../services/commentService';
 
 const initialState = {
     loading: true,
@@ -35,8 +35,16 @@ const CommentProvider = ({ children }) => {
         }
     };
 
+    const editComment = async (data) => {
+        try {
+            await editCommentService(data);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     return (
-        <CommentContext.Provider value={{ loading, comments, addComment, getCommentsByPost }}>
+        <CommentContext.Provider value={{ loading, comments, addComment, getCommentsByPost, editComment }}>
             {children}
         </CommentContext.Provider>
     );

@@ -1,7 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import PostContent from './ForumComponent/PostContent';
 import SendComment from './ForumComponent/SendComment';
-import Comment from './ForumComponent/Comment';
 
 const PostList = ({ posts }) => {
     const [searchParams] = useSearchParams();
@@ -16,7 +15,6 @@ const PostList = ({ posts }) => {
                         {(!statusQueryParams || statusQueryParams === 'Approved') && (
                             <>
                                 <SendComment postId={post.postId} />
-                                {/* <Comment /> */}
                             </>
                         )}
                     </div>

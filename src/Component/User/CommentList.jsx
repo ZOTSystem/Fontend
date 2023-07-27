@@ -1,8 +1,21 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { notification } from 'antd';
 import Comment from './ForumComponent/Comment';
+import { CommentContext } from '../../contexts/CommentContext';
 
 const CommentList = ({ comments }) => {
+    const { editComment } = useContext(CommentContext);
     const [editingCommentId, setEditingCommentId] = useState(null);
+
+    //Display notification
+    const [api, contextHolder] = notification.useNotification();
+    const openNotificationEditCommentSuccess = (placement) => {
+        api.success({
+            message: 'Thông báo',
+            description: 'Bình luận đã được chỉnh sửa !',
+            placement,
+        });
+    };
 
     const handleEditComment = (comment) => {
         setEditingCommentId(comment.postCommentId);
@@ -13,26 +26,27 @@ const CommentList = ({ comments }) => {
     };
 
     const handleSaveComment = (comment, updatedContent) => {
-        // Handle saving the updated content here (you can use the comment.postCommentId and updatedContent)
-        // For example: Call an API to update the comment on the server
-        console.log(comment.postCommentId, updatedContent);
-
+        editComment({ postCommentId: comment.postCommentId, content: updatedContent });
+        openNotificationEditCommentSuccess('topRight');
         setEditingCommentId(null);
     };
 
     return (
-        <div className="comment-list">
-            {comments?.map((comment) => (
-                <Comment
-                    key={comment.postCommentId}
-                    comment={comment}
-                    isEditing={editingCommentId === comment.postCommentId}
-                    onEditComment={handleEditComment}
-                    onCancelEditMode={handleCancelEditMode}
-                    onSaveComment={handleSaveComment}
-                />
-            ))}
-        </div>
+        <>
+            {contextHolder}
+            <div className="comment-list">
+                {comments?.map((comment) => (
+                    <Comment
+                        key={comment.postCommentId}
+                        comment={comment}
+                        isEditing={editingCommentId === comment.postCommentId}
+                        onEditComment={handleEditComment}
+                        onCancelEditMode={handleCancelEditMode}
+                        onSaveComment={handleSaveComment}
+                    />
+                ))}
+            </div>
+        </>
     );
 };
 
