@@ -9,6 +9,7 @@ export const GetQuestionByTopicId = async (topicId) => {
                 'Content-Type': 'application/json',
             },
         });
+        console.log(respone)
         return respone;
     } catch (e) {
         return e;

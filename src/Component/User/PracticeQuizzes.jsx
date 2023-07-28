@@ -1,6 +1,6 @@
 import { Component, useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import { getAllSubjectService } from '../../services/subjectService';
+import { GetAllSubjectService } from '../../services/subjectService';
 import '../../assets/PracticeQuizStyle.css';
 import '../../assets/Style.css';
 import Header from '../../Layout/User/Header';
@@ -10,11 +10,9 @@ export default function PracticeQuizzes() {
 
     const handleGetData = async () => {
         try {
-            const result = await getAllSubjectService();
-            console.log(result.data);
+            const result = await GetAllSubjectService();
             if (result.status === 200) {
                 setSubjectAll(result.data);
-                console.log(result.data);
             }
         } catch (error) {
             console.error('Error fetching mod service:', error);
@@ -34,7 +32,6 @@ export default function PracticeQuizzes() {
                 subjectName: subjectName,
             },
         });
-        console.log('subject: ' + subjectId);
     };
 
     return (
