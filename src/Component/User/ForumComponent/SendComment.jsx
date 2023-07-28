@@ -1,7 +1,11 @@
-import { Input, Avatar, Modal } from 'antd';
+import { Input, Avatar, Modal, notification } from 'antd';
 import 'bootstrap/dist/css/bootstrap.css';
 
-import React, { useState } from 'react';
+import { useContext, useState } from 'react';
+import { CommentContext } from '../../../contexts/CommentContext';
+import CommentList from '../CommentList';
+import PostDetails from './PostDetails';
+import { PostContext } from '../../../contexts/PostContext';
 
 const url = '../Image/Forum/forum-avatar1.png';
 const like = '../Image/Forum/like.png';
@@ -11,59 +15,67 @@ const upload = '../Image/Forum/upload.png';
 const send = '../Image/Forum/send.png';
 const { TextArea } = Input;
 export default function SendComment({ postId }) {
-    const [likeClick, setLike] = useState(false);
-    const [likeUrl, setLikeUrl] = useState(like);
+    const { comments, addComment, getCommentsByPost } = useContext(CommentContext);
+    const [content, setContent] = useState('');
+
+    const handleSendComment = () => {
+        addComment({ postId, content });
+        setContent('');
+        openNotificationSendCommentSuccess('topRight');
+        showModal(postId);
+    };
+
+    //Display notification
+    const [api, contextHolder] = notification.useNotification();
+    const openNotificationSendCommentSuccess = (placement) => {
+        api.success({
+            message: 'Thông báo',
+            description: 'Bình luận đã được gửi !',
+            placement,
+        });
+    };
+
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const showModal = () => {
+    const showModal = (postId) => {
         setIsModalOpen(true);
+        getCommentsByPost(postId);
     };
 
     const cancelModal = () => {
         setIsModalOpen(false);
     };
 
-    const likePost = () => {
-        if (likeClick == true) {
-            setLike(false);
-            setLikeUrl(like);
-        } else {
-            setLike(true);
-            setLikeUrl(liked);
-        }
-    };
-
     return (
         <>
+            {contextHolder}
             <div className="form-bottom">
-                <div className="form-like">
-                    <img onClick={likePost} src={likeUrl}></img>
-                    <p>155</p>
-                    <img src={comment} onClick={showModal}></img>
-                    <p>15</p>
-                </div>
                 <div className="form-comment">
                     <div className="form-comment-left">
                         <Avatar src={<img src={url} alt="avatar" />} />
                     </div>
                     <div className="form-comment-midle">
-                        <TextArea placeholder="Viết bình luận..." autoSize></TextArea>
+                        <TextArea
+                            value={content}
+                            onChange={(e) => setContent(e.target.value)}
+                            placeholder="Viết bình luận..."
+                            autoSize></TextArea>
                     </div>
                     <div className="form-comment-right">
-                        <img src={upload}></img>
-                        <img src={send}></img>
+                        <img src={upload} alt="upload"></img>
+                        <img src={send} alt="send" onClick={handleSendComment}></img>
                     </div>
                 </div>
             </div>
-
             {isModalOpen && (
                 <Modal
                     title="Bình luận"
                     cancelText="Đóng"
                     okButtonProps={{ style: { display: 'none' } }}
                     open={isModalOpen}
-                    onCancel={cancelModal}>
-                    <p>Đây là bình luận của bài viết {postId}</p>
+                    onCancel={cancelModal}
+                    className="comment-modal">
+                    <CommentList comments={comments} />
                 </Modal>
             )}
         </>

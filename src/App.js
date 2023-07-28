@@ -24,7 +24,7 @@ import ExamFinish from './Component/User/ExamFinish';
 import TopicStudy from './Component/User/TopicStudy';
 
 //#Region Admin Routes
-import ManageUser from './Component/Admin/ManageUser'
+import ManageUser from './Component/Admin/ManageUser';
 import ManageMod from './Component/Admin/ManageMod';
 import ManageQuestion from './Component/Admin/ManageQuestion';
 import ManageTopic from './Component/Admin/ManageTopic';
@@ -32,13 +32,13 @@ import ManageTopic from './Component/Admin/ManageTopic';
 import Testfirebase from './Testfirebase';
 import PostProvider from './contexts/PostContext';
 import SubjectProvider from './contexts/SubjectContext';
+import CommentProvider from './contexts/CommentContext';
 
 //#region Mod Routers
 import ManageNewsByMod from './Component/Mod/ManageNewsByMod';
 
 function App() {
-  const { token, user } = useContext(UserContext);
-
+    const { token, user } = useContext(UserContext);
   return (
     <Fragment>
       <BrowserRouter>
@@ -96,6 +96,7 @@ function App() {
                             <Route path="/*" element={<Navigate to="/admin/manageQuestion" />} />
                           </> :
                           <>
+
                             <Route path="/admin/manageUser" element={<ManageUser />} />
                             <Route path="/admin/manageMod" element={<ManageMod />} />
                             <Route path="/admin/manageQuestion" element={<ManageQuestion />} />

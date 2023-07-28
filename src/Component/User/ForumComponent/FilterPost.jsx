@@ -10,10 +10,11 @@ const FilterPost = () => {
     const [selectionValue, setSelectionValue] = useState(null);
 
     const { subjects } = useContext(SubjectContext);
-    const { getAllPost, getPostBySubject } = useContext(PostContext);
+    const { getAllPost, getPostBySubject, getPostByStatus, getPostBySubjectAndStatus } = useContext(PostContext);
     const subjectNameRef = useRef(null);
 
     const [searchParams, setSearchParams] = useSearchParams();
+    const statusQueryParams = searchParams.get('status');
 
     const handleSelectionChange = (subjectValue) => {
         setSelectionValue(subjectValue);
@@ -21,47 +22,52 @@ const FilterPost = () => {
         subjectNameRef.current = subjectFound ? subjectFound.subjectName : null;
     };
 
+    //Handle filter
+    const filterConditions = [
+        { type: 'both', condition: statusQueryParams && subjectNameRef.current },
+        { type: 'subject', condition: !statusQueryParams && subjectNameRef.current },
+        { type: 'status', condition: statusQueryParams && !subjectNameRef.current },
+    ];
+
+    const filterType = filterConditions.find((c) => c.condition)?.type;
+
     const handleSubmitFilterForm = () => {
-        if (subjectNameRef.current) {
-            getPostBySubject(selectionValue);
-            setSearchParams({ subject: `${subjectNameRef.current}` });
-        } else {
-            getAllPost();
-            searchParams.delete('subject');
-            setSearchParams({});
+        switch (filterType) {
+            case 'both':
+                getPostBySubjectAndStatus(selectionValue, statusQueryParams);
+                setSearchParams({ status: statusQueryParams, subject: `${subjectNameRef.current}` });
+                break;
+            case 'subject':
+                getPostBySubject(selectionValue);
+                setSearchParams({ subject: `${subjectNameRef.current}` });
+                break;
+            case 'status':
+                getPostByStatus(statusQueryParams);
+                setSearchParams({ status: statusQueryParams });
+                break;
+            default:
+                getAllPost();
+                setSearchParams({});
         }
     };
 
     return (
-        <Form
-            layout='horizontal'
-            form={form}
-            onFinish={handleSubmitFilterForm}
-            id='filter-post-form'
-        >
-            <Form.Item className='select-box'>
+        <Form layout="horizontal" form={form} onFinish={handleSubmitFilterForm} id="filter-post-form">
+            <Form.Item className="select-box form-item">
                 <Select
-                    label='Môn học'
+                    label="Môn học"
                     defaultValue={0}
-                    onChange={(subjectValue) => handleSelectionChange(subjectValue)}
-                >
+                    onChange={(subjectValue) => handleSelectionChange(subjectValue)}>
                     <Select.Option value={0}>-- Tất cả môn học --</Select.Option>
                     {subjects?.map((subject) => (
-                        <Select.Option
-                            key={subject.subjectId}
-                            value={subject.subjectId}
-                            ref={subjectNameRef}
-                        >
+                        <Select.Option key={subject.subjectId} value={subject.subjectId} ref={subjectNameRef}>
                             {subject.subjectName}
                         </Select.Option>
                     ))}
                 </Select>
             </Form.Item>
-            <Form.Item>
-                <Button
-                    type='primary'
-                    htmlType='submit'
-                >
+            <Form.Item className="form-item">
+                <Button type="primary" htmlType="submit">
                     Lọc
                 </Button>
             </Form.Item>

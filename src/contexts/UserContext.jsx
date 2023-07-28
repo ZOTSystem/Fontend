@@ -10,8 +10,8 @@ const UserContextProvider = (props) => {
     const [render, setRender] = useState('');
     const HandleGetInfo = async () => {
         const result = await GetInforService(token);
-        if (result.result.result.status === 200) {
-            setUser(result.result.result.data);
+        if (result?.result?.result?.status === 200) {
+            setUser(result?.result?.result.data);
         }
     };
 
@@ -43,8 +43,7 @@ const UserContextProvider = (props) => {
                 onSetRender,
                 onSetUser,
                 onSetToken,
-            }}
-        >
+            }}>
             {props.children}
         </UserContext.Provider>
     );

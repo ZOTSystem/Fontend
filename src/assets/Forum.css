@@ -61,6 +61,11 @@ hr {
     margin-top: 20px;
 }
 
+.post-empty {
+    text-align: center;
+    color: #1677ff;
+}
+
 .form-post {
     background-color: #fff;
     margin: auto;
@@ -71,7 +76,12 @@ hr {
 
 #filter-post-form {
     display: flex;
+    flex: 1;
     justify-content: flex-end;
+}
+
+#filter-post-form .form-item {
+    margin-bottom: 0;
 }
 
 .select-box {
@@ -180,41 +190,101 @@ hr {
     height: 35px;
 }
 
-.comment {
+.comment-wrapper {
     display: flex;
-    margin-top: 10px;
-}
-
-.comment-left {
-    width: 5%;
+    margin: 12px 0;
 }
 
 .comment-right {
-    width: 95%;
     font-size: 13px;
     color: #656c6a;
-    margin-top: 7px;
+    margin-left: 20px;
+    flex: 0 0 85%;
+}
+
+.comment-content {
+    padding: 8px;
+    margin-bottom: 8px;
+    background-color: #f5f6f7;
+    border-radius: 10px;
 }
 
 .comment-right p {
     color: black;
-    font-size: 24px;
-    margin: 0px;
+    font-size: 14px;
+    margin-bottom: 0;
+    max-width: 380px;
+}
+
+.comment-right p[contenteditable='true'] {
+    padding: 8px;
 }
 
 .comment-right img {
     height: auto;
-    width: 80%;
 }
 
-.comment-action-edit-delete {
+.comment-action {
     display: flex;
     color: #656c6a;
-    font-size: 13px;
-    margin-left: 30px;
 }
 
-.comment-action-edit-delete p {
-    margin: 0px;
-    margin-left: 10px;
+.comment-action-btn {
+    font-size: 12px;
+    border: none;
+    outline: none;
+    padding: 0;
+    background-color: transparent;
+}
+
+.comment-action-btn:first-child {
+    margin-right: 12px;
+}
+
+.comment-title {
+    margin: 24px 0;
+}
+
+.comment-modal .ant-modal-body {
+    max-height: 60vh;
+    overflow-x: hidden;
+}
+
+.comment-modal .ant-modal-body::-webkit-scrollbar {
+    width: 4px;
+    border-radius: 10px;
+}
+
+.comment-modal .ant-modal-body::-webkit-scrollbar-track {
+    background-color: #f5f6f7;
+}
+
+.comment-modal .ant-modal-body::-webkit-scrollbar-thumb {
+    background-color: #99ccff;
+}
+
+.post-filter-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.post-tab-item {
+    padding: 8px 15px;
+    margin: 0 12px;
+    border-radius: 10px;
+    border: none;
+    background-color: #fff;
+}
+
+.post-tab-item.active {
+    background-color: #99ccff;
+}
+
+.post-tab-item:first-child {
+    margin-left: 0;
+}
+
+.post-tab-item:last-child {
+    margin-right: 0;
 }

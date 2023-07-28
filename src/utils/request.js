@@ -15,7 +15,7 @@ instance.interceptors.response.use(
         return response.data;
     },
     (error) => {
-        switch (error.response.status) {
+        switch (error.response?.status) {
             case 401:
                 const message401 = error.response.data.error;
                 return Promise.reject(message401);
