@@ -88,7 +88,8 @@ export const LoginByGoogleService = async (data) => {
             },
             data: JSON.stringify(data),
         });
-        return response.data;
+        console.log(response);
+        return response;
     } catch (e) {
         return e;
     }

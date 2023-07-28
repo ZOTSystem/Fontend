@@ -1,13 +1,17 @@
-import { useState } from "react";
-import { UserOutlined, FundOutlined, FileUnknownOutlined, UsergroupAddOutlined, HddOutlined, WechatOutlined, FolderOpenOutlined} from "@ant-design/icons";
+import { useState, useContext } from "react";
+import { UserOutlined, FundOutlined, FileUnknownOutlined, UsergroupAddOutlined, HddOutlined, WechatOutlined, FolderOpenOutlined } from "@ant-design/icons";
 import { Layout, Menu } from "antd";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../../contexts/UserContext";
+import Login from "../../Component/Auth/Login";
 
 const { Sider } = Layout;
 
 export default function SiderAdmin() {
     const navigate = useNavigate();
     const [collapsed, setCollapsed] = useState(false);
+
+    const {user} = useContext(UserContext);
 
     function getItem(label, key, icon, path, children) {
         return {
@@ -19,15 +23,24 @@ export default function SiderAdmin() {
         };
     }
 
-    const managerMenu = [
+    const adminMenu = [
         getItem('Thống kê', '/admin/statistic', <FundOutlined />, '', null),
-        getItem('Quản lý người dùng','/admin/manageUser', <UserOutlined />, '/admin/manageUser', null),
+        getItem('Quản lý người dùng', '/admin/manageUser', <UserOutlined />, '/admin/manageUser', null),
         getItem('Quản lý Mod', '/admin/manageMod', <UsergroupAddOutlined />, '/admin/manageMod', null),
         getItem('Quản lý câu hỏi', '/admin/manageQuestion', <FileUnknownOutlined />, '/admin/manageQuestion', null),
         getItem('Quản lý bộ đề', '/admin/manageTopic', <FolderOpenOutlined />, '/admin/manageTopic', null),
         getItem('Quản lý diễn đàn', '/admin/manageForum', <WechatOutlined />, '/admin/manageForum', null),
         getItem('Quản lý Tin tức', '/admin/manageNew', <HddOutlined />, '/admin/manageNew', null),
     ];
+
+    const modMenu = [
+        getItem('Quản lý câu hỏi', '/admin/manageQuestion', <FileUnknownOutlined />, '/admin/manageQuestion', null),
+        getItem('Quản lý bộ đề', '/admin/manageTopic', <FolderOpenOutlined />, '/admin/manageTopic', null),
+        getItem('Quản lý Tin tức', '/mod/manageNews', <HddOutlined />, '/mod/manageNews', null),
+    ]
+
+
+    const items = user.roleId == "2" ? adminMenu : user.roleId == "3" ? modMenu : adminMenu;
 
     const onClick = (value) => {
         window.location.href = 'http://localhost:3000' + value.key;
@@ -59,7 +72,7 @@ export default function SiderAdmin() {
                 theme="dark"
                 defaultSelectedKeys={['1']}
                 mode="inline"
-                items={managerMenu}
+                items={items}
                 style={{ background: '#1d70ed', color: 'white' }}
             />
         </Sider>

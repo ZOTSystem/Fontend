@@ -12,19 +12,23 @@ export default function hanldeValidationEditUser(editData, errors) {
     if (editData.editPhoneNumber == '' || editData.editPhoneNumber == null || editData.editPhoneNumber == " ") {
         errors.editPhoneNumber = "Số điện thoại không được để trống";
     }
+    // if (phoneList.includes(editData.editPhoneNumber)) {
+    //     errors.editPhoneNumber = "Số điện thoại này đã tồn tại";
+    // }
+
     if (editData.editFullName == '' || editData.editFullName == null || editData.editFullName == " ") {
         errors.editFullName = "Tên không được để trống";
     }
     if (/^[a-zA-Z0-9ÀÁÂÃÈÉÊẾÌÍÒÓÔÕÙÚÝàáâãèéêếìíòóôõùúýĂăĐđĨĩŨũƠơƯưỠốộỐỘỒỚỜỬỨỮửỷỶỳỴỵỸỹ\s]+$/.test(editData.editFullName)) {
         errors.editFullName = "Tên không chứa kí tự đặc biệt";
     }
-    if (editData.editBirthDay == '' || editData.editBirthDay == null || editData.editBirthDay == " ") {
-        errors.editBirthDay = "Ngày sinh không được để trống";
-    }
-    console.log(editData.editBirthDay)
+    // if (editData.editBirthDay == '' || editData.editBirthDay == null || editData.editBirthDay == " ") {
+    //     errors.editBirthDay = "Ngày sinh không được để trống";
+    // }
     if (editData.editBirthDay > current == true) {
         errors.editBirthDay = "Ngày sinh phải nhỏ hơn ngày hiện tại";
     }
+
 }
 
 

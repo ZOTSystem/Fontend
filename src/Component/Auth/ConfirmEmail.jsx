@@ -14,11 +14,11 @@ export default function ConfirmEmail() {
         return (
             <Result
                 status='success'
-                title='Account confirmation successful.'
-                subTitle='Welcome to our website. Experience now!'
+                title='Xác thực tài khoản thành công.'
+                subTitle='Chào mừng bạn đến với trang web của chúng tôi. Hãy trải nghiệm nào!'
                 extra={[
                     <Button type='primary'>
-                        <a href='/login'>Go to Home page</a>
+                        <a href='/login'>Quay về trang đăng nhập</a>
                     </Button>,
                 ]}
             />

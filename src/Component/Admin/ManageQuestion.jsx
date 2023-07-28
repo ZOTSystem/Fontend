@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import CreateQuestionsExcel from "./ButtonCreateByExcel/CreateQuestionsExecel";
 import { DatePicker, Dropdown, Breadcrumb, Layout, Table, Input, Modal, Form, notification, Button, theme, Card, Timeline, Tooltip, Select } from 'antd';
 import {
     SearchOutlined, CheckCircleOutlined, FileTextOutlined,
@@ -409,7 +409,7 @@ export default function ManageQuestion() {
                             <Button type="primary" style={{ marginBottom: '20px', marginRight: '10px' }}>
                                 Thêm mới câu hỏi
                             </Button>
-                            <Button type="primary">Thêm câu hỏi bằng excel</Button>
+                            <CreateQuestionsExcel/>
                             <Table
                                 columns={columns}
                                 dataSource={data}

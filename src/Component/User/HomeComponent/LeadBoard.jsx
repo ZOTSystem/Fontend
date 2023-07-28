@@ -1,7 +1,36 @@
 import '../../../assets/HomePageStyle.css'
 import 'bootstrap/dist/css/bootstrap.css';
+import { useState, useContext, useEffect } from 'react';
+import { Option } from "antd/es/mentions";
+import { Select } from 'antd';
 
+
+import { GetAllSubject } from '../../../services/HistoryService';
 export default function LeadBoard() {
+
+    //#region - Declare - Khai báo các biến cần dùng
+    const [subjectList, setSubjectList] = useState([]);
+    //#endregion
+
+
+    //#region - Function - Lấy danh sách tất cả môn học
+    const handleGetAllSubject = async () => {
+        try {
+            const result = await GetAllSubject();
+            if (result.subjectList != null) {
+                setSubjectList(result.subjectList);
+            }
+        } catch (error) {
+            console.error('Error fetching testdetail service:', error);
+        }
+    }
+
+    useEffect(() => {
+        handleGetAllSubject();
+    }, []);
+
+    //#endregion
+
     return (
         <>
             <div className='sc-ehSCib kYuMkW mb-5'>
@@ -13,17 +42,46 @@ export default function LeadBoard() {
                     <div className='sc-dlfnbm sc-eCssSg dcHHcO oDHHe'>
                         <div className='sc-aemoO hgHGyw'>
                             <div className='sc-jONnTn jIvnOH'>
-                                <p class="sc-eLgOdN ejJoEn d-sm-inline-block d-none" style={{color: '#000000'}}>Môn học</p>
+                                <p class="sc-eLgOdN ejJoEn d-sm-inline-block d-none" style={{ color: '#000000' }}>Môn học</p>
                                 <div className='sc-hlTvYk bkPOGA css-2b097c-container'>
                                     <div className='react-select__control css-1gkg2bf-control'>
-                                        <div className='react-select__value-container css-1hwfws3'>
+                                        <Select
+                                            className='react-select__value-container css-1hwfws3'
+                                            style={{
+                                                width: '100%',
+                                                border: 'none',
+                                            }}
+                                            defaultValue="Danh sách môn học"
+                                            name="subjectId"
+                                            allowClear
+                                        // onChange={(e) => handleOnChange("subjectName", e)}
+                                        // value={selectdOption.subjectId}
+                                        >
+                                            <Option
+
+                                                value="Tất cả các môn"
+                                                key="all"
+                                                name="all"
+                                            >
+                                            </Option>
+                                            {subjectList?.map((item) => (
+                                                <Option
+                                                    value={item.subjectName}
+                                                    key={item.projectId}
+                                                    name="subjectName"
+                                                >
+                                                    {item.subjectName}
+                                                </Option>
+                                            ))}
+                                        </Select>
+                                        {/* <div className='react-select__value-container css-1hwfws3'>
                                             <div class="react-select__placeholder css-1wa3eu0-placeholder">Danh sách môn học</div>
                                             <div className='css-1g6gooi'>
                                                 <div class="react-select__input" style={{ display: 'inline-block' }}>
 
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
                                 <div>
@@ -66,7 +124,7 @@ export default function LeadBoard() {
                     <div className='sc-dlfnbm sc-eCssSg dcHHcO oDHHe'>
                         <div className='sc-aemoO hgHGyw'>
                             <div className='sc-jONnTn jIvnOH'>
-                                <p class="sc-eLgOdN ejJoEn d-sm-inline-block d-none" style={{color: '#000000'}}>Điểm thi</p>
+                                <p class="sc-eLgOdN ejJoEn d-sm-inline-block d-none" style={{ color: '#000000' }}>Điểm thi</p>
                                 <div className='sc-hlTvYk bkPOGA css-2b097c-container'>
                                     <div className='react-select__control css-1gkg2bf-control'>
                                         <div className='react-select__value-container css-1hwfws3'>

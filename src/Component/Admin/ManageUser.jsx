@@ -6,12 +6,16 @@ import {
 } from '@ant-design/icons'
 import SiderAdmin from "../../Layout/Admin/SiderAdmin";
 import HeaderAdmin from "../../Layout/Admin/HeaderAdmin";
-import moment from 'moment';
 import dayjs from "dayjs";
+
 
 import { UserContext } from "../../contexts/UserContext";
 import hanldeValidationEditUser from "../../assets/js/handleValidation";
 import { GetAllAccountUser } from "../../services/AccountUserService";
+import { UpdateUserService } from "../../services/AccountUserService";
+import { GettAllPhoneService } from "../../services/AccountUserService";
+import { ChangeStatusService } from "../../services/AccountUserService";
+
 
 const { Content } = Layout;
 
@@ -26,33 +30,43 @@ export default function ManageUser() {
     const columns = [
         {
             title: "ID",
-            // width: 30,
             dataIndex: "accountId",
             key: 1,
             fixed: "left",
         },
         {
             title: "Avatar",
-            // width: 50,
             dataIndex: "avatar",
             key: "avatar",
             fixed: "left",
             render: (record) => {
-                return (
-                    <img
-                        src={record}
-                        alt="Pic"
-                        width={70}
-                        height={70}
-                        style={{ borderRadius: "50%" }}
-                        className="borederRadius50"
-                    />
-                );
+                if (record != null) {
+                    return (
+                        <img
+                            src={record}
+                            alt="Pic"
+                            width={70}
+                            height={70}
+                            style={{ borderRadius: "50%", objectFit: "cover" }}
+                            className="borderRadius50"
+                        />
+                    );
+                } else {
+                    return (
+                        <img
+                            src="../Image/Avatar_Null.png"
+                            alt="Pic"
+                            width={70}
+                            height={70}
+                            style={{ borderRadius: "50%", objectFit: "cover" }}
+                            className="borderRadius50"
+                        />
+                    );
+                }
             },
         },
         {
             title: "Tên người dùng",
-            // width: 100,
             dataIndex: "fullName",
             key: 3,
             fixed: "left",
@@ -87,7 +101,6 @@ export default function ManageUser() {
             title: "Email",
             dataIndex: "email",
             key: 4,
-            // width: 100,
             filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
                 return (
                     <Input
@@ -115,7 +128,6 @@ export default function ManageUser() {
         },
         {
             title: "Số điện thoại",
-            // width: 100,
             dataIndex: "phone",
             key: 1,
             fixed: "left",
@@ -146,21 +158,12 @@ export default function ManageUser() {
         },
         {
             title: "Trạng thái",
-            // width: 100,
             dataIndex: "status",
             key: 1,
             fixed: "left",
-            render: (record) => {
-                return (
-                    <>
-                        {record == "1" ? "Activiate" : "Deactivate"}
-                    </>
-                )
-            }
         },
         {
             title: "Điều hướng",
-            // width: 100,
             key: 1,
             fixed: "left",
             render: (record) => {
@@ -172,7 +175,7 @@ export default function ManageUser() {
                             icon={<EditOutlined />}
                         ></Button>{" "}
                         &nbsp;
-                        {record.status == "1" ? (
+                        {record.status == "Đang hoạt động" ? (
                             <Button
                                 onClick={() => handleChangeStatusDeActivate(record)}
                                 style={{ color: "white", backgroundColor: "red" }}
@@ -181,7 +184,7 @@ export default function ManageUser() {
                         ) : (
                             <></>
                         )}
-                        {record.status == "0" ? (
+                        {record.status == "Đang khóa" ? (
                             <Button
                                 onClick={() => handleChangeStatusActivate(record)}
                                 style={{ color: "white", backgroundColor: "green" }}
@@ -202,7 +205,11 @@ export default function ManageUser() {
     const [dataSource, setDataSource] = useState('');
     const [show, setShow] = useState(false);
     const { render, onSetRender } = useContext(UserContext);
-
+    const [phoneList, setPhoneList] = useState([]);
+    const pagination = {
+        pageSize: 5,
+        total: dataSource != null ? dataSource.length : "",
+    };
     //#endregion
 
     //#region - Declare - input và lỗi của mỗi input  
@@ -210,6 +217,7 @@ export default function ManageUser() {
     const [errors, setErrors] = useState({
         editFullName: "",
         editPhoneNumber: "",
+        editBirthDay: "",
     });
 
     const [editData, setEditData] = useState({
@@ -227,22 +235,15 @@ export default function ManageUser() {
     const [api, contextHolder] = notification.useNotification();
     const openNotificationUpdate = (placement) => {
         api.success({
-            message: `Notification`,
-            description: "Update Successfully",
+            message: `Thông báo`,
+            description: "Chỉnh sửa thành công",
             placement,
         });
     };
     const openNotificationEnable = (placement) => {
         api.success({
-            message: `Notification`,
-            description: "Change Status Successfully",
-            placement,
-        });
-    };
-    const openNotificationDisable = (placement) => {
-        api.error({
-            message: `Notification`,
-            description: "Change Status Successfully",
+            message: `Thông báo`,
+            description: "Thay đổi trạng thái thành công",
             placement,
         });
     };
@@ -324,32 +325,6 @@ export default function ManageUser() {
         });
     };
 
-    const handleInputChangeGender = (value) => {
-        setEditData({
-            editUserId: editData.editUserId,
-            editAvatar: editData.editAvatar,
-            editFullName: editData.editFullName,
-            editEmail: editData.editEmail,
-            editPhoneNumber: editData.editPhoneNumber,
-            editBirthDay: editData.editBirthDay,
-            editGender: value,
-            editSchoolName: editData.editSchoolName,
-        });
-    };
-
-    const handleInputChangeSchool = (value) => {
-        setEditData({
-            editUserId: editData.editUserId,
-            editAvatar: editData.editAvatar,
-            editFullName: editData.editFullName,
-            editEmail: editData.editEmail,
-            editPhoneNumber: editData.editPhoneNumber,
-            editBirthDay: editData.editBirthDay,
-            editGender: editData.editGender,
-            editSchoolName: value,
-        });
-    };
-
     const formatDate = (dateString) => {
         const date = new Date(dateString);
 
@@ -368,13 +343,20 @@ export default function ManageUser() {
     //#endregion
 
     //#region - Function - Deactivate/Activate tài khoản user
-    const handleChangeStatusDeActivate = (record) => {
+    const handleChangeStatusDeActivate = async (record) => {
         Modal.confirm({
-            title: "Are you sure to Deactivate account: " + record.email + " ?",
-            okText: "DeaActivate",
+            title: "Bạn muốn khóa tài khoản: " + record.email + " ?",
+            okText: "Khóa",
+            cancelText: "Thoát",
             okType: "danger",
-            onOk: () => {
-                openNotificationDisable("topRight");
+            onOk: async () => {
+                const status = "Đang khóa";
+                // const result = handleChangeStatus(record.accountId, status);
+                const result = await ChangeStatusService(record.accountId, status);
+                if(result.status === 200){
+                    openNotificationEnable("topRight");
+                }
+                onSetRender();
             },
             cancelText: "Cancel",
             onCancel: () => { },
@@ -383,11 +365,18 @@ export default function ManageUser() {
 
     const handleChangeStatusActivate = (record) => {
         Modal.confirm({
-            title: "Are you sure to Activate account: " + record.email + " ?",
-            okText: "Activate",
+            title: "Bạn muốn mở khóa tài khoản: " + record.email + " ?",
+            okText: "Mở",
             okType: "default",
-            onOk: () => {
-                openNotificationEnable("topRight");
+            cancelText: "Thoát",
+            onOk: async () => {
+                const status = "Đang hoạt động";
+                // handleChangeStatus(record.accountId, status);
+                const result = await ChangeStatusService(record.accountId, status);
+                if(result.status === 200){
+                    openNotificationEnable("topRight");
+                }
+                onSetRender();
             },
             cancelText: "Cancel",
             onCancel: () => { },
@@ -399,26 +388,38 @@ export default function ManageUser() {
 
     const handleEdit = (record) => {
         setEditData({
-            editUserId: record.userId,
+            editUserId: record.accountId,
             editAvatar: record.avatar,
             editFullName: record.fullName,
             editEmail: record.email,
-            editPhoneNumber: record.phoneNumber,
+            editPhoneNumber: record.phone,
             editBirthDay: record.birthDay,
             editGender: record.gender,
             editSchoolName: record.schoolName,
         });
         setShow(true);
-        console.log(record);
     }
 
-    const handleFunctionEdit = () => {
+    const handleFunctionEdit = async () => {
         let errors = {};
-        hanldeValidationEditUser(editData, errors);
+        const data = {
+            accountId: editData.editUserId,
+            email: editData.editEmail,
+            fullName: editData.editFullName,
+            birthDay: editData.editBirthDay,
+            phone: editData.editPhoneNumber,
+            schoolName: editData.editSchoolName,
+            gender: editData.editGender,
+        }
+
+        hanldeValidationEditUser(editData, errors, phoneList);
         if (Object.keys(errors).length === 0) {
-            openNotificationUpdate("topRight");
             setErrors([]);
-            setShow(false);
+            const result = await UpdateUserService(data);
+            if(result.status === 200){
+                openNotificationUpdate("topRight");
+            }
+            onSetRender();
         } else {
             setErrors(errors);
         }
@@ -427,7 +428,7 @@ export default function ManageUser() {
     //#endregion
 
 
-    //#region - Function - lấy list User
+    //#region - Function - lấy list User/Phone
     const handleGetAllAccountUser = async () => {
         try {
             const result = await GetAllAccountUser();
@@ -435,12 +436,27 @@ export default function ManageUser() {
                 setDataSource(result.userList);
             }
         } catch (error) {
-            console.error('Error fetching testdetail service:', error);
+            console.error('Error fetching account user service:', error);
         }
     }
 
     useEffect(() => {
         handleGetAllAccountUser();
+    }, [render]);
+
+    const handleGetAllPhone = async () => {
+        try {
+            const result = await GettAllPhoneService();
+            if (result) {
+                setPhoneList(result);
+            }
+        } catch (error) {
+            console.error('Error fetching account user service:', error);
+        }
+    };
+
+    useEffect(() => {
+        handleGetAllPhone();
     }, [render]);
     //#endregion
 
@@ -496,6 +512,7 @@ export default function ManageUser() {
                                     row: CustomRow,
                                 },
                             }}
+                            pagination={pagination}
                         />
 
                         {/* Form Edit */}
@@ -503,7 +520,7 @@ export default function ManageUser() {
                             title="Chỉnh sửa thôi tin người dùng"
                             visible={show}
                             okText="Save Change"
-                            onCancel={() => { setShow(false); setErrors([]); }}
+                            onCancel={() => { setShow(false); setErrors([]); setEditData("") }}
                             onOk={() => handleFunctionEdit()}
                         >
                             <div
@@ -525,22 +542,35 @@ export default function ManageUser() {
                                     >
                                         Avatar
                                     </p>
-                                    <img
-                                        src={editData.editAvatar}
-                                        alt="Pic"
-                                        width={70}
-                                        height={70}
-                                        className="borederRadius50"
-                                    />
+                                    {editData.editAvatar != null ? (
+                                        <img
+                                            src={editData.editAvatar}
+                                            alt="Pic"
+                                            width={70}
+                                            height={70}
+                                            className="borederRadius50"
+                                            style={{ objectFit: 'cover', borderRadius: '50%' }}
+                                        />)
+                                        : (
+                                            <img
+                                                src='../Image/Avatar_Null.png'
+                                                alt="Pic"
+                                                width={70}
+                                                height={70}
+                                                className="borederRadius50"
+                                                style={{ objectFit: 'cover', borderRadius: '50%' }} />
+                                        )
+                                    }
+
                                 </div>
                             </div>
 
                             <Form>
                                 <Form.Item>
-                                    <label>FullName</label>
+                                    <label>Tên</label>
                                     <Input
                                         type="text"
-                                        placeholder="Enter FullName"
+                                        placeholder="Nhập tên"
                                         className="form-control"
                                         value={editData.editFullName}
                                         name="editFullName"
@@ -559,17 +589,17 @@ export default function ManageUser() {
                                     <label>Email</label>
                                     <Input
                                         type="email"
-                                        placeholder="Enter Email"
+                                        placeholder="Nhập email"
                                         className="form-control"
                                         value={editData.editEmail}
                                         disabled
                                     />
                                 </Form.Item>
                                 <Form.Item>
-                                    <label>PhoneNumber</label>
+                                    <label>Số điện thoại</label>
                                     <Input
                                         type="phonenumber"
-                                        placeholder="Enter PhoneNumber"
+                                        placeholder="Nhập số điện thoại"
                                         className="form-control"
                                         value={editData.editPhoneNumber}
                                         name="editPhoneNumber"
@@ -585,20 +615,21 @@ export default function ManageUser() {
                                     )}
                                 </Form.Item>
                                 <Form.Item>
-                                    <label style={{ display: 'block' }}>Gender</label>
-                                    <Select
-                                        defaultValue={editData.editGender}
-                                        name="editGender"
-                                        style={{ width: "100%" }}
-                                        onChange={handleInputChangeGender}
-                                        options={[
-                                            { value: '1', label: 'Nam' },
-                                            { value: '0', label: 'Nữ' },
-                                        ]}
-                                    />
+                                    <label style={{ display: 'block' }}>Giói tính</label>
+                                    <select
+                                        id='cars'
+                                        className='form-control w-100'
+                                        value={editData.editGender}
+                                        name='editGender'
+                                        onChange={handleInputChange}
+                                    >
+                                        <option value='Nam'>Nam</option>
+                                        <option value='Nữ'>Nữ</option>
+                                        <option value='Khác'>Khác</option>
+                                    </select>
                                 </Form.Item>
                                 <Form.Item>
-                                    <label>BirthDay:</label>
+                                    <label>Ngày sinh:</label>
 
                                     <DatePicker
                                         className="form-control"
@@ -619,16 +650,13 @@ export default function ManageUser() {
                                 </Form.Item>
                                 <Form.Item>
                                     <label style={{ display: 'block' }}>Trường học</label>
-                                    <Select
-                                        defaultValue={editData.editSchoolName}
+                                    <Input
+                                        type="phonenumber"
+                                        placeholder="Enter PhoneNumber"
+                                        className="form-control"
+                                        value={editData.editSchoolName}
                                         name="editSchoolName"
-                                        style={{ width: "100%" }}
-                                        onChange={handleInputChangeSchool}
-                                        options={[
-                                            { value: 'THPT Chuyên Nguyễn Bỉnh Khiêm', label: 'THPT Chuyên Nguyễn Bỉnh Khiêm' },
-                                            { value: 'THPT Phan Bội Châu', label: 'THPT Phan Bội Châu' },
-                                            { value: 'THPT Trần Cao Vân', label: 'THPT Trần Cao Vân' },
-                                        ]}
+                                        onChange={handleInputChange}
                                     />
                                 </Form.Item>
                             </Form>
