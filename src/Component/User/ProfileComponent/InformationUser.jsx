@@ -32,6 +32,8 @@ const formatDate = (dateString) => {
 const dayFormat = 'YYYY-MM-DD';
 
 export default function InformationUser() {
+
+    
     //#region - Function - Ẩn hiện mật khẩu
     const [enableDisable, setEnableDisable] = useState('password');
 
@@ -378,7 +380,7 @@ export default function InformationUser() {
                                 <div className='sc-jMlkEa fmBJFo'>
                                     <p>Email</p>
                                 </div>
-                                <div className='sc-dYZCcZ dIwkuJ'>
+                                <div className='sc-dYZCcZ dIwkuJ' style={{display: 'flex'}}>
                                     <span class='text'>{userInfo.email}</span>
                                     <span
                                         className='btn-edit'

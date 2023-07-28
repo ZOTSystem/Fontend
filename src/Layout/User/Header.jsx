@@ -9,7 +9,7 @@ import { useCookies } from 'react-cookie';
 
 export default function Header() {
 
-    const { user, onSetUser } = useContext(UserContext);
+    const { user, onSetUser, onSetRender } = useContext(UserContext);
     const [cookies, setCookie, removeCookie] = useCookies([]);
     const navigate = useNavigate();
 
@@ -19,6 +19,7 @@ export default function Header() {
             data: "",
             token: "",
         })
+        onSetRender();
         navigate("/");
     };
 
@@ -75,12 +76,12 @@ export default function Header() {
                                     items: itemsOfAvatar,
                                 }}
                             >
-                                <div style={{ borderRadius: '50%', border: '3px solid white', padding: '8px' }}>
+                                <div style={{ borderRadius: '50%', border: '3px solid white', padding: '6px' }}>
                                     {user.avatar != null ?
                                         <>
                                             <img src={user.avatar} alt="" width={60} height={50} style={{borderRadius: '50%', objectFit: "cover"}}/>
                                         </> : <>
-                                            <img src="../Image/Avatar_Null.png" alt="" width={40} height={50} />
+                                            <img src="../Image/Avatar_Null.png" alt="" width={40} height={50} style={{borderRadius: '50%', objectFit: "cover"}}/>
 
                                         </>
                                     }

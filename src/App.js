@@ -1,7 +1,7 @@
 import './App.css';
 import { Fragment } from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
-import { useContext, useEffect } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { UserContext } from './contexts/UserContext';
 
 //#Region Auth Routes
@@ -33,55 +33,83 @@ import Testfirebase from './Testfirebase';
 import PostProvider from './contexts/PostContext';
 import SubjectProvider from './contexts/SubjectContext';
 
+//#region Mod Routers
+import ManageNewsByMod from './Component/Mod/ManageNewsByMod';
+
 function App() {
   const { token, user } = useContext(UserContext);
-
 
   return (
     <Fragment>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomePage />}></Route>
-          <Route path="/login" element={<Login />}></Route>
-          <Route path="/forum" element={<PostProvider><SubjectProvider><Forum /></SubjectProvider></PostProvider>}></Route>
-          <Route path="/news" element={<News />}></Route>
-          <Route path="confirm/:email" element={<ConfirmEmail />} />
-          <Route path="/practiceQuizz" element={<PracticeQuizzes />}></Route>
-          <Route path="/testSubject" element={<TestSubject />}></Route>
-          <Route path="/test" element={<Testfirebase />}></Route>
-
-
-          {token && user?.roleId == "4" && (
-            <Fragment>
-              {/* Router của người dùng */}
-              <Route path="/practiceQuizz" element={<PracticeQuizzes />}></Route>
-              <Route path="/testSubject" element={<TestSubject />}></Route>
-              <Route path="/profile" element={<Profile />}></Route>
-              <Route path='/testHistory' element={<TestHistory />}></Route>
-              <Route path="/takeExam" element={<TakeExam />}></Route>
-              <Route path="/exam" element={<Exam />}></Route>
+          {!token ?
+            <>
+              <Route path="/login" element={<Login />}></Route>
               <Route path="/forum" element={<PostProvider><SubjectProvider><Forum /></SubjectProvider></PostProvider>}></Route>
               <Route path="/news" element={<News />}></Route>
-              <Route path="/examResult" element={<ExamResult />}></Route>
-              <Route path="/study" element={<Study />}></Route>
-              <Route path="/examFinish" element={<ExamFinish />}></Route>
-              <Route path="/" element={<HomePage />}></Route>
-              <Route path="topicStudy" element={<TopicStudy />}></Route>
+              <Route path="confirm/:email" element={<ConfirmEmail />} />
+              <Route path="/practiceQuizz" element={<PracticeQuizzes />}></Route>
+              <Route path="/testSubject" element={<TestSubject />}></Route>
+              <Route path="/test" element={<Testfirebase />}></Route>
 
-            </Fragment>
-          )}
+              <Route path="/*" element={<Navigate to="/login" />} />
+            </> :
+            <>
+              {
+                user.roleId == '4' ?
+                  <>
+                    <Route path="/testSubject" element={<TestSubject />}></Route>
+                    <Route path="/test" element={<Testfirebase />}></Route>
+                    <Route path="/practiceQuizz" element={<PracticeQuizzes />}></Route>
+                    <Route path="/profile" element={<Profile />}></Route>
+                    <Route path='/testHistory' element={<TestHistory />}></Route>
+                    <Route path="/takeExam" element={<TakeExam />}></Route>
+                    <Route path="/exam" element={<Exam />}></Route>
+                    <Route path="/forum" element={<PostProvider><SubjectProvider><Forum /></SubjectProvider></PostProvider>}></Route>
+                    <Route path="/examResult" element={<ExamResult />}></Route>
+                    <Route path="/study" element={<Study />}></Route>
+                    <Route path="/examFinish" element={<ExamFinish />}></Route>
+                    <Route path="topicStudy" element={<TopicStudy />}></Route>
 
-          {token && user?.roleId == "1" && (
-            <Fragment>
-              <Route path="/admin/manageUser" element={<ManageUser />} />
-              <Route path="/admin/manageMod" element={<ManageMod />} />
-              <Route path="/admin/manageQuestion" element={<ManageQuestion />} />
-              <Route path="/admin/manageTopic" element={<ManageTopic />} />
-            </Fragment>
-          )}
+                    <Route path="/*" element={<Navigate to="/" />} />
+                  </> :
+                  <>
+                    {
+                      user.roleId == '2' ?
+                        <>
+                          <Route path="/admin/manageUser" element={<ManageUser />} />
+                          <Route path="/admin/manageMod" element={<ManageMod />} />
+                          <Route path="/admin/manageQuestion" element={<ManageQuestion />} />
+                          <Route path="/admin/manageTopic" element={<ManageTopic />} />
+                          {/* <Route path="/mod/manageNews" element={<ManageNewsByMod />} /> */}
 
-          {/* <Route path="/*" element={<Navigate to="/" />} /> */}
+                          <Route path="/*" element={<Navigate to="/admin/manageUser" />} />
+                        </> :
+                        user.roleId == '3' ?
+                          <>
+                            <Route path="/admin/manageQuestion" element={<ManageQuestion />} />
+                            <Route path="/admin/manageTopic" element={<ManageTopic />} />
+                            <Route path="/mod/manageNews" element={<ManageNewsByMod />} />
 
+                            <Route path="/*" element={<Navigate to="/admin/manageQuestion" />} />
+                          </> :
+                          <>
+                            <Route path="/admin/manageUser" element={<ManageUser />} />
+                            <Route path="/admin/manageMod" element={<ManageMod />} />
+                            <Route path="/admin/manageQuestion" element={<ManageQuestion />} />
+                            <Route path="/admin/manageTopic" element={<ManageTopic />} />
+                            <Route path="/mod/manageNews" element={<ManageNewsByMod />} />
+
+
+                            <Route path="/*" element={<Navigate to="/admin/manageUser" />} />
+                          </>
+                    }
+                  </>
+              }
+            </>
+          }
         </Routes>
       </BrowserRouter>
     </Fragment >

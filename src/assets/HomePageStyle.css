@@ -455,3 +455,11 @@ img {
     padding: 30px;
     position: relative;
 }
+
+.react-select__control .ant-select .ant-select-selector{
+    border: none;
+    color: rgb(128, 128, 128);
+    width: 100%;
+    overflow: 'hiden';
+    background: #f8fbfb;
+}

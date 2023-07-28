@@ -195,8 +195,10 @@ export default function Login() {
             handleSetCookie(result.token);
             if (result.roleId === 4) {
                 navigate('/');
-            } else if (result.roleId === 1) {
+            } else if (result.roleId === 2) {
                 navigate('/admin/manageUser');
+            } else if (result.roleId === 3) {
+                navigate('/admin/manageQuestion');
             }
         } else {
             openNotificationLoginFailly('topRight');
