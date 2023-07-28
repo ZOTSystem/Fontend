@@ -13,6 +13,7 @@ const initialState = {
     loading: true,
     posts: [],
     currentPost: {},
+    likedNumber: 0,
 };
 
 export const PostContext = createContext(null);
@@ -20,7 +21,7 @@ export const PostContext = createContext(null);
 const PostProvider = ({ children }) => {
     const [state, dispatch] = useReducer(postReducer, initialState);
 
-    const { loading, posts, currentPost } = state;
+    const { loading, posts, currentPost, likedNumber } = state;
 
     const getAllPost = async () => {
         try {
@@ -107,13 +108,15 @@ const PostProvider = ({ children }) => {
                 posts,
                 loading,
                 currentPost,
+                likedNumber,
                 addPost,
                 getAllPost,
                 getPostById,
                 getPostBySubject,
                 getPostByStatus,
                 getPostBySubjectAndStatus,
-            }}>
+            }}
+        >
             {children}
         </PostContext.Provider>
     );

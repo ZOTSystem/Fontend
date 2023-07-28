@@ -1,9 +1,17 @@
-import { useState, useContext } from "react";
-import { UserOutlined, FundOutlined, FileUnknownOutlined, UsergroupAddOutlined, HddOutlined, WechatOutlined, FolderOpenOutlined } from "@ant-design/icons";
-import { Layout, Menu } from "antd";
-import { useNavigate } from "react-router-dom";
-import { UserContext } from "../../contexts/UserContext";
-import Login from "../../Component/Auth/Login";
+import { useState, useContext } from 'react';
+import {
+    UserOutlined,
+    FundOutlined,
+    FileUnknownOutlined,
+    UsergroupAddOutlined,
+    HddOutlined,
+    WechatOutlined,
+    FolderOpenOutlined,
+} from '@ant-design/icons';
+import { Layout, Menu } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../../contexts/UserContext';
+import Login from '../../Component/Auth/Login';
 
 const { Sider } = Layout;
 
@@ -11,7 +19,7 @@ export default function SiderAdmin() {
     const navigate = useNavigate();
     const [collapsed, setCollapsed] = useState(false);
 
-    const {user} = useContext(UserContext);
+    const { user } = useContext(UserContext);
 
     function getItem(label, key, icon, path, children) {
         return {
@@ -37,10 +45,9 @@ export default function SiderAdmin() {
         getItem('Quản lý câu hỏi', '/admin/manageQuestion', <FileUnknownOutlined />, '/admin/manageQuestion', null),
         getItem('Quản lý bộ đề', '/admin/manageTopic', <FolderOpenOutlined />, '/admin/manageTopic', null),
         getItem('Quản lý Tin tức', '/mod/manageNews', <HddOutlined />, '/mod/manageNews', null),
-    ]
+    ];
 
-
-    const items = user.roleId == "2" ? adminMenu : user.roleId == "3" ? modMenu : adminMenu;
+    const items = user.roleId == '2' ? adminMenu : user.roleId == '3' ? modMenu : adminMenu;
 
     const onClick = (value) => {
         window.location.href = 'http://localhost:3000' + value.key;
@@ -54,27 +61,35 @@ export default function SiderAdmin() {
             trigger={null}
             style={{ background: '#1d70ed' }}
         >
-            <div style={{ padding: "20px 15px" }}>
-                <a href="" className="d-flex align-items-center">
+            <div style={{ padding: '20px 15px' }}>
+                <a
+                    href=''
+                    className='d-flex align-items-center'
+                >
                     <img
-                        className="borederRadius50"
-                        src="../Image/Logo.png"
-                        style={{ background: "#fff" }}
-                        width="50"
-                        height="50"
-                        alt=""
+                        className='borederRadius50'
+                        src='../Image/Logo.png'
+                        style={{ background: '#fff' }}
+                        width='50'
+                        height='50'
+                        alt=''
                     />
-                    <span className="ml-3 text-white titleRoomFont" style={{ fontSize: 20, margin: 'auto', fontWeight: 'bold' }}>ZOT System</span>
+                    <span
+                        className='ml-3 text-white titleRoomFont'
+                        style={{ fontSize: 20, margin: 'auto', fontWeight: 'bold' }}
+                    >
+                        ZOT System
+                    </span>
                 </a>
             </div>
             <Menu
                 onClick={(key) => onClick(key)}
-                theme="dark"
+                theme='dark'
                 defaultSelectedKeys={['1']}
-                mode="inline"
+                mode='inline'
                 items={items}
                 style={{ background: '#1d70ed', color: 'white' }}
             />
         </Sider>
-    )
+    );
 }

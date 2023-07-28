@@ -7,6 +7,7 @@ const END_POINTS = {
     GET_BY_SUBJECT: 'post/GetPostBySubject',
     GET_BY_STATUS: 'post/GetPostByStatus',
     GET_BY_SUBJECT_STATUS: 'post/GetPostBySubjectAndStatus',
+    COUNT_LIKED_NUMBER: 'post/CountLikedNumberByPost'
 };
 
 export const getAllPostService = async () => await request.get(END_POINTS.GET_ALL_POST);

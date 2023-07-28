@@ -36,9 +36,10 @@ import CommentProvider from './contexts/CommentContext';
 
 //#region Mod Routers
 import ManageNewsByMod from './Component/Mod/ManageNewsByMod';
+import ManageForum from './Component/Admin/ManageForum';
 
 function App() {
-    const { token, user } = useContext(UserContext);
+  const { token, user } = useContext(UserContext);
   return (
     <Fragment>
       <BrowserRouter>
@@ -47,14 +48,14 @@ function App() {
           {!token ?
             <>
               <Route path="/login" element={<Login />}></Route>
-              <Route path="/forum" element={<PostProvider><SubjectProvider><Forum /></SubjectProvider></PostProvider>}></Route>
+              <Route path="/forum" element={<PostProvider><SubjectProvider><CommentProvider><Forum /></CommentProvider></SubjectProvider></PostProvider>}></Route>
               <Route path="/news" element={<News />}></Route>
               <Route path="confirm/:email" element={<ConfirmEmail />} />
               <Route path="/practiceQuizz" element={<PracticeQuizzes />}></Route>
               <Route path="/testSubject" element={<TestSubject />}></Route>
               <Route path="/test" element={<Testfirebase />}></Route>
 
-              <Route path="/*" element={<Navigate to="/login" />} />
+              {/* <Route path="/*" element={<Navigate to="/login" />} /> */}
             </> :
             <>
               {
@@ -67,13 +68,13 @@ function App() {
                     <Route path='/testHistory' element={<TestHistory />}></Route>
                     <Route path="/takeExam" element={<TakeExam />}></Route>
                     <Route path="/exam" element={<Exam />}></Route>
-                    <Route path="/forum" element={<PostProvider><SubjectProvider><Forum /></SubjectProvider></PostProvider>}></Route>
+                    <Route path="/forum" element={<PostProvider><SubjectProvider><CommentProvider><Forum /></CommentProvider></SubjectProvider></PostProvider>}></Route>
                     <Route path="/examResult" element={<ExamResult />}></Route>
                     <Route path="/study" element={<Study />}></Route>
                     <Route path="/examFinish" element={<ExamFinish />}></Route>
                     <Route path="topicStudy" element={<TopicStudy />}></Route>
 
-                    <Route path="/*" element={<Navigate to="/" />} />
+                    {/* <Route path="/*" element={<Navigate to="/" />} /> */}
                   </> :
                   <>
                     {
@@ -83,9 +84,11 @@ function App() {
                           <Route path="/admin/manageMod" element={<ManageMod />} />
                           <Route path="/admin/manageQuestion" element={<ManageQuestion />} />
                           <Route path="/admin/manageTopic" element={<ManageTopic />} />
+                          <Route path="/admin/manageForum" element={<PostProvider><SubjectProvider><CommentProvider><ManageForum /></CommentProvider></SubjectProvider></PostProvider>} />
+
                           {/* <Route path="/mod/manageNews" element={<ManageNewsByMod />} /> */}
 
-                          <Route path="/*" element={<Navigate to="/admin/manageUser" />} />
+                          {/* <Route path="/*" element={<Navigate to="/admin/manageUser" />} /> */}
                         </> :
                         user.roleId == '3' ?
                           <>
@@ -103,8 +106,7 @@ function App() {
                             <Route path="/admin/manageTopic" element={<ManageTopic />} />
                             <Route path="/mod/manageNews" element={<ManageNewsByMod />} />
 
-
-                            <Route path="/*" element={<Navigate to="/admin/manageUser" />} />
+                            {/* <Route path="/*" element={<Navigate to="/admin/manageUser" />} /> */}
                           </>
                     }
                   </>

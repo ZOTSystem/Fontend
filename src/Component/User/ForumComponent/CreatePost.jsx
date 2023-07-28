@@ -11,6 +11,7 @@ import { storage } from '../../../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { v4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../../../contexts/UserContext';
 const url = '../Image/Forum/forum-avatar1.png';
 const anh = '../Image/Forum/icon-anh-video.png';
 const monhoc = '../Image/Forum/icon-sach.png';
@@ -24,7 +25,10 @@ export default function CreatePost() {
     const [imageUpload, setImageUpload] = useState(null);
     const { subjects } = useContext(SubjectContext);
     const { addPost, getPostByStatus } = useContext(PostContext);
+    const { user } = useContext(UserContext);
+    const { accountId } = user;
     const imageUrlRef = useRef('');
+
     let imageUrlUpload = '';
     const normFile = (e) => {
         if (Array.isArray(e)) {
@@ -67,7 +71,7 @@ export default function CreatePost() {
 
     const handleSubmitAddPostForm = async () => {
         const postFile = await uploadImage();
-        await addPost({ ...formValue, postFile });
+        await addPost({ ...formValue, accountId, postFile });
         cancelModal();
         openNotificationAddPostSuccess('topRight');
         await getPostByStatus('Pending');
