@@ -7,7 +7,7 @@ const END_POINTS = {
     GET_BY_SUBJECT: 'post/GetPostBySubject',
     GET_BY_STATUS: 'post/GetPostByStatus',
     GET_BY_SUBJECT_STATUS: 'post/GetPostBySubjectAndStatus',
-    COUNT_LIKED_NUMBER: 'post/CountLikedNumberByPost'
+    CHANGE_POST_STATUS: 'post/ChangeStatusPost'
 };
 
 export const getAllPostService = async () => await request.get(END_POINTS.GET_ALL_POST);
@@ -24,3 +24,5 @@ export const getPostByStatusService = async (status) =>
 
 export const getPostBySubjectAndStatusService = async (subjectId, status) =>
     await request.get(`${END_POINTS.GET_BY_SUBJECT_STATUS}?subjectId=${subjectId}&status=${status}`);
+
+export const changePostStatusService = async (postId, status) => await request.post(`${END_POINTS.CHANGE_POST_STATUS}?postId=${postId}&status=${status}`);

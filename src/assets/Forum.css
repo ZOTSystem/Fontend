@@ -288,3 +288,7 @@ hr {
 .post-tab-item:last-child {
     margin-right: 0;
 }
+
+.admin-action-btn .reject {
+    margin-left: 12px;
+}
