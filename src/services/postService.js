@@ -4,10 +4,12 @@ const END_POINTS = {
     GET_ALL_POST: 'post/getAllPost',
     GET_BY_ID: 'post/getPostDetail',
     ADD_POST: 'post/AddPost',
+    GET_APPROVE_BY_SUBJECT: 'post/GetApprovedPostBySubject',
     GET_BY_SUBJECT: 'post/GetPostBySubject',
     GET_BY_STATUS: 'post/GetPostByStatus',
     GET_BY_SUBJECT_STATUS: 'post/GetPostBySubjectAndStatus',
-    CHANGE_POST_STATUS: 'post/ChangeStatusPost'
+    CHANGE_POST_STATUS: 'post/ChangeStatusPost',
+    LIKE_POST: '/post/LikePost'
 };
 
 export const getAllPostService = async () => await request.get(END_POINTS.GET_ALL_POST);
@@ -16,13 +18,17 @@ export const getPostByIdService = async (postId) => await request.get(`${END_POI
 
 export const addPostService = async (data) => await request.post(END_POINTS.ADD_POST, data);
 
+export const getApprovedPostBySubjectService = async (subjectId) => await request.get(`${END_POINTS.GET_APPROVE_BY_SUBJECT}?subjectId=${subjectId}`);
+
 export const getPostBySubjectService = async (subjectId) =>
     await request.get(`${END_POINTS.GET_BY_SUBJECT}?subjectId=${subjectId}`);
 
-export const getPostByStatusService = async (status) =>
-    await request.get(`${END_POINTS.GET_BY_STATUS}?status=${status}`);
+export const getPostByStatusService = async (status, accountId) =>
+    await request.get(`${END_POINTS.GET_BY_STATUS}?status=${status}&accountId=${accountId}`);
 
-export const getPostBySubjectAndStatusService = async (subjectId, status) =>
-    await request.get(`${END_POINTS.GET_BY_SUBJECT_STATUS}?subjectId=${subjectId}&status=${status}`);
+export const getPostBySubjectAndStatusService = async (subjectId, status, accountId) =>
+    await request.get(`${END_POINTS.GET_BY_SUBJECT_STATUS}?subjectId=${subjectId}&status=${status}&accountId=${accountId}`);
 
 export const changePostStatusService = async (postId, status) => await request.post(`${END_POINTS.CHANGE_POST_STATUS}?postId=${postId}&status=${status}`);
+
+export const likePostService = async (postId, accountId) => await request.post(`${END_POINTS.LIKE_POST}?postId=${postId}&accountId=${accountId}`);

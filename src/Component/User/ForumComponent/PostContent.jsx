@@ -1,23 +1,25 @@
 import { Avatar, Modal } from 'antd';
 import 'bootstrap/dist/css/bootstrap.css';
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext } from 'react';
 import { CommentContext } from '../../../contexts/CommentContext';
 import CommentList from '../CommentList';
 import { PostContext } from '../../../contexts/PostContext';
 import PostDetails from './PostDetails';
+import { UserContext } from '../../../contexts/UserContext';
+import { useSearchParams } from 'react-router-dom';
 
-const url = '../Image/Forum/forum-avatar1.png';
-const luu = '../Image/Forum/luu.png';
-const daluu = '../Image/Forum/daluu.png';
-const baitoan = '../Image/Forum/baitoan.png';
+const defaultAvatar = '../Image/Avatar_null.png';
 const like = '../Image/Forum/like.png';
 const liked = '../Image/Forum/liked.png';
 const comment = '../Image/Forum/comment.png';
 
 export default function PostContent({ post }) {
-    const { postId, fullName, createdTime, subjectName, postText, postFile } = post;
-    const { currentPost, getPostById } = useContext(PostContext);
+    const { postId, avatar, fullName, createdTime, subjectName, postText, postFile, countComment, countLike } = post;
+    const { getAllPost, currentPost, getPostById, getPostByStatus, likePost } = useContext(PostContext);
     const { comments, getCommentsByPost } = useContext(CommentContext);
+    const { user } = useContext(UserContext);
+    const [searchParams] = useSearchParams();
+    const statusQueryParams = searchParams.get('status');
 
     const [isLiked, setIsLiked] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,6 +35,12 @@ export default function PostContent({ post }) {
     };
 
     const handleLikedClick = () => {
+        likePost(postId, user.accountId);
+        if (statusQueryParams) {
+            getPostByStatus(statusQueryParams, user.accountId);
+        } else {
+            getAllPost();
+        }
         setIsLiked(!isLiked);
     };
 
@@ -43,8 +51,9 @@ export default function PostContent({ post }) {
                     <Avatar
                         src={
                             <img
-                                src={url}
+                                src={!avatar ? defaultAvatar : avatar}
                                 alt='avatar'
+                                className='avatar'
                             />
                         }
                     />
@@ -75,13 +84,15 @@ export default function PostContent({ post }) {
                 <img
                     onClick={handleLikedClick}
                     src={isLiked ? liked : like}
+                    alt='heart'
                 />
-                <p>155</p>
+                <p>{countLike}</p>
                 <img
                     src={comment}
                     onClick={() => showModal(postId)}
+                    alt='comment'
                 />
-                <p>15</p>
+                <p>{countComment}</p>
             </div>
 
             {isModalOpen && (

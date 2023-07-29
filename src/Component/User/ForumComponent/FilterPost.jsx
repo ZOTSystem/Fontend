@@ -4,13 +4,16 @@ import { Button, Form, Select } from 'antd';
 import { SubjectContext } from '../../../contexts/SubjectContext';
 import { PostContext } from '../../../contexts/PostContext';
 import { useSearchParams } from 'react-router-dom';
+import { UserContext } from '../../../contexts/UserContext';
 
 const FilterPost = () => {
     const [form] = Form.useForm();
     const [selectionValue, setSelectionValue] = useState(null);
 
     const { subjects } = useContext(SubjectContext);
-    const { getAllPost, getPostBySubject, getPostByStatus, getPostBySubjectAndStatus } = useContext(PostContext);
+    const { user } = useContext(UserContext);
+    const { getAllPost, getApprovedPostBySubject, getPostBySubject, getPostByStatus, getPostBySubjectAndStatus } =
+        useContext(PostContext);
     const subjectNameRef = useRef(null);
 
     const [searchParams, setSearchParams] = useSearchParams();
@@ -25,6 +28,7 @@ const FilterPost = () => {
     //Handle filter
     const filterConditions = [
         { type: 'both', condition: statusQueryParams && subjectNameRef.current },
+        { type: 'subject_guest', condition: !user && !statusQueryParams && subjectNameRef.current },
         { type: 'subject', condition: !statusQueryParams && subjectNameRef.current },
         { type: 'status', condition: statusQueryParams && !subjectNameRef.current },
     ];
@@ -34,8 +38,15 @@ const FilterPost = () => {
     const handleSubmitFilterForm = () => {
         switch (filterType) {
             case 'both':
-                getPostBySubjectAndStatus(selectionValue, statusQueryParams);
-                setSearchParams({ status: statusQueryParams, subject: `${subjectNameRef.current}` });
+                getPostBySubjectAndStatus(selectionValue, statusQueryParams, user.accountId);
+                setSearchParams({
+                    status: statusQueryParams,
+                    subject: `${subjectNameRef.current}`,
+                });
+                break;
+            case 'subject_guest':
+                getApprovedPostBySubject(selectionValue);
+                setSearchParams({ subject: `${subjectNameRef.current}` });
                 break;
             case 'subject':
                 getPostBySubject(selectionValue);
@@ -43,7 +54,7 @@ const FilterPost = () => {
                 break;
             case 'status':
                 getPostByStatus(statusQueryParams);
-                setSearchParams({ status: statusQueryParams });
+                setSearchParams({ status: statusQueryParams, accountId: user.accountId });
                 break;
             default:
                 getAllPost();
@@ -52,22 +63,35 @@ const FilterPost = () => {
     };
 
     return (
-        <Form layout="horizontal" form={form} onFinish={handleSubmitFilterForm} id="filter-post-form">
-            <Form.Item className="select-box form-item">
+        <Form
+            layout='horizontal'
+            form={form}
+            onFinish={handleSubmitFilterForm}
+            id='filter-post-form'
+        >
+            <Form.Item className='select-box form-item'>
                 <Select
-                    label="Môn học"
+                    label='Môn học'
                     defaultValue={0}
-                    onChange={(subjectValue) => handleSelectionChange(subjectValue)}>
+                    onChange={(subjectValue) => handleSelectionChange(subjectValue)}
+                >
                     <Select.Option value={0}>-- Tất cả môn học --</Select.Option>
                     {subjects?.map((subject) => (
-                        <Select.Option key={subject.subjectId} value={subject.subjectId} ref={subjectNameRef}>
+                        <Select.Option
+                            key={subject.subjectId}
+                            value={subject.subjectId}
+                            ref={subjectNameRef}
+                        >
                             {subject.subjectName}
                         </Select.Option>
                     ))}
                 </Select>
             </Form.Item>
-            <Form.Item className="form-item">
-                <Button type="primary" htmlType="submit">
+            <Form.Item className='form-item'>
+                <Button
+                    type='primary'
+                    htmlType='submit'
+                >
                     Lọc
                 </Button>
             </Form.Item>

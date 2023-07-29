@@ -292,3 +292,7 @@ hr {
 .admin-action-btn .reject {
     margin-left: 12px;
 }
+
+.delete-post-btn {
+    margin-top: 24px;
+}

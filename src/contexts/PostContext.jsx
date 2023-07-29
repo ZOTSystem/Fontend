@@ -7,6 +7,8 @@ import {
     getPostBySubjectAndStatusService,
     getPostByIdService,
     changePostStatusService,
+    likePostService,
+    getApprovedPostBySubjectService,
 } from '../services/postService';
 import postReducer from '../reducers/postReducer';
 
@@ -64,6 +66,19 @@ const PostProvider = ({ children }) => {
         }
     };
 
+    const getApprovedPostBySubject = async (subjectId) => {
+        try {
+            const response = await getApprovedPostBySubjectService(subjectId);
+            dispatch({
+                type: 'GET_POSTS',
+                payload: response,
+                loading: false,
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     const getPostBySubject = async (subjectId) => {
         try {
             const response = await getPostBySubjectService(subjectId);
@@ -77,9 +92,9 @@ const PostProvider = ({ children }) => {
         }
     };
 
-    const getPostByStatus = async (status) => {
+    const getPostByStatus = async (status, accountId) => {
         try {
-            const response = await getPostByStatusService(status);
+            const response = await getPostByStatusService(status, accountId);
             dispatch({
                 type: 'GET_POSTS',
                 payload: response,
@@ -90,9 +105,9 @@ const PostProvider = ({ children }) => {
         }
     };
 
-    const getPostBySubjectAndStatus = async (subjectId, status) => {
+    const getPostBySubjectAndStatus = async (subjectId, status, accountId) => {
         try {
-            const response = await getPostBySubjectAndStatusService(subjectId, status);
+            const response = await getPostBySubjectAndStatusService(subjectId, status, accountId);
             dispatch({
                 type: 'GET_POSTS',
                 payload: response,
@@ -111,6 +126,14 @@ const PostProvider = ({ children }) => {
         }
     };
 
+    const likePost = async (postId, accountId) => {
+        try {
+            await likePostService(postId, accountId);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     return (
         <PostContext.Provider
             value={{
@@ -121,10 +144,12 @@ const PostProvider = ({ children }) => {
                 addPost,
                 getAllPost,
                 getPostById,
+                getApprovedPostBySubject,
                 getPostBySubject,
                 getPostByStatus,
                 getPostBySubjectAndStatus,
                 changePostStatus,
+                likePost,
             }}
         >
             {children}

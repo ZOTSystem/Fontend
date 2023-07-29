@@ -41,21 +41,21 @@ export default function Forum() {
 
     //get post list
     useEffect(() => {
-        if (statusQueryParam) getPostByStatus(statusQueryParam);
+        if (statusQueryParam) getPostByStatus(statusQueryParam, user.accountId);
         else getAllPost();
-    }, [statusQueryParam]);
+    }, [statusQueryParam, user.accountId]);
 
     return (
         <>
             <Header />
-            <div className="body-forum">
-                <div className="container">
+            <div className='body-forum'>
+                <div className='container'>
                     <CreatePost />
-                    <div className="post-filter-container">
+                    <div className='post-filter-container'>
                         {user && <PostStatusTab statusList={statusList} />}
                         <FilterPost />
                     </div>
-                    <div className="post-container">{loading ? <Spinner /> : <PostList posts={posts} />}</div>
+                    <div className='post-container'>{loading ? <Spinner /> : <PostList posts={posts} />}</div>
                 </div>
             </div>
         </>
