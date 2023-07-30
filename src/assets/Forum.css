@@ -289,10 +289,15 @@ hr {
     margin-right: 0;
 }
 
-.admin-action-btn .reject {
-    margin-left: 12px;
-}
-
 .delete-post-btn {
     margin-top: 24px;
+}
+
+.admin-action-btn {
+    display: flex;
+    gap: 12px;
+}
+
+.admin-action-btn .delete-post-btn {
+    margin-top: 0;
 }

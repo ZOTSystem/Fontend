@@ -20,15 +20,15 @@ export default function SendComment({ post }) {
     const [searchParams] = useSearchParams();
     const statusQueryParams = searchParams.get('status');
 
-    const handleSendComment = () => {
-        addComment({ postId: post.postId, content });
+    const handleSendComment = async () => {
+        await addComment({ postId: post.postId, accountId: user.accountId, content });
         setContent('');
         openNotificationSendCommentSuccess('topRight');
         showModal(post.postId);
         if (statusQueryParams) {
-            getPostByStatus(statusQueryParams, user.accountId);
+            await getPostByStatus(statusQueryParams, user.accountId);
         } else {
-            getAllPost();
+            await getAllPost();
         }
     };
 

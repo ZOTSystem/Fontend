@@ -9,7 +9,8 @@ const END_POINTS = {
     GET_BY_STATUS: 'post/GetPostByStatus',
     GET_BY_SUBJECT_STATUS: 'post/GetPostBySubjectAndStatus',
     CHANGE_POST_STATUS: 'post/ChangeStatusPost',
-    LIKE_POST: '/post/LikePost'
+    LIKE_POST: '/post/LikePost',
+    DELETE_POST: '/post/DeletePost'
 };
 
 export const getAllPostService = async () => await request.get(END_POINTS.GET_ALL_POST);
@@ -32,3 +33,5 @@ export const getPostBySubjectAndStatusService = async (subjectId, status, accoun
 export const changePostStatusService = async (postId, status) => await request.post(`${END_POINTS.CHANGE_POST_STATUS}?postId=${postId}&status=${status}`);
 
 export const likePostService = async (postId, accountId) => await request.post(`${END_POINTS.LIKE_POST}?postId=${postId}&accountId=${accountId}`);
+
+export const deletePostService = async (postId) => await request.post(`${END_POINTS.DELETE_POST}?postId=${postId}`);

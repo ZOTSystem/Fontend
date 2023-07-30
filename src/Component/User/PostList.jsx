@@ -8,14 +8,16 @@ import { PostContext } from '../../contexts/PostContext';
 
 const PostList = ({ posts }) => {
     const [open, setOpen] = useState(false);
+    const [selectedPost, setSelectedPost] = useState(null);
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const statusQueryParams = searchParams.get('status');
     const { user } = useContext(UserContext);
-    const { changePostStatus } = useContext(PostContext);
+    const { getAllPost, getPostByStatus, changePostStatus, deletePost } = useContext(PostContext);
 
-    const showModal = () => {
+    const showModal = (post) => {
         setOpen(true);
+        setSelectedPost(post);
     };
 
     const cancelModal = () => {
@@ -40,6 +42,14 @@ const PostList = ({ posts }) => {
         });
     };
 
+    const openNotificationDeletedPost = (placement) => {
+        api.success({
+            message: 'Thông báo',
+            description: 'Bài viết đã được xóa thành công !',
+            placement,
+        });
+    };
+
     const handleApprovedPost = async (post) => {
         await changePostStatus(post.postId, 'Approved');
         navigate('/admin/manageForum?status=Approved');
@@ -50,6 +60,17 @@ const PostList = ({ posts }) => {
         await changePostStatus(post.postId, 'Rejected');
         navigate('/admin/manageForum?status=Rejected');
         openNotificationRejectedPost('topRight');
+    };
+
+    const handleDeletePost = async (postId) => {
+        await deletePost(postId);
+        if (statusQueryParams) {
+            getPostByStatus(statusQueryParams, user.accountId);
+        } else {
+            getAllPost();
+        }
+        cancelModal();
+        openNotificationDeletedPost('topRight');
     };
 
     return (
@@ -72,7 +93,7 @@ const PostList = ({ posts }) => {
                                 className='delete-post-btn'
                                 type='primary'
                                 danger
-                                onClick={showModal}
+                                onClick={() => showModal(post)}
                             >
                                 Xóa bài
                             </Button>
@@ -82,6 +103,7 @@ const PostList = ({ posts }) => {
                                 className='delete-post-btn'
                                 type='primary'
                                 danger
+                                onClick={() => showModal(post)}
                             >
                                 Xóa bài
                             </Button>
@@ -91,6 +113,7 @@ const PostList = ({ posts }) => {
                                 className='delete-post-btn'
                                 type='primary'
                                 danger
+                                onClick={() => showModal(post)}
                             >
                                 Xóa bài
                             </Button>
@@ -98,19 +121,26 @@ const PostList = ({ posts }) => {
                         {statusQueryParams === 'Pending' && user.roleId == 2 && (
                             <div className='admin-action-btn'>
                                 <Button
-                                    className='approve'
+                                    className='approve-post-btn'
                                     type='primary'
                                     onClick={() => handleApprovedPost(post)}
                                 >
                                     Đồng ý
                                 </Button>
                                 <Button
-                                    className='reject'
-                                    type='primary'
+                                    className='reject-post-btn'
                                     danger
                                     onClick={() => handleRejectedPost(post)}
                                 >
                                     Từ chối
+                                </Button>
+                                <Button
+                                    className='delete-post-btn'
+                                    type='primary'
+                                    danger
+                                    onClick={() => showModal(post)}
+                                >
+                                    Xóa bài
                                 </Button>
                             </div>
                         )}
@@ -119,6 +149,7 @@ const PostList = ({ posts }) => {
                             open={open}
                             okText='Đồng ý'
                             cancelText='Hủy bỏ'
+                            onOk={() => handleDeletePost(selectedPost?.postId)}
                             onCancel={cancelModal}
                             className='confirm-delete-modal'
                         >

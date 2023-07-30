@@ -9,11 +9,13 @@ import { PostContext } from '../../contexts/PostContext';
 import Spinner from '../common/Spinner/Spinner';
 import PostList from '../User/PostList';
 import { useSearchParams } from 'react-router-dom';
+import { UserContext } from '../../contexts/UserContext';
 
 const { Content } = Layout;
 const ManageForum = () => {
     const navigate = useNavigate();
     const { loading, posts, getAllPost, getPostByStatus } = useContext(PostContext);
+    const { user } = useContext(UserContext);
     const [searchParams] = useSearchParams();
     const statusQueryParam = searchParams.get('status');
 
@@ -40,7 +42,7 @@ const ManageForum = () => {
     }, []);
 
     useEffect(() => {
-        if (statusQueryParam) getPostByStatus(statusQueryParam);
+        if (statusQueryParam) getPostByStatus(statusQueryParam, user.accountId);
         else getAllPost();
     }, [statusQueryParam]);
 

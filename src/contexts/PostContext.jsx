@@ -9,6 +9,7 @@ import {
     changePostStatusService,
     likePostService,
     getApprovedPostBySubjectService,
+    deletePostService,
 } from '../services/postService';
 import postReducer from '../reducers/postReducer';
 
@@ -134,6 +135,14 @@ const PostProvider = ({ children }) => {
         }
     };
 
+    const deletePost = async (postId) => {
+        try {
+            await deletePostService(postId);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     return (
         <PostContext.Provider
             value={{
@@ -149,6 +158,7 @@ const PostProvider = ({ children }) => {
                 getPostByStatus,
                 getPostBySubjectAndStatus,
                 changePostStatus,
+                deletePost,
                 likePost,
             }}
         >
