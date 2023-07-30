@@ -4,10 +4,11 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { getPointerContentEditable, setEndOfContentEditable } from '../../../utils/focusEditable';
 import { UserContext } from '../../../contexts/UserContext';
 import { CommentContext } from '../../../contexts/CommentContext';
-const url = '../Image/Forum/forum-avatar1.png';
+
+const defaultAvatar = '../Image/Avatar_null.png';
 
 export default function Comment({ comment, isEditing, onEditComment, onCancelEditMode, onSaveComment }) {
-    const { fullName, content } = comment;
+    const { fullName, avatar, content } = comment;
     const contentRef = useRef();
     const caretPos = useRef();
     const [textContent, setTextContent] = useState(content);
@@ -60,7 +61,7 @@ export default function Comment({ comment, isEditing, onEditComment, onCancelEdi
                 <Avatar
                     src={
                         <img
-                            src={url}
+                            src={!avatar ? defaultAvatar : avatar}
                             alt='avatar'
                         />
                     }
@@ -68,7 +69,7 @@ export default function Comment({ comment, isEditing, onEditComment, onCancelEdi
             </div>
             <div className='comment-right'>
                 <div className='comment-content'>
-                    <div>{fullName} • 15 giờ trước</div>
+                    <span>{fullName}</span>
 
                     <p
                         ref={contentRef}

@@ -47,7 +47,7 @@ export default function CreatePost() {
     };
     const uploadImage = async () => {
         if (imageUpload == null) return;
-        const imageRef = ref(storage, `images/${imageUpload.name + v4()}`);
+        const imageRef = ref(storage, `forum_images/${imageUpload.name + v4()}`);
         try {
             const snapshot = await uploadBytes(imageRef, imageUpload);
             const url = await getDownloadURL(snapshot.ref);

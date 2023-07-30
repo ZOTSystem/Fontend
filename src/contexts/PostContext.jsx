@@ -10,6 +10,7 @@ import {
     likePostService,
     getApprovedPostBySubjectService,
     deletePostService,
+    unlikePostService,
 } from '../services/postService';
 import postReducer from '../reducers/postReducer';
 
@@ -135,6 +136,14 @@ const PostProvider = ({ children }) => {
         }
     };
 
+    const unlikePost = async (postId, accountId) => {
+        try {
+            await unlikePostService(postId, accountId);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     const deletePost = async (postId) => {
         try {
             await deletePostService(postId);
@@ -160,6 +169,7 @@ const PostProvider = ({ children }) => {
                 changePostStatus,
                 deletePost,
                 likePost,
+                unlikePost,
             }}
         >
             {children}

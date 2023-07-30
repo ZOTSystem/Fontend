@@ -245,6 +245,10 @@ hr {
     margin: 24px 0;
 }
 
+.comment-title-empty {
+    text-align: center;
+}
+
 .comment-modal .ant-modal-body {
     max-height: 60vh;
     overflow-x: hidden;

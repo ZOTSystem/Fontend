@@ -10,6 +10,7 @@ const END_POINTS = {
     GET_BY_SUBJECT_STATUS: 'post/GetPostBySubjectAndStatus',
     CHANGE_POST_STATUS: 'post/ChangeStatusPost',
     LIKE_POST: '/post/LikePost',
+    UNLIKE_POST: '/post/UnlikePost',
     DELETE_POST: '/post/DeletePost'
 };
 
@@ -30,8 +31,10 @@ export const getPostByStatusService = async (status, accountId) =>
 export const getPostBySubjectAndStatusService = async (subjectId, status, accountId) =>
     await request.get(`${END_POINTS.GET_BY_SUBJECT_STATUS}?subjectId=${subjectId}&status=${status}&accountId=${accountId}`);
 
+export const deletePostService = async (postId) => await request.post(`${END_POINTS.DELETE_POST}?postId=${postId}`);
+
 export const changePostStatusService = async (postId, status) => await request.post(`${END_POINTS.CHANGE_POST_STATUS}?postId=${postId}&status=${status}`);
 
 export const likePostService = async (postId, accountId) => await request.post(`${END_POINTS.LIKE_POST}?postId=${postId}&accountId=${accountId}`);
 
-export const deletePostService = async (postId) => await request.post(`${END_POINTS.DELETE_POST}?postId=${postId}`);
+export const unlikePostService = async (postId, accountId) => await request.delete(`${END_POINTS.UNLIKE_POST}?postId=${postId}&accountId=${accountId}`)

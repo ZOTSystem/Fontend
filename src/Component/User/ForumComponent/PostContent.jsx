@@ -14,15 +14,28 @@ const liked = '../Image/Forum/liked.png';
 const comment = '../Image/Forum/comment.png';
 
 export default function PostContent({ post }) {
-    const { postId, avatar, fullName, createdTime, subjectName, postText, postFile, countComment, countLike } = post;
-    const { getAllPost, currentPost, getPostById, getPostByStatus, likePost } = useContext(PostContext);
+    const {
+        postId,
+        avatar,
+        fullName,
+        createdTime,
+        subjectName,
+        postText,
+        postFile,
+        status,
+        postlikes,
+        countComment,
+        countLike,
+    } = post;
+    const { getAllPost, currentPost, getPostById, getPostByStatus, likePost, unlikePost } = useContext(PostContext);
     const { comments, getCommentsByPost } = useContext(CommentContext);
     const { user } = useContext(UserContext);
     const [searchParams] = useSearchParams();
     const statusQueryParams = searchParams.get('status');
 
-    const [isLiked, setIsLiked] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const userLiked = postlikes.find((like) => like.accountId === user.accountId);
 
     const showModal = (postId) => {
         setIsModalOpen(true);
@@ -33,15 +46,18 @@ export default function PostContent({ post }) {
     const cancelModal = () => {
         setIsModalOpen(false);
     };
-
-    const handleLikedClick = () => {
-        likePost(postId, user.accountId);
-        if (statusQueryParams) {
-            getPostByStatus(statusQueryParams, user.accountId);
+    const handleLikedClick = async () => {
+        if (!userLiked) {
+            await likePost(postId, user.accountId);
         } else {
-            getAllPost();
+            await unlikePost(postId, user.accountId);
         }
-        setIsLiked(!isLiked);
+
+        if (statusQueryParams) {
+            await getPostByStatus(statusQueryParams, user.accountId);
+        } else {
+            await getAllPost();
+        }
     };
 
     return (
@@ -80,20 +96,22 @@ export default function PostContent({ post }) {
                     </div>
                 </div>
             </div>
-            <div className='form-like'>
-                <img
-                    onClick={handleLikedClick}
-                    src={isLiked ? liked : like}
-                    alt='heart'
-                />
-                <p>{countLike}</p>
-                <img
-                    src={comment}
-                    onClick={() => showModal(postId)}
-                    alt='comment'
-                />
-                <p>{countComment}</p>
-            </div>
+            {status === 'Approved' && (
+                <div className='form-like'>
+                    <img
+                        onClick={handleLikedClick}
+                        src={userLiked ? liked : like}
+                        alt='heart'
+                    />
+                    <p>{countLike}</p>
+                    <img
+                        src={comment}
+                        onClick={() => showModal(postId)}
+                        alt='comment'
+                    />
+                    <p>{countComment}</p>
+                </div>
+            )}
 
             {isModalOpen && (
                 <Modal
@@ -105,8 +123,14 @@ export default function PostContent({ post }) {
                     className='comment-modal'
                 >
                     <PostDetails data={currentPost} />
-                    <h6 className='comment-title'>Bình luận</h6>
-                    <CommentList comments={comments} />
+                    {comments.length > 0 ? (
+                        <>
+                            <h6 className='comment-title'>Bình luận</h6>
+                            <CommentList comments={comments} />
+                        </>
+                    ) : (
+                        <h6 className='comment-title-empty'> Chưa có bình luận nào !</h6>
+                    )}
                 </Modal>
             )}
         </>
