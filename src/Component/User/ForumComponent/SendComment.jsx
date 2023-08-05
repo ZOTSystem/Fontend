@@ -5,7 +5,7 @@ import { useContext, useState } from 'react';
 import { CommentContext } from '../../../contexts/CommentContext';
 import CommentList from '../CommentList';
 import { PostContext } from '../../../contexts/PostContext';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { UserContext } from '../../../contexts/UserContext';
 
 const defaultAvatar = '../Image/Avatar_null.png';
@@ -19,16 +19,18 @@ export default function SendComment({ post }) {
     const [content, setContent] = useState('');
     const [searchParams] = useSearchParams();
     const statusQueryParams = searchParams.get('status');
-
+    const navigate = useNavigate();
     const handleSendComment = async () => {
-        await addComment({ postId: post.postId, accountId: user.accountId, content });
-        setContent('');
-        openNotificationSendCommentSuccess('topRight');
-        showModal(post.postId);
-        if (statusQueryParams) {
-            await getPostByStatus(statusQueryParams, user.accountId);
-        } else {
-            await getAllPost();
+        if (content) {
+            await addComment({ postId: post.postId, accountId: user.accountId, content });
+            setContent('');
+            openNotificationSendCommentSuccess('topRight');
+            showModal(post.postId);
+            if (statusQueryParams) {
+                await getPostByStatus(statusQueryParams, user.accountId);
+            } else {
+                await getAllPost();
+            }
         }
     };
 
@@ -43,6 +45,7 @@ export default function SendComment({ post }) {
     };
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isOpenLoginModal, setIsOpenLoginModal] = useState(false);
 
     const showModal = (postId) => {
         setIsModalOpen(true);
@@ -51,6 +54,13 @@ export default function SendComment({ post }) {
 
     const cancelModal = () => {
         setIsModalOpen(false);
+        setIsOpenLoginModal(false);
+    };
+
+    const handleCommentClick = () => {
+        if (!user) {
+            setIsOpenLoginModal(true);
+        }
     };
 
     return (
@@ -71,6 +81,7 @@ export default function SendComment({ post }) {
                     </div>
                     <div className='form-comment-midle'>
                         <TextArea
+                            onClick={handleCommentClick}
                             value={content}
                             onChange={(e) => setContent(e.target.value)}
                             placeholder='Viết bình luận...'
@@ -86,22 +97,32 @@ export default function SendComment({ post }) {
                             src={send}
                             alt='send'
                             onClick={handleSendComment}
+                            style={content ? { cursor: 'pointer' } : { cursor: 'not-allowed' }}
                         ></img>
                     </div>
                 </div>
             </div>
-            {isModalOpen && (
-                <Modal
-                    title='Bình luận'
-                    cancelText='Đóng'
-                    okButtonProps={{ style: { display: 'none' } }}
-                    open={isModalOpen}
-                    onCancel={cancelModal}
-                    className='comment-modal'
-                >
-                    <CommentList comments={comments} />
-                </Modal>
-            )}
+
+            <Modal
+                title='Bình luận'
+                cancelText='Đóng'
+                okButtonProps={{ style: { display: 'none' } }}
+                open={isModalOpen}
+                onCancel={cancelModal}
+                className='comment-modal'
+            >
+                <CommentList comments={comments} />
+            </Modal>
+            <Modal
+                title='Bình luận'
+                open={isOpenLoginModal}
+                okText='Đồng ý'
+                cancelText='Hủy bỏ'
+                onCancel={cancelModal}
+                onOk={() => navigate('/login')}
+            >
+                <h5>Vui lòng đăng nhập để bình luận về bài viết !</h5>
+            </Modal>
         </>
     );
 }

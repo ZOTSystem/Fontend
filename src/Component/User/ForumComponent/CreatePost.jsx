@@ -19,6 +19,7 @@ const tag = '../Image/Forum/icon-tag.png';
 
 export default function CreatePost() {
     const [open, setOpen] = useState(false);
+    const [openLogin, setOpenLogin] = useState(false);
     const navigate = useNavigate();
     const [form] = Form.useForm();
     const [formValue, setFormValue] = useState({ subjectId: null, postText: '', postFile: '' });
@@ -38,11 +39,19 @@ export default function CreatePost() {
     };
 
     const showModal = () => {
-        setOpen(true);
+        if (!user) {
+            setOpenLogin(true);
+        } else {
+            setOpen(true);
+        }
     };
 
     const cancelModal = () => {
-        setOpen(false);
+        if (!user) {
+            setOpenLogin(false);
+        } else {
+            setOpen(false);
+        }
         form.resetFields();
     };
     const uploadImage = async () => {
@@ -213,6 +222,16 @@ export default function CreatePost() {
                             </Upload> */}
                         </Form.Item>
                     </Form>
+                </Modal>
+                <Modal
+                    title='Tạo bài viết'
+                    open={openLogin}
+                    okText='Đồng ý'
+                    cancelText='Hủy bỏ'
+                    onCancel={cancelModal}
+                    onOk={() => navigate('/login')}
+                >
+                    <h5>Vui lòng đăng nhập để đăng bài viết !</h5>
                 </Modal>
             </div>
         </>
