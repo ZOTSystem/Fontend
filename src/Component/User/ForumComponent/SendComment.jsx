@@ -14,7 +14,7 @@ const send = '../Image/Forum/send.png';
 const { TextArea } = Input;
 export default function SendComment({ post }) {
     const { comments, addComment, getCommentsByPost } = useContext(CommentContext);
-    const { getAllPost, getPostByStatus } = useContext(PostContext);
+    const { getAllPost, getPostByStatus, getSavedPost } = useContext(PostContext);
     const { user } = useContext(UserContext);
     const [content, setContent] = useState('');
     const [searchParams] = useSearchParams();
@@ -27,7 +27,11 @@ export default function SendComment({ post }) {
             openNotificationSendCommentSuccess('topRight');
             showModal(post.postId);
             if (statusQueryParams) {
-                await getPostByStatus(statusQueryParams, user.accountId);
+                if (statusQueryParams === 'Saved') {
+                    await getSavedPost(user.accountId);
+                } else {
+                    await getPostByStatus(statusQueryParams, user.accountId);
+                }
             } else {
                 await getAllPost();
             }
