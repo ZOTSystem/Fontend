@@ -25,6 +25,7 @@ export default function CreatePost() {
     const [form] = Form.useForm();
     const [formValue, setFormValue] = useState({ subjectId: null, postText: '', postFile: '' });
     const [imageUpload, setImageUpload] = useState(null);
+    const [uploadingImage, setUploadingImage] = useState(false);
     const { subjects } = useContext(SubjectContext);
     const { loading, addPost, getPostByStatus } = useContext(PostContext);
     const { user } = useContext(UserContext);
@@ -57,15 +58,18 @@ export default function CreatePost() {
     };
     const uploadImage = async () => {
         if (imageUpload == null) return;
+        setUploadingImage(true);
         const imageRef = ref(storage, `forum_images/${imageUpload.name + v4()}`);
         try {
             const snapshot = await uploadBytes(imageRef, imageUpload);
             const url = await getDownloadURL(snapshot.ref);
             imageUrlRef.current = url;
             imageUrlUpload = imageUrlRef.current;
+            setUploadingImage(false);
             return imageUrlUpload;
         } catch (error) {
             console.log(error);
+            setUploadingImage(false);
         }
     };
 
@@ -122,10 +126,11 @@ export default function CreatePost() {
                 <Modal
                     title='Tạo bài viết'
                     open={open}
-                    okText={loading ? <Spinner /> : 'Đăng bài'}
+                    okText={uploadingImage ? <Spinner /> : 'Đăng bài'}
                     cancelText='Đóng'
                     onCancel={cancelModal}
                     onOk={handleSubmitAddPostForm}
+                    okButtonProps={uploadingImage && { style: { pointerEvents: 'none' } }}
                 >
                     <Form
                         form={form}

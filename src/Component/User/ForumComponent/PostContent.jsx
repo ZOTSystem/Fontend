@@ -30,8 +30,17 @@ export default function PostContent({ post }) {
         countComment,
         countLike,
     } = post;
-    const { getAllPost, currentPost, getPostById, getPostByStatus, likePost, unlikePost, savePost, unSavePost } =
-        useContext(PostContext);
+    const {
+        getAllPost,
+        currentPost,
+        getPostById,
+        getPostByStatus,
+        likePost,
+        unlikePost,
+        savePost,
+        unSavePost,
+        getSavedPost,
+    } = useContext(PostContext);
     const { comments, getCommentsByPost } = useContext(CommentContext);
     const { user } = useContext(UserContext);
     const [searchParams] = useSearchParams();
@@ -89,7 +98,11 @@ export default function PostContent({ post }) {
             }
 
             if (statusQueryParams) {
-                await getPostByStatus(statusQueryParams, user.accountId);
+                if (statusQueryParams === 'Saved') {
+                    await getSavedPost(user.accountId);
+                } else {
+                    await getPostByStatus(statusQueryParams, user.accountId);
+                }
             } else {
                 await getAllPost();
             }
@@ -110,7 +123,11 @@ export default function PostContent({ post }) {
             }
 
             if (statusQueryParams) {
-                await getPostByStatus(statusQueryParams, user.accountId);
+                if (statusQueryParams === 'Saved') {
+                    await getSavedPost(user.accountId);
+                } else {
+                    await getPostByStatus(statusQueryParams, user.accountId);
+                }
             } else {
                 await getAllPost();
             }

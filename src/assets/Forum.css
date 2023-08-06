@@ -160,6 +160,7 @@ hr {
 .form-like img {
     width: 30px;
     height: 30px;
+    cursor: pointer;
 }
 
 .form-like p {
