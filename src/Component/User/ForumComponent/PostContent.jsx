@@ -201,7 +201,7 @@ export default function PostContent({ post }) {
             </Modal>
 
             <Modal
-                title='Tạo bài viết'
+                title={`${messageModal.charAt(0).toUpperCase() + messageModal.slice(1)} bài viết`}
                 open={isLoginOpen}
                 okText='Đồng ý'
                 cancelText='Hủy bỏ'
