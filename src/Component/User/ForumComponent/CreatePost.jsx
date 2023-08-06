@@ -12,7 +12,8 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { v4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../../contexts/UserContext';
-const url = '../Image/Forum/forum-avatar1.png';
+import Spinner from './../../common/Spinner/Spinner';
+const defaultAvatar = '../Image/Avatar_null.png';
 const anh = '../Image/Forum/icon-anh-video.png';
 const monhoc = '../Image/Forum/icon-sach.png';
 const tag = '../Image/Forum/icon-tag.png';
@@ -25,7 +26,7 @@ export default function CreatePost() {
     const [formValue, setFormValue] = useState({ subjectId: null, postText: '', postFile: '' });
     const [imageUpload, setImageUpload] = useState(null);
     const { subjects } = useContext(SubjectContext);
-    const { addPost, getPostByStatus } = useContext(PostContext);
+    const { loading, addPost, getPostByStatus } = useContext(PostContext);
     const { user } = useContext(UserContext);
     const { accountId } = user;
     const imageUrlRef = useRef('');
@@ -81,37 +82,11 @@ export default function CreatePost() {
     const handleSubmitAddPostForm = async () => {
         const postFile = await uploadImage();
         await addPost({ ...formValue, accountId, postFile });
-        cancelModal();
         openNotificationAddPostSuccess('topRight');
-        await getPostByStatus('Pending');
+        await getPostByStatus('Pending', accountId);
+        cancelModal();
         navigate('/forum?status=Pending');
     };
-
-    // const SubmitButton = ({ form }) => {
-    //     const [submittable, setSubmittable] = useState(false);
-    //     const values = Form.useWatch([], form);
-    //     useEffect(() => {
-    //         form.validateFields({
-    //             validateOnly: true,
-    //         }).then(
-    //             () => {
-    //                 setSubmittable(true);
-    //             },
-    //             () => {
-    //                 setSubmittable(false);
-    //             }
-    //         );
-    //     }, [values]);
-    //     return (
-    //         <Button
-    //             type='primary'
-    //             htmlType='submit'
-    //             disabled={!submittable}
-    //         >
-    //             Đăng
-    //         </Button>
-    //     );
-    // };
 
     return (
         <>
@@ -125,7 +100,7 @@ export default function CreatePost() {
                         onClick={showModal}
                         size='large'
                         placeholder='Bạn đang nghĩ gì thế?'
-                        prefix={<Avatar src={url} />}
+                        prefix={user && <Avatar src={user.avatar ? user.avatar : defaultAvatar} />}
                     />
                     <hr></hr>
                     <div className='bottom-form'>
@@ -147,7 +122,7 @@ export default function CreatePost() {
                 <Modal
                     title='Tạo bài viết'
                     open={open}
-                    okText='Đăng bài'
+                    okText={loading ? <Spinner /> : 'Đăng bài'}
                     cancelText='Đóng'
                     onCancel={cancelModal}
                     onOk={handleSubmitAddPostForm}
@@ -212,14 +187,6 @@ export default function CreatePost() {
                                 accept='image/*'
                                 onChange={(event) => setImageUpload(event.target.files[0])}
                             />
-                            {/* <Upload
-                                listType='picture-card'
-                                onChange={(file) => setImageUpload(file)}
-                            >
-                                <div>
-                                    <PlusOutlined />
-                                </div>
-                            </Upload> */}
                         </Form.Item>
                     </Form>
                 </Modal>

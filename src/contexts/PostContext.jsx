@@ -11,6 +11,9 @@ import {
     getApprovedPostBySubjectService,
     deletePostService,
     unlikePostService,
+    savePostService,
+    unSavePostService,
+    getSavedPostService,
 } from '../services/postService';
 import postReducer from '../reducers/postReducer';
 
@@ -152,6 +155,35 @@ const PostProvider = ({ children }) => {
         }
     };
 
+    const savePost = async (postId, accountId) => {
+        try {
+            await savePostService(postId, accountId);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const unSavePost = async (postId, accountId) => {
+        try {
+            await unSavePostService(postId, accountId);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const getSavedPost = async (accountId) => {
+        try {
+            const response = await getSavedPostService(accountId);
+            dispatch({
+                type: 'GET_POSTS',
+                payload: response,
+                loading: false,
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     return (
         <PostContext.Provider
             value={{
@@ -170,6 +202,9 @@ const PostProvider = ({ children }) => {
                 deletePost,
                 likePost,
                 unlikePost,
+                savePost,
+                unSavePost,
+                getSavedPost,
             }}
         >
             {children}

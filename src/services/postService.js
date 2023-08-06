@@ -11,7 +11,10 @@ const END_POINTS = {
     CHANGE_POST_STATUS: 'post/ChangeStatusPost',
     LIKE_POST: '/post/LikePost',
     UNLIKE_POST: '/post/UnlikePost',
-    DELETE_POST: '/post/DeletePost'
+    DELETE_POST: '/post/DeletePost',
+    SAVE_POST: '/post/SavePost',
+    UNSAVE_POST: '/post/UnSavePost',
+    GET_SAVED_POST: '/post/GetSavedPostByAccount'
 };
 
 export const getAllPostService = async () => await request.get(END_POINTS.GET_ALL_POST);
@@ -37,4 +40,10 @@ export const changePostStatusService = async (postId, status) => await request.p
 
 export const likePostService = async (postId, accountId) => await request.post(`${END_POINTS.LIKE_POST}?postId=${postId}&accountId=${accountId}`);
 
-export const unlikePostService = async (postId, accountId) => await request.delete(`${END_POINTS.UNLIKE_POST}?postId=${postId}&accountId=${accountId}`)
+export const unlikePostService = async (postId, accountId) => await request.delete(`${END_POINTS.UNLIKE_POST}?postId=${postId}&accountId=${accountId}`);
+
+export const savePostService = async (postId, accountId) => await request.post(`${END_POINTS.SAVE_POST}?postId=${postId}&accountId=${accountId}`);
+
+export const unSavePostService = async (postId, accountId) => await request.delete(`${END_POINTS.UNSAVE_POST}?postId=${postId}&accountId=${accountId}`);
+
+export const getSavedPostService = async (accountId) => await request.get(`${END_POINTS.GET_SAVED_POST}?accountId=${accountId}`);

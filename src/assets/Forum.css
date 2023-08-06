@@ -78,6 +78,7 @@ hr {
     display: flex;
     flex: 1;
     justify-content: flex-end;
+    margin-bottom: 12px;
 }
 
 #filter-post-form .form-item {
@@ -147,6 +148,7 @@ hr {
 .form-right img {
     width: 35px;
     height: 35px;
+    cursor: pointer;
 }
 
 .form-like {
@@ -265,12 +267,6 @@ hr {
 
 .comment-modal .ant-modal-body::-webkit-scrollbar-thumb {
     background-color: #99ccff;
-}
-
-.post-filter-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
 }
 
 .post-tab-item {

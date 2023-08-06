@@ -83,7 +83,9 @@ const PostList = ({ posts }) => {
                         className='form-post'
                     >
                         <PostContent post={post} />
-                        {(!statusQueryParams || (statusQueryParams === 'Approved' && user.roleId !== 2)) && (
+                        {(!statusQueryParams ||
+                            (statusQueryParams === 'Approved' && user.roleId !== 2) ||
+                            statusQueryParams === 'Saved') && (
                             <>
                                 <SendComment post={post} />
                             </>
