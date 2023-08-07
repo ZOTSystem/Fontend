@@ -1,6 +1,5 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Avatar, Modal, notification } from 'antd';
-import 'bootstrap/dist/css/bootstrap.css';
 import { getPointerContentEditable, setEndOfContentEditable } from '../../../utils/focusEditable';
 import { UserContext } from '../../../contexts/UserContext';
 import { CommentContext } from '../../../contexts/CommentContext';
@@ -11,11 +10,13 @@ export default function Comment({ comment, isEditing, onEditComment, onCancelEdi
     const { fullName, avatar, content } = comment;
     const contentRef = useRef();
     const caretPos = useRef();
-    const [textContent, setTextContent] = useState(content);
+    const [originalContent, setOriginalContent] = useState(content);
     const [open, setOpen] = useState(false);
     const [selectedComment, setSelectedComment] = useState(null);
     const { user } = useContext(UserContext);
     const { getCommentsByPost, deleteComment } = useContext(CommentContext);
+    const originalContentRef = useRef(originalContent);
+    const [isEmptyContent, setIsEmptyContent] = useState(false);
 
     const showModal = (comment) => {
         setOpen(true);
@@ -39,6 +40,10 @@ export default function Comment({ comment, isEditing, onEditComment, onCancelEdi
     const handleEditComment = () => {
         onSaveComment(comment, contentRef.current.textContent);
         contentRef.current.focus();
+        if (contentRef.current.textContent.trim() === '') {
+            // Set the cursor to the end of the contentEditable
+            setEndOfContentEditable(contentRef.current);
+        }
     };
 
     const handleDeleteComment = async (comment) => {
@@ -48,11 +53,18 @@ export default function Comment({ comment, isEditing, onEditComment, onCancelEdi
         openNotificationDeletedComment('topRight');
     };
 
+    const handleCancelEditMode = () => {
+        originalContentRef.current = originalContent;
+        contentRef.current.textContent = originalContent; // Manually update the content in the DOM
+        onCancelEditMode();
+    };
+
     useEffect(() => {
         if (isEditing) {
             setEndOfContentEditable(contentRef.current);
+            setOriginalContent(contentRef.current.textContent); // Store the original content when editing begins
         }
-    }, [textContent, isEditing]);
+    }, [isEditing]);
 
     return (
         <div className='comment-wrapper'>
@@ -76,11 +88,18 @@ export default function Comment({ comment, isEditing, onEditComment, onCancelEdi
                         contentEditable={isEditing}
                         suppressContentEditableWarning={true}
                         onInput={(e) => {
+                            originalContentRef.current = e.target.textContent;
                             caretPos.current = getPointerContentEditable(contentRef.current);
-                            setTextContent(e.target.textContent);
+                            if (!e.target.textContent) {
+                                setIsEmptyContent(true);
+                                setEndOfContentEditable(contentRef.current);
+                            } else {
+                                setIsEmptyContent(false);
+                                setEndOfContentEditable(contentRef.current);
+                            }
                         }}
                     >
-                        {content}
+                        {originalContentRef.current}
                     </p>
                 </div>
                 {!isEditing && comment.accountId === user.accountId && (
@@ -104,12 +123,14 @@ export default function Comment({ comment, isEditing, onEditComment, onCancelEdi
                         <button
                             className='comment-action-btn'
                             onClick={handleEditComment}
+                            style={isEmptyContent ? { cursor: 'not-allowed' } : { cursor: 'pointer' }}
+                            disabled={isEmptyContent}
                         >
                             Lưu
                         </button>
                         <button
                             className='comment-action-btn'
-                            onClick={onCancelEditMode}
+                            onClick={handleCancelEditMode}
                         >
                             Hủy
                         </button>
