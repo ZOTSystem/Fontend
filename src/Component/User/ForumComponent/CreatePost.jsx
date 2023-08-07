@@ -27,7 +27,7 @@ export default function CreatePost() {
     const [imageUpload, setImageUpload] = useState(null);
     const [uploadingImage, setUploadingImage] = useState(false);
     const { subjects } = useContext(SubjectContext);
-    const { loading, addPost, getPostByStatus } = useContext(PostContext);
+    const { addPost, getPostByStatus } = useContext(PostContext);
     const { user } = useContext(UserContext);
     const { accountId } = user;
     const imageUrlRef = useRef('');
@@ -129,21 +129,23 @@ export default function CreatePost() {
                     okText={uploadingImage ? <Spinner /> : 'Đăng bài'}
                     cancelText='Đóng'
                     onCancel={cancelModal}
-                    onOk={handleSubmitAddPostForm}
+                    onOk={form.submit}
                     okButtonProps={uploadingImage && { style: { pointerEvents: 'none' } }}
                 >
                     <Form
                         form={form}
                         layout='horizontal'
                         initialValues={formValue}
+                        onFinish={handleSubmitAddPostForm}
                     >
                         <Form.Item
                             label='Môn học'
                             className='input-form'
-                            name='mon'
+                            name='subject'
                             rules={[
                                 {
                                     required: true,
+                                    message: 'Vui lòng chọn môn học!',
                                 },
                             ]}
                         >
@@ -164,11 +166,11 @@ export default function CreatePost() {
                             </Select>
                         </Form.Item>
                         <Form.Item
-                            name='text'
+                            name='content'
                             rules={[
                                 {
                                     required: true,
-                                    message: '',
+                                    message: 'Vui lòng nhập nội dung!',
                                 },
                             ]}
                         >
