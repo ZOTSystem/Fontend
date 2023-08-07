@@ -25,8 +25,8 @@ export const addPostService = async (data) => await request.post(END_POINTS.ADD_
 
 export const getApprovedPostBySubjectService = async (subjectId) => await request.get(`${END_POINTS.GET_APPROVE_BY_SUBJECT}?subjectId=${subjectId}`);
 
-export const getPostBySubjectService = async (subjectId) =>
-    await request.get(`${END_POINTS.GET_BY_SUBJECT}?subjectId=${subjectId}`);
+export const getPostBySubjectService = async (subjectId, accountId) =>
+    await request.get(`${END_POINTS.GET_BY_SUBJECT}?subjectId=${subjectId}&accountId=${accountId}`);
 
 export const getPostByStatusService = async (status, accountId) =>
     await request.get(`${END_POINTS.GET_BY_STATUS}?status=${status}&accountId=${accountId}`);

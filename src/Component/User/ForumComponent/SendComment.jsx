@@ -76,7 +76,7 @@ export default function SendComment({ post }) {
                         <Avatar
                             src={
                                 <img
-                                    src={!post?.avatar ? defaultAvatar : post.avatar}
+                                    src={!user.avatar ? defaultAvatar : user.avatar}
                                     alt='avatar'
                                     className='avatar'
                                 />

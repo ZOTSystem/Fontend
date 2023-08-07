@@ -84,9 +84,9 @@ const PostProvider = ({ children }) => {
         }
     };
 
-    const getPostBySubject = async (subjectId) => {
+    const getPostBySubject = async (subjectId, accountId) => {
         try {
-            const response = await getPostBySubjectService(subjectId);
+            const response = await getPostBySubjectService(subjectId, accountId);
             dispatch({
                 type: 'GET_POSTS',
                 payload: response,

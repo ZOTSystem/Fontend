@@ -49,7 +49,7 @@ const FilterPost = () => {
                 setSearchParams({ subject: `${subjectNameRef.current}` });
                 break;
             case 'subject':
-                getPostBySubject(selectionValue);
+                getPostBySubject(selectionValue, user.accountId);
                 setSearchParams({ subject: `${subjectNameRef.current}` });
                 break;
             case 'status':

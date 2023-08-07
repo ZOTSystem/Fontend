@@ -26,9 +26,11 @@ const CommentList = ({ comments }) => {
     };
 
     const handleSaveComment = (comment, updatedContent) => {
-        editComment({ postCommentId: comment.postCommentId, content: updatedContent });
-        openNotificationEditCommentSuccess('topRight');
-        setEditingCommentId(null);
+        if (updatedContent !== '') {
+            editComment({ postCommentId: comment.postCommentId, content: updatedContent });
+            openNotificationEditCommentSuccess('topRight');
+            setEditingCommentId(null);
+        }
     };
 
     return (
