@@ -54,7 +54,7 @@ const FilterPost = () => {
                 break;
             case 'status':
                 getPostByStatus(statusQueryParams);
-                setSearchParams({ status: statusQueryParams, accountId: user.accountId });
+                setSearchParams({ status: statusQueryParams });
                 break;
             default:
                 getAllPost();
