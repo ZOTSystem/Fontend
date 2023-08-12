@@ -32,7 +32,7 @@ export default function SiderAdmin() {
     }
 
     const adminMenu = [
-        getItem('Thống kê', '/admin/statistic', <FundOutlined />, '', null),
+        getItem('Thống kê', '/admin/statistics', <FundOutlined />, '/admin/statistics', null),
         getItem('Quản lý người dùng', '/admin/manageUser', <UserOutlined />, '/admin/manageUser', null),
         getItem('Quản lý Mod', '/admin/manageMod', <UsergroupAddOutlined />, '/admin/manageMod', null),
         getItem('Quản lý topic', '/admin/manageTopic', <FolderOpenOutlined />, '/admin/manageTopic', null),

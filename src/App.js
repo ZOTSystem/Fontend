@@ -30,11 +30,13 @@ import ManageUser from './Component/Admin/ManageUser';
 import ManageMod from './Component/Admin/ManageMod';
 import ManageQuestion from './Component/Admin/ManageQuestion';
 import ManageTopic from './Component/Admin/ManageTopic';
+import ManageNews from './Component/Admin/ManageNews';
+import Statistics from './Component/Admin/Statistics';
+
 
 import Testfirebase from './Testfirebase';
 import PostProvider from './contexts/PostContext';
 import SubjectProvider from './contexts/SubjectContext';
-import CommentProvider from './contexts/CommentContext';
 
 //#region Mod Routers
 import ManageNewsByMod from './Component/Mod/ManageNewsByMod';
@@ -115,7 +117,7 @@ function App() {
                           <Route path="/*" element={<Navigate to="/admin/manageUser" />} />
 
                           </>
-                    }
+                    } 
                   </>
               }
             </>
