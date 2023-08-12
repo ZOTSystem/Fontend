@@ -9,7 +9,6 @@ export const GetTopicByGrade = async (grade, subjectId, topicType, accountId) =>
                 'Content-Type': 'application/json',
             },
         });
-        console.log('topic: ' + respone)
         return respone;
     } catch (e) {
         return e;

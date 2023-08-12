@@ -22,6 +22,8 @@ import ExamResult from './Component/User/ExamResult';
 import Study from './Component/User/Study';
 import ExamFinish from './Component/User/ExamFinish';
 import TopicStudy from './Component/User/TopicStudy';
+import Contest from './Component/User/Contest'  
+import Ranking from './Component/User/Ranking'  
 
 //#Region Admin Routes
 import ManageUser from './Component/Admin/ManageUser';
@@ -76,7 +78,10 @@ function App() {
                     <Route path="/examResult" element={<ExamResult />}></Route>
                     <Route path="/study" element={<Study />}></Route>
                     <Route path="/examFinish" element={<ExamFinish />}></Route>
-                    <Route path="topicStudy" element={<TopicStudy />}></Route>
+                    <Route path="/topicStudy" element={<TopicStudy />}></Route>
+                    <Route path="/contest" element={<Contest />}></Route>
+                    <Route path="/ranking" element={<Ranking />}></Route>
+
 
                     <Route path="/*" element={<Navigate to="/" />} />
                   </> :

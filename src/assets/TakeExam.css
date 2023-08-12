@@ -135,6 +135,14 @@
     display: flex;
 }
 
+.exam-button-again button:hover {
+    background-color: #91b156;
+}
+
+.exam-button button:hover {
+    background-color: #79bbf2;
+}
+
 .exam-button-again {    
     margin-top: auto;
     margin-bottom: 10px;

@@ -21,4 +21,19 @@ export const GetAllSubjectService = async () => {
     }
 };
 
+export const GetSubjectByTopicType = async (topicType) => {
+    try {
+        const respone = await request({
+            method: 'get',
+            url: `Subject/getSubjectByTopicType?topicType=${topicType}`,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        return respone;
+    } catch (e) {
+        return e;
+    }
+};
+
 

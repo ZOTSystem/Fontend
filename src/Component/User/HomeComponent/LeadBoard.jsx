@@ -42,7 +42,7 @@ export default function LeadBoard() {
                     <div className='sc-dlfnbm sc-eCssSg dcHHcO oDHHe'>
                         <div className='sc-aemoO hgHGyw'>
                             <div className='sc-jONnTn jIvnOH'>
-                                <p class="sc-eLgOdN ejJoEn d-sm-inline-block d-none" style={{ color: '#000000' }}>Môn học</p>
+                                <p class="sc-eLgOdN ejJoEn d-sm-inline-block d-none" style={{ color: '#000000' }}>Cuộc thi gần đây</p>
                                 <div className='sc-hlTvYk bkPOGA css-2b097c-container'>
                                     <div className='react-select__control css-1gkg2bf-control'>
                                         <Select
@@ -124,19 +124,7 @@ export default function LeadBoard() {
                     <div className='sc-dlfnbm sc-eCssSg dcHHcO oDHHe'>
                         <div className='sc-aemoO hgHGyw'>
                             <div className='sc-jONnTn jIvnOH'>
-                                <p class="sc-eLgOdN ejJoEn d-sm-inline-block d-none" style={{ color: '#000000' }}>Điểm thi</p>
-                                <div className='sc-hlTvYk bkPOGA css-2b097c-container'>
-                                    <div className='react-select__control css-1gkg2bf-control'>
-                                        <div className='react-select__value-container css-1hwfws3'>
-                                            <div class="react-select__placeholder css-1wa3eu0-placeholder">Danh sách cuộc thi</div>
-                                            <div className='css-1g6gooi'>
-                                                <div class="react-select__input" style={{ display: 'inline-block' }}>
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <p class="sc-eLgOdN ejJoEn d-sm-inline-block d-none" style={{ color: '#000000' }}>Chăm chỉ</p>
                                 <div>
                                     <div className='sc-kIeTtH cnxSGb'>
                                         <div className='d-sm-flex justify-content-between d-none'>

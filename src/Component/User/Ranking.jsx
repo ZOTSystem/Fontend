@@ -1,17 +1,14 @@
-import 'bootstrap/dist/css/bootstrap.css';
-import Header from "../../Layout/User/Header";
-import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Component, useState, useEffect, useContext } from 'react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { GetTopicByGrade } from '../../services/topicService';
-import { AddTestDetailService } from '../../services/testDetailService';
-import { Modal } from 'antd';
 import { UserContext } from '../../contexts/UserContext';
-import { ExclamationCircleFilled } from '@ant-design/icons';
-import "../../assets/TakeExam.css"
+import { AddTestDetailService } from '../../services/testDetailService';
+import 'bootstrap/dist/css/bootstrap.css';
+import '../../assets/TestSubjectStyle.css'
+import Header from "../../Layout/User/Header";
 import '../../assets/Style.css'
 
-export default function TakeExam() {
-
+export default function Ranking() {
     const { user } = useContext(UserContext);
 
     //#region take subjectId
@@ -39,13 +36,22 @@ export default function TakeExam() {
     };
     //#endregion
 
+    //#region move to exam result
+    const handleRanking = async (item) => {
+        navigate('/ranking', {
+            state: {
+                topicId: item.topicId,
+                accountId: user.accountId,
+            },
+        });
+    };
+    //#endregion
+
     //#region  get topic list by grade and subjecId
     const [topicStudy, setTopicStudy] = useState([]);
-    const [topicType, setTopicType] = useState('');
-    const handleListTopic = async (grade, subjectId, topicType, accountId) => {
+    const handleGetData = async () => {
         try {
-            setTopicType(topicType)
-            const result = grade === undefined ? await GetTopicByGrade('', subjectId, topicType, accountId) : await GetTopicByGrade(grade, subjectId, topicType, accountId)
+            const result = await GetTopicByGrade('', subjectId, 6, user.accountId);
             if (result.status === 200) {
                 setTopicStudy(result.data);
             }
@@ -53,27 +59,10 @@ export default function TakeExam() {
             console.error('Error fetching mod service:', error);
         }
     };
+
     useEffect(() => {
-        handleListTopic();
+        handleGetData();
     }, []);
-    //#endregion
-
-    //#region show modal confirm
-
-    const { confirm } = Modal;
-    const showConfirm = (item) => {
-        confirm({
-            title: 'Vui lòng kiểm tra thật kĩ trước khi bắt đầu làm bài',
-            width: 600,
-            icon: <ExclamationCircleFilled />,
-            content: 'Chúc bạn có được kết quả tốt',
-            onOk() {
-                handleClick(item)
-            },
-            okText: 'Bắt đầu',
-            cancelText: 'Hủy',
-        });
-    };
     //#endregion
     return (
         <>
@@ -98,88 +87,35 @@ export default function TakeExam() {
                                             fill='#000000'
                                         ></path>
                                     </svg>
-                                    <span>Đề kiểm Tra</span>
-                                    <span className='topic-subject'>{subjectName}</span>
+                                    <span>Bảng xếp hạng</span>
+                                    <span className='topic-subject'>Toán</span>
                                 </h2>
-                            </div>
-                            <div
-                                className='topic-study-grade'
-                                style={{ display: 'flex' }}
-                            >
-                                <select
-                                    class='form-select form-select-lg mb-3'
-                                    aria-label='.form-select-lg example'
-                                    onChange={(e) => handleListTopic(undefined, subjectId, e.target.value, user.accountId)}
-                                >
-                                    <option selected>Chọn bài kiểm tra</option>
-                                    <option value='2'>Kiểm tra 15 phút</option>
-                                    <option value='3'>Kiểm tra 1 tiết</option>
-                                    <option value='4'>Kiểm tra học kì</option>
-                                    <option value='5'>THPT Quốc Gia</option>
-                                </select>
-                            </div>
-
-                            {topicType !== '5' &&
-                                <div
-                                    className='topic-study-grade'
-                                    style={{ display: 'flex' }}
-                                >
-                                    <select
-                                        class='form-select form-select-lg mb-3'
-                                        aria-label='.form-select-lg example'
-                                        onChange={(e) => handleListTopic(e.target.value, subjectId, topicType, user.accountId)}
-                                    >
-                                        <option selected>Chọn khối</option>
-                                        <option value='10'>Khối 10</option>
-                                        <option value='11'>Khối 11</option>
-                                        <option value='12'>Khối 12</option>
-                                    </select>
-                                </div>
-                            }
-
-                            <div
-                                className='exam-detail'
-                                style={{ width: '100%', height: 'auto' }}
-                            >
-                                {topicStudy.map((item, index) =>
-                                    <div className='exam-item'
-                                    >
-                                        <div className='exam-item-fixed'>
-                                            <div className='exam-item-title'>{item.topicName}</div>
-                                            <div className='exam-item-subject'>{subjectName}</div>
-                                            {item.score !== null ?
-                                                <>
-                                                    <div className='exam-item-status-did'>Đã làm</div>
-                                                    <div className='exam-item-des-dtl' style={{ display: 'inline-block', marginLeft: 10 }}>Điểm cao nhất: {item.score}</div>
-                                                </>
-                                                :
-                                                <div className='exam-item-status-didnt'>Chưa làm</div>
-                                            }
-                                            <div className='exam-item-des'>
-                                                <div className='exam-item-des-dtl'>Thời gian làm bài: {item.duration} phút</div>
-                                                <div className='exam-item-des-dtl'>Số câu hỏi: {item.totalQuestion} câu</div>
-                                            </div>
-                                        </div>
-                                        {item.score !== null ?
-                                            <div className='exam-button-start'>
-                                                <div className='exam-button-again'>
-                                                    <button style={{ color: 'white' }} onClick={() => showConfirm(item)}>Bắt đầu lại</button>
-                                                </div>
-                                            </div>
-                                            :
-                                            <div className='exam-button-start' style={{ marginLeft: 30 }}>
-                                                <div className='exam-button'>
-                                                    <button style={{ color: 'white' }} onClick={() => showConfirm(item)}>Bắt đầu</button>
-                                                </div>
-                                            </div>
-                                        }
-                                    </div>
-                                )}
                             </div>
                         </div>
                     </div>
+                    <div class="container">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Thứ hạng</th>
+                                    <th scope="col">Tên</th>
+                                    <th scope="col">Điểm</th>
+                                    <th scope="col">Thời gian nộp bài</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <td>Mark</td>
+                                    <td>Otto</td>
+                                    <td>@mdo</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </span>
+            </span >
+
         </>
     )
 }
