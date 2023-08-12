@@ -28,11 +28,13 @@ import ManageUser from './Component/Admin/ManageUser';
 import ManageMod from './Component/Admin/ManageMod';
 import ManageQuestion from './Component/Admin/ManageQuestion';
 import ManageTopic from './Component/Admin/ManageTopic';
+import ManageNews from './Component/Admin/ManageNews';
+import Statistics from './Component/Admin/Statistics';
+
 
 import Testfirebase from './Testfirebase';
 import PostProvider from './contexts/PostContext';
 import SubjectProvider from './contexts/SubjectContext';
-import CommentProvider from './contexts/CommentContext';
 
 //#region Mod Routers
 import ManageNewsByMod from './Component/Mod/ManageNewsByMod';
@@ -72,6 +74,8 @@ function App() {
                     <Route path="/study" element={<Study />}></Route>
                     <Route path="/examFinish" element={<ExamFinish />}></Route>
                     <Route path="topicStudy" element={<TopicStudy />}></Route>
+                    <Route path="/news" element={<News />}></Route>
+
 
                     <Route path="/*" element={<Navigate to="/" />} />
                   </> :
@@ -83,9 +87,10 @@ function App() {
                           <Route path="/admin/manageMod" element={<ManageMod />} />
                           <Route path="/admin/manageQuestion" element={<ManageQuestion />} />
                           <Route path="/admin/manageTopic" element={<ManageTopic />} />
-                          {/* <Route path="/mod/manageNews" element={<ManageNewsByMod />} /> */}
+                          <Route path="/admin/manageNews" element={<ManageNews />} />
+                          <Route path="/admin/statistics" element={<Statistics />} />
 
-                          <Route path="/*" element={<Navigate to="/admin/manageUser" />} />
+                          <Route path="/*" element={<Navigate to="/admin/statistics" />} />
                         </> :
                         user.roleId == '3' ?
                           <>
@@ -102,11 +107,11 @@ function App() {
                             <Route path="/admin/manageQuestion" element={<ManageQuestion />} />
                             <Route path="/admin/manageTopic" element={<ManageTopic />} />
                             <Route path="/mod/manageNews" element={<ManageNewsByMod />} />
+                            <Route path="/admin/manageNews" element={<ManageNews />} />
 
-
-                            <Route path="/*" element={<Navigate to="/admin/manageUser" />} />
+                            <Route path="/*" element={<Navigate to="/admin/statistics" />} />
                           </>
-                    }
+                    } 
                   </>
               }
             </>
