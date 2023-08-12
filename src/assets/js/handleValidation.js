@@ -163,3 +163,94 @@ export function handleValidationChangePassword(newPassword, errors) {
     }
 
 }
+
+
+export function handleValidationCreateTopic (createData, errors){
+    if(createData.createSubjectId == "Chọn môn học" ){
+        errors.createSubjectId = "Môn học không được để trống";
+    }
+    if(createData.createTopicType == "Chọn loại topic"){
+        errors.createTopicType = "Loại topic không được để trống";
+    } else if (createData.createTopicType != "1"){
+        if(createData.createDuration == "Chọn thời gian"){
+            errors.createDuration = "Thời gian không được để trống";
+        }
+    }
+    if(createData.createGrade == "Chọn lớp"){
+        errors.createGrade = "Lớp học không được để trống";
+    }
+    if(createData.createTopicName == "" || createData.createTopicName== " " || createData.createTopicName == null){
+        errors.createTopicName = "Tên topic không được để trống";
+    }
+
+
+}
+
+export function handleValidationUpdateTopic (editData, errors){
+    if(editData.editSubjectId == "Chọn môn học" ){
+        errors.editSubjectId = "Môn học không được để trống";
+    }
+    if(editData.editTopicType == "Chọn loại topic"){
+        errors.editTopicType = "Loại topic không được để trống";
+    } else if (editData.editGrade != "1"){
+        if(editData.editDuration == "Chọn thời gian"){
+            errors.editDuration = "Thời gian không được để trống";
+        }
+    }
+    if(editData.editGrade == "Chọn lớp"){
+        errors.editGrade = "Lớp học không được để trống";
+    }
+    if(editData.editTopicName == "" || editData.editTopicName== " " || editData.editTopicName == null){
+        errors.editTopicName = "Tên topic không được để trống";
+    }
+
+
+}
+
+export function handleValidationCreateQuestion(createData, errors){
+    if(createData.createLevelId == "Chọn cấp độ" || createData.createLevelId == ""){
+        errors.createLevelId = "Cấp độ câu hỏi không được để trống";
+    } 
+    if(createData.createQuestionContent == null || createData.createQuestionContent == " " || createData.createQuestionContent == ""){
+        errors.createQuestionContent = "Nội dung câu hỏi không được để trống";
+    }
+    if(createData.createOptionA == null || createData.createOptionA == " " || createData.createOptionA == ""){
+        errors.createOptionA = "Lựa chọn A không được để trống";
+    } 
+    if(createData.createOptionB == null || createData.createOptionB == " " || createData.createOptionB == ""){
+        errors.createOptionB = "Lựa chọn B không được để trống";
+    } 
+    if(createData.createOptionC == null || createData.createOptionC == " " || createData.createOptionC == ""){
+        errors.createOptionC = "Lựa chọn C không được để trống";
+    } 
+    if(createData.createOptionD == null || createData.createOptionD == " " || createData.createOptionD == ""){
+        errors.createOptionD = "Lựa chọn D không được để trống";
+    } 
+    if(createData.createAnswerId == "Chọn đáp án" || createData.createAnswerId == ""){
+        errors.createAnswerId = "Đáp án câu hỏi không được để trống";
+    } 
+}
+
+export function handleValidationEditQuestion(editData, errors){
+    if(editData.editLevelId == "Chọn cấp độ" || editData.editLevelId == ""){
+        errors.editLevelId = "Cấp độ câu hỏi không được để trống";
+    } 
+    if(editData.editQuestionContent == "<p><br></p>" || editData.editQuestionContent == "<p> </p>"){
+        errors.editQuestionContent = "Nội dung câu hỏi không được để trống";
+    }
+    if(editData.editOptionA == "<p><br></p>" || editData.editOptionA == "<p> </p>"){
+        errors.editOptionA = "Lựa chọn A không được để trống";
+    } 
+    if(editData.editOptionB == "<p><br></p>" || editData.editOptionB == "<p> </p>"){
+        errors.editOptionB = "Lựa chọn B không được để trống";
+    } 
+    if(editData.editOptionC == "<p><br></p>" || editData.editOptionC == "<p> </p>"){
+        errors.editOptionC = "Lựa chọn C không được để trống";
+    } 
+    if(editData.editOptionD == "<p><br></p>" || editData.editOptionD == "<p> </p>"){
+        errors.editOptionD = "Lựa chọn D không được để trống";
+    } 
+    if(editData.editAnswerId == "Chọn đáp án" || editData.editAnswerId == ""){
+        errors.editAnswerId = "Đáp án câu hỏi không được để trống";
+    } 
+}

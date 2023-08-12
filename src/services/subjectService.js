@@ -20,3 +20,5 @@ export const GetAllSubjectService = async () => {
         return e;
     }
 };
+
+
