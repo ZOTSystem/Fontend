@@ -1,13 +1,15 @@
-import { Component, useState, useEffect } from 'react';
+import { Component, useState, useEffect, useContext } from 'react';
 import { Routes, Route, useNavigate, useLocation, Await } from 'react-router-dom';
-import { GetAllSubjectService } from '../../services/subjectService';
+import { UserContext } from '../../contexts/UserContext';
 import '../../assets/PracticeQuizStyle.css';
 import '../../assets/Style.css';
 import Header from '../../Layout/User/Header';
-import { hover } from '@testing-library/user-event/dist/hover';
 import { GetTopicByGrade } from '../../services/topicService';
 
 export default function TopicStudy() {
+
+    const { user } = useContext(UserContext);
+
     //#region take subjectId
     const location = useLocation();
     let subjectId = location.state.subjectId;
@@ -28,11 +30,14 @@ export default function TopicStudy() {
 
     //#region  get topic list by grade and subjecId
     const [topicStudy, setTopicStudy] = useState([]);
-    const handleGetData = async (grade, subjectId) => {
-        console.log('1');
+    const handleGetData = async (grade, subjectId, topicType) => {
         try {
-            const result = await GetTopicByGrade(grade, subjectId);
+            console.log(grade)
+            console.log(subjectId)
+            const result = await GetTopicByGrade(grade, subjectId, topicType, user.accountId);
+            console.log(result)
             if (result.status === 200) {
+
                 setTopicStudy(result.data);
             }
         } catch (error) {
@@ -80,7 +85,7 @@ export default function TopicStudy() {
                                 <select
                                     class='form-select form-select-lg mb-3'
                                     aria-label='.form-select-lg example'
-                                    onChange={(e) => handleGetData(e.target.value, subjectId)}
+                                    onChange={(e) => handleGetData(e.target.value, subjectId, 1)}
                                 >
                                     <option selected>Chọn khối</option>
                                     <option value='10'>Khối 10</option>

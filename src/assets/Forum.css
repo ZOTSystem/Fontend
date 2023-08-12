@@ -78,6 +78,7 @@ hr {
     display: flex;
     flex: 1;
     justify-content: flex-end;
+    margin-bottom: 12px;
 }
 
 #filter-post-form .form-item {
@@ -147,6 +148,7 @@ hr {
 .form-right img {
     width: 35px;
     height: 35px;
+    cursor: pointer;
 }
 
 .form-like {
@@ -158,6 +160,7 @@ hr {
 .form-like img {
     width: 30px;
     height: 30px;
+    cursor: pointer;
 }
 
 .form-like p {
@@ -245,6 +248,10 @@ hr {
     margin: 24px 0;
 }
 
+.comment-title-empty {
+    text-align: center;
+}
+
 .comment-modal .ant-modal-body {
     max-height: 60vh;
     overflow-x: hidden;
@@ -261,12 +268,6 @@ hr {
 
 .comment-modal .ant-modal-body::-webkit-scrollbar-thumb {
     background-color: #99ccff;
-}
-
-.post-filter-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
 }
 
 .post-tab-item {
@@ -287,4 +288,17 @@ hr {
 
 .post-tab-item:last-child {
     margin-right: 0;
+}
+
+.delete-post-btn {
+    margin-top: 24px;
+}
+
+.admin-action-btn {
+    display: flex;
+    gap: 12px;
+}
+
+.admin-action-btn .delete-post-btn {
+    margin-top: 0;
 }

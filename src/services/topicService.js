@@ -1,10 +1,10 @@
 import Request from '../utils/request';
 
-export const GetTopicByGrade = async (grade, subjectId) => {
+export const GetTopicByGrade = async (grade, subjectId, topicType, accountId) => {
     try {
         const respone = await Request({
             method: 'get',
-            url: `Topics/getTopicByGrade?grade=${grade}&subjectId=${subjectId}`,
+            url: `Topics/getTopicByGrade?grade=${grade}&subjectId=${subjectId}&topicType=${topicType}&accountId=${accountId}`,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -15,3 +15,80 @@ export const GetTopicByGrade = async (grade, subjectId) => {
     }
 };
 
+export const GetAllTopicService = async () => {
+    try {
+        const respone = await Request({
+            method: 'get',
+            url: `Topics/getAllTopic`,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        return respone;
+    } catch (e) {
+        return e;
+    }
+};
+
+
+export const ChangeStatusTopicService = async (topicId, status) => {
+    try {
+        const respone = await Request({
+            method: 'post',
+            url: `Topics/changeStatusTopic?topicId=${topicId}&status=${status}`,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        return respone;
+    } catch (e) {
+        return e;
+    }
+};
+
+export const AddTopicService = async (data) => {
+    try {
+        const respone = await Request({
+            method: 'post',
+            url: `Topics/addTopic`,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            data: JSON.stringify(data),
+        });
+        return respone;
+    } catch (e) {
+        return e;
+    }
+}
+
+export const GetTopicByIdService = async (topicId) => {
+    try {
+        const respone = await Request({
+            method: 'get',
+            url: `Topics/getTopicById?topicId=${topicId}`,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        return respone;
+    } catch (e) {
+        return e;
+    }
+}
+
+export const UpdateTopicService = async (data) => {
+    try {
+        const respone = await Request({
+            method: 'post',
+            url: `Topics/editTopic`,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            data: JSON.stringify(data),
+        });
+        return respone;
+    } catch (e) {
+        return e;
+    }
+};

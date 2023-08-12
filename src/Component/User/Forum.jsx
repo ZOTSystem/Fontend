@@ -13,7 +13,7 @@ import PostStatusTab from './ForumComponent/PostStatusTab';
 import Spinner from '../common/Spinner/Spinner';
 
 export default function Forum() {
-    const { loading, posts, getAllPost, getPostByStatus } = useContext(PostContext);
+    const { loading, posts, getAllPost, getPostByStatus, getSavedPost } = useContext(PostContext);
     const { user } = useContext(UserContext);
     const [searchParams] = useSearchParams();
     const statusQueryParam = searchParams.get('status');
@@ -37,25 +37,32 @@ export default function Forum() {
             name: 'Rejected',
             title: 'Bị từ chối',
         },
+        {
+            id: 5,
+            name: 'Saved',
+            title: 'Đã lưu',
+        },
     ];
 
     //get post list
     useEffect(() => {
-        if (statusQueryParam) getPostByStatus(statusQueryParam);
-        else getAllPost();
-    }, [statusQueryParam]);
+        if (statusQueryParam) {
+            if (statusQueryParam === 'Saved') getSavedPost(user.accountId);
+            else getPostByStatus(statusQueryParam, user.accountId);
+        } else getAllPost();
+    }, [statusQueryParam, user.accountId]);
 
     return (
         <>
             <Header />
-            <div className="body-forum">
-                <div className="container">
+            <div className='body-forum'>
+                <div className='container'>
                     <CreatePost />
-                    <div className="post-filter-container">
-                        {user && <PostStatusTab statusList={statusList} />}
+                    <div className='post-filter-container'>
                         <FilterPost />
+                        {user && <PostStatusTab statusList={statusList} />}
                     </div>
-                    <div className="post-container">{loading ? <Spinner /> : <PostList posts={posts} />}</div>
+                    <div className='post-container'>{loading ? <Spinner /> : <PostList posts={posts} />}</div>
                 </div>
             </div>
         </>

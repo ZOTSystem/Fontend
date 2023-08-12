@@ -34,7 +34,7 @@ const CommentList = ({ comments }) => {
     return (
         <>
             {contextHolder}
-            <div className="comment-list">
+            <div className='comment-list'>
                 {comments?.map((comment) => (
                     <Comment
                         key={comment.postCommentId}

@@ -11,20 +11,27 @@ import { storage } from '../../../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { v4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
-const url = '../Image/Forum/forum-avatar1.png';
+import { UserContext } from '../../../contexts/UserContext';
+import Spinner from './../../common/Spinner/Spinner';
+const defaultAvatar = '../Image/Avatar_null.png';
 const anh = '../Image/Forum/icon-anh-video.png';
 const monhoc = '../Image/Forum/icon-sach.png';
 const tag = '../Image/Forum/icon-tag.png';
 
 export default function CreatePost() {
     const [open, setOpen] = useState(false);
+    const [openLogin, setOpenLogin] = useState(false);
     const navigate = useNavigate();
     const [form] = Form.useForm();
     const [formValue, setFormValue] = useState({ subjectId: null, postText: '', postFile: '' });
     const [imageUpload, setImageUpload] = useState(null);
+    const [uploadingImage, setUploadingImage] = useState(false);
     const { subjects } = useContext(SubjectContext);
     const { addPost, getPostByStatus } = useContext(PostContext);
+    const { user } = useContext(UserContext);
+    const { accountId } = user;
     const imageUrlRef = useRef('');
+
     let imageUrlUpload = '';
     const normFile = (e) => {
         if (Array.isArray(e)) {
@@ -34,24 +41,35 @@ export default function CreatePost() {
     };
 
     const showModal = () => {
-        setOpen(true);
+        if (!user) {
+            setOpenLogin(true);
+        } else {
+            setOpen(true);
+        }
     };
 
     const cancelModal = () => {
-        setOpen(false);
+        if (!user) {
+            setOpenLogin(false);
+        } else {
+            setOpen(false);
+        }
         form.resetFields();
     };
     const uploadImage = async () => {
         if (imageUpload == null) return;
-        const imageRef = ref(storage, `images/${imageUpload.name + v4()}`);
+        setUploadingImage(true);
+        const imageRef = ref(storage, `forum_images/${imageUpload.name + v4()}`);
         try {
             const snapshot = await uploadBytes(imageRef, imageUpload);
             const url = await getDownloadURL(snapshot.ref);
             imageUrlRef.current = url;
             imageUrlUpload = imageUrlRef.current;
+            setUploadingImage(false);
             return imageUrlUpload;
         } catch (error) {
             console.log(error);
+            setUploadingImage(false);
         }
     };
 
@@ -67,38 +85,12 @@ export default function CreatePost() {
 
     const handleSubmitAddPostForm = async () => {
         const postFile = await uploadImage();
-        await addPost({ ...formValue, postFile });
-        cancelModal();
+        await addPost({ ...formValue, accountId, postFile });
         openNotificationAddPostSuccess('topRight');
-        await getPostByStatus('Pending');
+        await getPostByStatus('Pending', accountId);
+        cancelModal();
         navigate('/forum?status=Pending');
     };
-
-    // const SubmitButton = ({ form }) => {
-    //     const [submittable, setSubmittable] = useState(false);
-    //     const values = Form.useWatch([], form);
-    //     useEffect(() => {
-    //         form.validateFields({
-    //             validateOnly: true,
-    //         }).then(
-    //             () => {
-    //                 setSubmittable(true);
-    //             },
-    //             () => {
-    //                 setSubmittable(false);
-    //             }
-    //         );
-    //     }, [values]);
-    //     return (
-    //         <Button
-    //             type='primary'
-    //             htmlType='submit'
-    //             disabled={!submittable}
-    //         >
-    //             Đăng
-    //         </Button>
-    //     );
-    // };
 
     return (
         <>
@@ -112,7 +104,7 @@ export default function CreatePost() {
                         onClick={showModal}
                         size='large'
                         placeholder='Bạn đang nghĩ gì thế?'
-                        prefix={<Avatar src={url} />}
+                        prefix={user && <Avatar src={user.avatar ? user.avatar : defaultAvatar} />}
                     />
                     <hr></hr>
                     <div className='bottom-form'>
@@ -134,23 +126,26 @@ export default function CreatePost() {
                 <Modal
                     title='Tạo bài viết'
                     open={open}
-                    okText='Đăng bài'
+                    okText={uploadingImage ? <Spinner /> : 'Đăng bài'}
                     cancelText='Đóng'
                     onCancel={cancelModal}
-                    onOk={handleSubmitAddPostForm}
+                    onOk={form.submit}
+                    okButtonProps={uploadingImage && { style: { pointerEvents: 'none' } }}
                 >
                     <Form
                         form={form}
                         layout='horizontal'
                         initialValues={formValue}
+                        onFinish={handleSubmitAddPostForm}
                     >
                         <Form.Item
                             label='Môn học'
                             className='input-form'
-                            name='mon'
+                            name='subject'
                             rules={[
                                 {
                                     required: true,
+                                    message: 'Vui lòng chọn môn học!',
                                 },
                             ]}
                         >
@@ -171,11 +166,11 @@ export default function CreatePost() {
                             </Select>
                         </Form.Item>
                         <Form.Item
-                            name='text'
+                            name='content'
                             rules={[
                                 {
                                     required: true,
-                                    message: '',
+                                    message: 'Vui lòng nhập nội dung!',
                                 },
                             ]}
                         >
@@ -199,16 +194,18 @@ export default function CreatePost() {
                                 accept='image/*'
                                 onChange={(event) => setImageUpload(event.target.files[0])}
                             />
-                            {/* <Upload
-                                listType='picture-card'
-                                onChange={(file) => setImageUpload(file)}
-                            >
-                                <div>
-                                    <PlusOutlined />
-                                </div>
-                            </Upload> */}
                         </Form.Item>
                     </Form>
+                </Modal>
+                <Modal
+                    title='Tạo bài viết'
+                    open={openLogin}
+                    okText='Đồng ý'
+                    cancelText='Hủy bỏ'
+                    onCancel={cancelModal}
+                    onOk={() => navigate('/login')}
+                >
+                    <h5>Vui lòng đăng nhập để đăng bài viết !</h5>
                 </Modal>
             </div>
         </>

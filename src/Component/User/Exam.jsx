@@ -1,18 +1,147 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import Header from "../../Layout/User/Header";
-import React, { useState } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { useNavigate, useLocation } from "react-router-dom";
+import { GetQuestionByTopicId } from '../../services/questionService';
+import { AddQuestionTest } from '../../services/questionTestService.jsx';
+import { UpdateTestDetailService } from '../../services/testDetailService';
+import { ExclamationCircleFilled } from '@ant-design/icons';
+import { Modal } from 'antd';
 import "../../assets/Exam.css"
 import '../../assets/Style.css'
 const dongho = '../Image/Exam/clock.png';
-const anhcauhoi = '../Image/Exam/anhcauhoi.jpg';
 export default function Exam() {
+
+    //#region take subjectId
+    const location = useLocation();
+    let topicId = location.state.topicId;
+    let testDetailId = location.state.testDetailId;
+    let duration = location.state.duration;
+    //#endregion
+
+    //#region get question
+    const [questions, setQuestions] = useState([]);
+    const [questionDone, setQuestionDone] = useState([])
+    const handleGetData = async () => {
+        try {
+            const result = await GetQuestionByTopicId(topicId);
+            if (result.status === 200) {
+                setQuestions(result.data);
+                setQuestionDone(
+                    result.data.map((item) => ({
+                        questionId: item.questionId,
+                        answerId: '',
+                        isChoose: false,
+                    })));
+            }
+        } catch (error) {
+            console.error('Error fetching mod service:', error);
+        }
+    };
+    useEffect(() => {
+        handleGetData();
+    }, []);
+    //#endregion
+
+    //#region choose question
+    const handleQuestion = (e) => {
+        const optionId = e.target.value;
+        const questionId = e.target.name;
+        console.log(optionId)
+        console.log(questionId)
+        setQuestionDone(
+            questionDone.map((item, index) => {
+                if (optionId != '' && questionId == item.questionId) {
+                    return {
+                        ...item,
+                        answerId: optionId,
+                        isChoose: true
+                    }
+                }
+                else {
+                    return {
+                        ...item,
+                    }
+                }
+            }
+            ))
+    }
+
+    function handleClickScroll(questionId) {
+        const element = document.getElementById(questionId);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    };
+    //#endregion
+
+    //#region countdown timer
+    const initialMinute = duration - 1;
+    const initialSeconds = 59;
+    const [minutes, setMinutes] = useState(initialMinute);
+    const [seconds, setSeconds] = useState(initialSeconds);
+    useEffect(() => {
+        let myInterval = setInterval(() => {
+            if (seconds > 0) {
+                setSeconds(seconds - 1);
+            }
+            if (seconds === 0) {
+                if (minutes === 0) {
+                    clearInterval(myInterval)
+                } else {
+                    setMinutes(minutes - 1);
+                    setSeconds(59);
+                }
+            }
+            if (minutes === 0 && seconds === 0) {
+                handleSubmit()
+            }
+        }, 1000)
+        return () => {
+            clearInterval(myInterval);
+        };
+    });
+    //#endregion
+
+
+    const navigate = useNavigate();
+    const handleSubmit = async () => {
+        questionDone.map((item) =>
+        (item.answerId != null
+            ?
+            AddQuestionTest(item.questionId, testDetailId, item.answerId)
+            :
+            AddQuestionTest(item.questionId, testDetailId, '')
+        )
+        )
+        await UpdateTestDetailService(testDetailId);
+        navigate('/examFinish', {
+            state: {
+                testDetailId: testDetailId
+            },
+        });
+    };
+
+    const { confirm } = Modal;
+    const showConfirm = () => {
+        confirm({
+            title: 'Vui lòng kiểm tra thật kĩ trước khi nộp bài',
+            width: 600,
+            icon: <ExclamationCircleFilled />,
+            onOk() {
+                handleSubmit()
+            },
+            okText: 'Nộp bài',
+            cancelText: 'Hủy',
+        });
+    };
 
     return (
         <>
             <Header />
             <div className='exam-top'>
                 <div className='exam-timer'>
-                    <img src={dongho}></img><h4>01:59:36</h4>
+                    <img src={dongho}></img><h4>{minutes}:{seconds}</h4>
                 </div>
             </div>
             <div className='exam'>
@@ -23,252 +152,60 @@ export default function Exam() {
                     <div className='exam-right-question'>
                         <p>Câu hỏi</p>
                         <div className='exam-right-question-num'>
-                            <div className='exam-right-question-item'>
-                                <p>1</p>
-                            </div>
-                            <div className='exam-right-question-item'>
-                                <p>2</p>
-                            </div>
-                            <div className='exam-right-question-item'>
-                                <p>3</p>
-                            </div>
-                            <div className='exam-right-question-item'>
-                                <p>4</p>
-                            </div>
-                            <div className='exam-right-question-item'>
-                                <p>5</p>
-                            </div>
-                            <div className='exam-right-question-item'>
-                                <p>6</p>
-                            </div>
-                            <div className='exam-right-question-item'>
-                                <p>7</p>
-                            </div>
-                            <div className='exam-right-question-item'>
-                                <p>8</p>
-                            </div>
-                            <div className='exam-right-question-item'>
-                                <p>9</p>
-                            </div>
-                            <div className='exam-right-question-item'>
-                                <p>10</p>
-                            </div>
-                            <div className='exam-right-question-item'>
-                                <p>11</p>
-                            </div>
-                            <div className='exam-right-question-item'>
-                                <p>12</p>
-                            </div>
-                            <div className='exam-right-question-item'>
-                                <p>13</p>
-                            </div>
-                            <div className='exam-right-question-item'>
-                                <p>14</p>
-                            </div>
-                            <div className='exam-right-question-item'>
-                                <p>15</p>
-                            </div>
+                            {questionDone.map((item, index) => (
+                                item.isChoose ?
+                                    <div className='exam-right-question-item' style={{ cursor: 'pointer' }} onClick={() => handleClickScroll(item.questionId)}>
+                                        <p style={{ backgroundColor: 'green', color: 'white' }}>{index + 1}</p>
+                                    </div>
+                                    : <div className='exam-right-question-item' style={{ cursor: 'pointer' }} onClick={() => handleClickScroll(item.questionId)}>
+                                        <p>{index + 1}</p>
+                                    </div>
+                            ))}
                         </div>
                     </div>
                     <div className='exam-right-button'>
-                        <button className='btn btn-primary'>Nộp bài</button>
+                        <button className='btn btn-primary' onClick={showConfirm}>Nộp bài</button>
                     </div>
                 </div>
                 <div className='exam-left'>
-                    <div className='exam-left-quesion'>
-                        <div className='exam-left-quesion-top'>
-                            <p style={{ fontWeight: 'bold', paddingLeft: 10, width: 60 }}>Câu 1:</p>
-                            <div className='exam-left-quesion-text'>
-                                <p>Đường cong trong hình bên là đồ thị của một hàm số trong bốn hàm được
-                                    liệt kê ở bốn phương án A, B, C, D dưới đây. Hỏi
-                                    hàm số đó là hàm số nào?</p>
-                                <img src={anhcauhoi}></img>
-                            </div>
-                        </div>
-                        <div className='exam-left-quesion-bottom'>
-                            <div className='exam-left-quesion-answer'>
-                                <input type='radio' value='1' name='topic' id='1'></input>
-                                <div>
-                                    <label for='1' className=''>A. Đường cong trong hình bên là đồ thị của một hàm số trong bốn hàm được
-                                    liệt kê ở bốn phương án A, B, C, D dưới đây. Hỏi
-                                    hàm số đó là hàm số nào?</label><br></br>
-                                </div>
-                            </div><div className='exam-left-quesion-answer'>
-                                <input type='radio' value='2' name='topic' id='2'></input>
-                                <div>
-                                    <label for='2' className=''>B. Đáp án B</label><br></br>
+                    {questions.map((item, index) =>
+                        <div className='exam-left-quesion' id={item.questionId}>
+                            <div className='exam-left-quesion-top'>
+                                <p style={{ fontWeight: 'bold', paddingLeft: 10, whiteSpace: 'nowrap' }}>Câu {index + 1}:</p>
+                                <div className='exam-left-quesion-text'>
+                                    <p>{item.questionContext}</p>
+                                    {item.image != '' &&
+                                        <img src={item.image}></img>
+                                    }
                                 </div>
                             </div>
-                            <div className='exam-left-quesion-answer'>
-                                <input type='radio' value='3' name='topic' id='3'></input>
-                                <div>
-                                    <label for='3' className=''>C. Đáp án C</label><br></br>
+                            <div className='exam-left-quesion-bottom'>
+                                <div className='exam-left-quesion-answer'>
+                                    <input onClick={handleQuestion} type='radio' value='1' name={item.questionId} id={item.optionA}></input>
+                                    <div>
+                                        <label for={item.optionA} className=''>A. {item.optionA}</label><br></br>
+                                    </div>
+                                </div><div className='exam-left-quesion-answer'>
+                                    <input onClick={handleQuestion} type='radio' value='2' name={item.questionId} id={item.optionB}></input>
+                                    <div>
+                                        <label for={item.optionB} className=''>B. {item.optionB}</label><br></br>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className='exam-left-quesion-answer'>
-                                <input type='radio' value='4' name='topic' id='4'></input>
-                                <div>
-                                    <label for='4' className=''>D. Đáp án D</label><br></br>
+                                <div className='exam-left-quesion-answer'>
+                                    <input onClick={handleQuestion} type='radio' value='3' name={item.questionId} id={item.optionC}></input>
+                                    <div>
+                                        <label for={item.optionC} className=''>C. {item.optionC}</label><br></br>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className='exam-left-quesion'>
-                        <div className='exam-left-quesion-top'>
-                            <p style={{ fontWeight: 'bold', paddingLeft: 10, width: 60 }}>Câu 2:</p>
-                            <div className='exam-left-quesion-text'>
-                                <p>Đường cong trong hình bên là đồ thị của một hàm số trong bốn hàm được
-                                    liệt kê ở bốn phương án A, B, C, D dưới đây. Hỏi
-                                    hàm số đó là hàm số nào?</p>
-                                <img src={anhcauhoi}></img>
-                            </div>
-                        </div>
-                        <div className='exam-left-quesion-bottom'>
-                            <div className='exam-left-quesion-answer'>
-                                <input type='radio' value='1' name='topic' id='1'></input>
-                                <div>
-                                    <label for='1' className=''>A. Đường cong trong hình bên là đồ thị của một hàm số trong bốn hàm được
-                                    liệt kê ở bốn phương án A, B, C, D dưới đây. Hỏi
-                                    hàm số đó là hàm số nào?</label><br></br>
-                                </div>
-                            </div><div className='exam-left-quesion-answer'>
-                                <input type='radio' value='2' name='topic' id='2'></input>
-                                <div>
-                                    <label for='2' className=''>B. Đáp án B</label><br></br>
-                                </div>
-                            </div>
-                            <div className='exam-left-quesion-answer'>
-                                <input type='radio' value='3' name='topic' id='3'></input>
-                                <div>
-                                    <label for='3' className=''>C. Đáp án C</label><br></br>
-                                </div>
-                            </div>
-                            <div className='exam-left-quesion-answer'>
-                                <input type='radio' value='4' name='topic' id='4'></input>
-                                <div>
-                                    <label for='4' className=''>D. Đáp án D</label><br></br>
+                                <div className='exam-left-quesion-answer'>
+                                    <input onClick={handleQuestion} type='radio' value='4' name={item.questionId} id={item.optionD}></input>
+                                    <div>
+                                        <label for={item.optionD} className=''>D. {item.optionD}</label><br></br>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div className='exam-left-quesion'>
-                        <div className='exam-left-quesion-top'>
-                            <p style={{ fontWeight: 'bold', paddingLeft: 10, width: 60 }}>Câu 3:</p>
-                            <div className='exam-left-quesion-text'>
-                                <p>Đường cong trong hình bên là đồ thị của một hàm số trong bốn hàm được
-                                    liệt kê ở bốn phương án A, B, C, D dưới đây. Hỏi
-                                    hàm số đó là hàm số nào?</p>
-                                <img src={anhcauhoi}></img>
-                            </div>
-                        </div>
-                        <div className='exam-left-quesion-bottom'>
-                            <div className='exam-left-quesion-answer'>
-                                <input type='radio' value='1' name='topic' id='1'></input>
-                                <div>
-                                    <label for='1' className=''>A. Đường cong trong hình bên là đồ thị của một hàm số trong bốn hàm được
-                                    liệt kê ở bốn phương án A, B, C, D dưới đây. Hỏi
-                                    hàm số đó là hàm số nào?</label><br></br>
-                                </div>
-                            </div><div className='exam-left-quesion-answer'>
-                                <input type='radio' value='2' name='topic' id='2'></input>
-                                <div>
-                                    <label for='2' className=''>B. Đáp án B</label><br></br>
-                                </div>
-                            </div>
-                            <div className='exam-left-quesion-answer'>
-                                <input type='radio' value='3' name='topic' id='3'></input>
-                                <div>
-                                    <label for='3' className=''>C. Đáp án C</label><br></br>
-                                </div>
-                            </div>
-                            <div className='exam-left-quesion-answer'>
-                                <input type='radio' value='4' name='topic' id='4'></input>
-                                <div>
-                                    <label for='4' className=''>D. Đáp án D</label><br></br>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className='exam-left-quesion'>
-                        <div className='exam-left-quesion-top'>
-                            <p style={{ fontWeight: 'bold', paddingLeft: 10, width: 60 }}>Câu 4:</p>
-                            <div className='exam-left-quesion-text'>
-                                <p>Đường cong trong hình bên là đồ thị của một hàm số trong bốn hàm được
-                                    liệt kê ở bốn phương án A, B, C, D dưới đây. Hỏi
-                                    hàm số đó là hàm số nào?</p>
-                                <img src={anhcauhoi}></img>
-                            </div>
-                        </div>
-                        <div className='exam-left-quesion-bottom'>
-                            <div className='exam-left-quesion-answer'>
-                                <input type='radio' value='1' name='topic' id='1'></input>
-                                <div>
-                                    <label for='1' className=''>A. Đường cong trong hình bên là đồ thị của một hàm số trong bốn hàm được
-                                    liệt kê ở bốn phương án A, B, C, D dưới đây. Hỏi
-                                    hàm số đó là hàm số nào?</label><br></br>
-                                </div>
-                            </div><div className='exam-left-quesion-answer'>
-                                <input type='radio' value='2' name='topic' id='2'></input>
-                                <div>
-                                    <label for='2' className=''>B. Đáp án B</label><br></br>
-                                </div>
-                            </div>
-                            <div className='exam-left-quesion-answer'>
-                                <input type='radio' value='3' name='topic' id='3'></input>
-                                <div>
-                                    <label for='3' className=''>C. Đáp án C</label><br></br>
-                                </div>
-                            </div>
-                            <div className='exam-left-quesion-answer'>
-                                <input type='radio' value='4' name='topic' id='4'></input>
-                                <div>
-                                    <label for='4' className=''>D. Đáp án D</label><br></br>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className='exam-left-quesion'>
-                        <div className='exam-left-quesion-top'>
-                            <p style={{ fontWeight: 'bold', paddingLeft: 10, width: 60 }}>Câu 5:</p>
-                            <div className='exam-left-quesion-text'>
-                                <p>Đường cong trong hình bên là đồ thị của một hàm số trong bốn hàm được
-                                    liệt kê ở bốn phương án A, B, C, D dưới đây. Hỏi
-                                    hàm số đó là hàm số nào?</p>
-                                <img src={anhcauhoi}></img>
-                            </div>
-                        </div>
-                        <div className='exam-left-quesion-bottom'>
-                            <div className='exam-left-quesion-answer'>
-                                <input type='radio' value='1' name='topic' id='1'></input>
-                                <div>
-                                    <label for='1' className=''>A. Đường cong trong hình bên là đồ thị của một hàm số trong bốn hàm được
-                                    liệt kê ở bốn phương án A, B, C, D dưới đây. Hỏi
-                                    hàm số đó là hàm số nào?</label><br></br>
-                                </div>
-                            </div><div className='exam-left-quesion-answer'>
-                                <input type='radio' value='2' name='topic' id='2'></input>
-                                <div>
-                                    <label for='2' className=''>B. Đáp án B</label><br></br>
-                                </div>
-                            </div>
-                            <div className='exam-left-quesion-answer'>
-                                <input type='radio' value='3' name='topic' id='3'></input>
-                                <div>
-                                    <label for='3' className=''>C. Đáp án C</label><br></br>
-                                </div>
-                            </div>
-                            <div className='exam-left-quesion-answer'>
-                                <input type='radio' value='4' name='topic' id='4'></input>
-                                <div>
-                                    <label for='4' className=''>D. Đáp án D</label><br></br>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    )}
                 </div>
             </div>
         </>

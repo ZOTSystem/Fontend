@@ -1,18 +1,60 @@
-import { Component, useState, useEffect } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
-import { GetAllSubjectService } from '../../services/subjectService';
-import '../../assets/PracticeQuizStyle.css';
-import '../../assets/Style.css';
-import Header from '../../Layout/User/Header';
+import { Component, useState, useEffect, useContext } from 'react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { GetTopicByGrade } from '../../services/topicService';
+import { UserContext } from '../../contexts/UserContext';
+import { AddTestDetailService } from '../../services/testDetailService';
+import { ExclamationCircleFilled } from '@ant-design/icons';
+import { Modal } from 'antd';
+import '../../assets/TestSubjectStyle.css'
+import Header from "../../Layout/User/Header";
+import '../../assets/Style.css'
 
-export default function PracticeQuizzes() {
-    const [subjectAll, setSubjectAll] = useState([]);
+export default function Contest() {
+    const { user } = useContext(UserContext);
 
+    //#region take subjectId
+    const location = useLocation();
+    let subjectId = location.state.subjectId;
+    let subjectName = location.state.subjectName;
+    //#endregion
+
+    //#region move to study screen
+    const navigate = useNavigate();
+
+    const handleClick = async (item) => {
+        const result = await AddTestDetailService(user.accountId);
+        const testDetailId = result.testdetail.testDetailId;
+        if (result) {
+            navigate('/exam', {
+                state: {
+                    testDetailId: testDetailId,
+                    topicId: item.topicId,
+                    duration: item.duration,
+                    topicName: item.topicName,
+                },
+            });
+        }
+    };
+    //#endregion
+
+    //#region move to exam result
+    const handleRanking = async (item) => {
+        navigate('/ranking', {
+            state: {
+                topicId: item.topicId,
+                accountId: user.accountId,
+            },
+        });
+    };
+    //#endregion
+
+    //#region  get topic list by grade and subjecId
+    const [topicStudy, setTopicStudy] = useState([]);
     const handleGetData = async () => {
         try {
-            const result = await GetAllSubjectService();
+            const result = await GetTopicByGrade('', subjectId, 6, user.accountId);
             if (result.status === 200) {
-                setSubjectAll(result.data);
+                setTopicStudy(result.data);
             }
         } catch (error) {
             console.error('Error fetching mod service:', error);
@@ -22,18 +64,22 @@ export default function PracticeQuizzes() {
     useEffect(() => {
         handleGetData();
     }, []);
+    //#endregion
 
-    const navigate = useNavigate();
-
-    const handleClick = (subjectId, subjectName) => {
-        navigate('/topicStudy', {
-            state: {
-                subjectId: subjectId,
-                subjectName: subjectName,
+    const { confirm } = Modal;
+    const showConfirm = (item) => {
+        confirm({
+            title: 'Vui lòng kiểm tra thật kĩ trước khi nộp làm bài',
+            width: 600,
+            icon: <ExclamationCircleFilled />,
+            onOk() {
+                handleClick(item)
             },
+            okText: 'Bắt đầu',
+            cancelText: 'Hủy',
         });
     };
-
+    
     return (
         <>
             <Header />
@@ -57,40 +103,56 @@ export default function PracticeQuizzes() {
                                             fill='#000000'
                                         ></path>
                                     </svg>
-                                    <span>Tự học/Luyện thi trắc nghiệm</span>
+                                    <span>Cuộc thi đang diễn ra</span>
+                                    <span className='topic-subject'>{subjectName}</span>
                                 </h2>
                             </div>
-                            <div className='sc-gGTGfU fSjCQg'>
-                                <div className='sc-gsTCUz gQRQLT'>
-                                    {subjectAll.map((item) => (
-                                        <div
-                                            className='sc-dlfnbm sc-eCssSg fnjxoh ddsNTO'
-                                            onClick={() => handleClick(item.subjectId, item.subjectName)}
-                                        >
-                                            <div className='sc-dcwrBW kLSqMv'>
-                                                <div className='sc-ehsPrw ciEbjT'>
-                                                    <div
-                                                        className='sc-dwqbIM iLQQSn'
-                                                        aria-setsize={70}
-                                                    ></div>
-                                                    <p>{item.subjectName}</p>
-                                                </div>
-                                                <div className='sc-ehsPrw fqtCF'>
-                                                    <img
-                                                        alt=''
-                                                        src='../Image/physics-svgrepo-com.svg'
-                                                        className='icon'
-                                                    ></img>
-                                                </div>
+
+                            <div
+                                className='exam-detail'
+                                style={{ width: '100%', height: 'auto' }}
+                            >
+                                {topicStudy.map((item, index) =>
+                                    <div className='exam-item'
+                                    >
+                                        <div className='exam-item-fixed'>
+                                            <div className='exam-item-title'>{item.topicName}</div>
+                                            <div className='exam-item-subject'>{subjectName}</div>
+                                            {item.score !== null ?
+                                                <>
+                                                    <div className='exam-item-status-did'>Đã làm</div>
+                                                    <div className='exam-item-des-dtl' style={{ display: 'inline-block', marginLeft: 10 }}>Điểm của bạn: {item.score}</div>
+                                                </>
+                                                :
+                                                <div className='exam-item-status-didnt'>Chưa làm</div>
+                                            }
+                                            <div className='exam-item-des'>
+                                                <div className='exam-item-des-dtl'>Thời gian làm bài: {item.duration} phút</div>
+                                                <div className='exam-item-des-dtl'>Số câu hỏi: {item.totalQuestion} câu</div>
+                                            </div>
+                                            <div className='exam-item-des'>
+                                                <div className='exam-item-des-dtl'>Ngày bắt đầu: {item.startTestDate}</div>
+                                                <div className='exam-item-des-dtl'>Ngày kết thúc: {item.finishTestDate}</div>
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
+                                        <div className='exam-button-start'>
+                                            {item.score == null ?
+                                                <div className='exam-button-again'>
+                                                    <button style={{ color: 'white' }} onClick={() => showConfirm(item)}>Bắt đầu</button>
+                                                </div>
+                                                :
+                                                <div className='exam-button-again'>
+                                                    <button style={{ color: 'white' }} onClick={() => handleRanking(item)}>Bảng xếp hạng</button>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
                 </div>
-            </span>
+            </span >
         </>
-    );
+    )
 }

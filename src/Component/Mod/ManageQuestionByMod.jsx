@@ -1,29 +1,40 @@
 import { useEffect, useState, useContext } from "react";
 import { useParams } from 'react-router-dom';
-import { UserContext } from "../../contexts/UserContext";
-import { DatePicker, Dropdown, Breadcrumb, Layout, Table, Input, Modal, Form, notification, Button, theme, Card, Timeline, Tooltip, Select } from 'antd';
+import { DatePicker, Dropdown, Breadcrumb, Layout, Table, Input, Modal, Form, notification, Button, theme, Card, Timeline, Tooltip, Select, Upload } from 'antd';
 import {
-    SearchOutlined, CheckCircleOutlined, FileTextOutlined, StopOutlined,
+    SearchOutlined, CheckCircleOutlined, FileTextOutlined, UploadOutlined,
     EditOutlined, PoweroffOutlined, PlusCircleOutlined,
 } from '@ant-design/icons'
 import SiderAdmin from "../../Layout/Admin/SiderAdmin";
 import HeaderAdmin from "../../Layout/Admin/HeaderAdmin";
+import moment from 'moment';
+import dayjs from "dayjs";
+import { UserContext } from "../../contexts/UserContext";
 import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
+import 'bootstrap/dist/css/bootstrap.css';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../../firebase";
 import { v4 } from "uuid";
+import { CommonNotification } from "../../utils/CommonNotification";
+import readXlsxFile from "read-excel-file";
 
-import { handleValidationEditQuestion } from "../../assets/js/handleValidation";
-import { ChangeStatusQuestionService, GetAllQuestionByTopicIdService } from "../../services/questionService";
-import { GetTopicByIdService } from "../../services/topicService";
-import { ChangeStatusTopicService } from "../../services/topicService";
 import { EditQuestionService } from "../../services/questionService";
-import { ApproveAllQuestionService } from "../../services/questionService";
+import { handleValidationEditQuestion } from "../../assets/js/handleValidation";
+import { handleValidationCreateQuestion } from "../../assets/js/handleValidation";
+import { GetAllQuestionByTopicIdService } from "../../services/questionService";
+import { GetTopicByIdService } from "../../services/topicService";
+import { AddQuestionService } from "../../services/questionService";
+import { AddQuestionByExcelService } from "../../services/questionService";
+import axios from "axios";
+import Sider from "antd/es/layout/Sider";
+
 
 const { Content } = Layout;
 
-export default function ManageQuestion() {
+
+
+export default function ManageQuestionByMod() {
 
     const {
         token: { colorBgContainer },
@@ -107,9 +118,7 @@ export default function ManageQuestion() {
         pageSize: 8,
         total: dataSource != null ? dataSource.length : "",
     };
-    const { user, render, onSetRender } = useContext(UserContext);
-    const [topic, setTopic] = useState("");
-
+    const {user, render, onSetRender } = useContext(UserContext);
     const columns = [
         {
             title: "ID",
@@ -172,7 +181,7 @@ export default function ManageQuestion() {
                             {`
                                 td p:not([class]):not([id]) {
                                 margin: 0;
-                                }
+                                }   
                             `}
                         </style>
                     <div dangerouslySetInnerHTML={{ __html: record }} />
@@ -241,7 +250,7 @@ export default function ManageQuestion() {
             title: "Người tạo",
             width: 100,
             dataIndex: "accountName",
-            key: 5,
+            key: 1,
             fixed: "left",
             filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
                 return (
@@ -274,7 +283,7 @@ export default function ManageQuestion() {
             title: "Trạng thái",
             width: 100,
             dataIndex: "statusString",
-            key: 6,
+            key: 1,
             fixed: "left",
             filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
                 return (
@@ -316,33 +325,23 @@ export default function ManageQuestion() {
                             type="primary"
                             icon={<EditOutlined />}
                         ></Button>{" "}
-                        &nbsp;
-                        {record.status == "1" && (
-                            <Button
-                                onClick={() => handleChangeStatusClose(record)}
-                                style={{ color: "white", backgroundColor: "red" }}
-                                icon={<StopOutlined />}
-                            ></Button>
-                        )}
-                        {record.status == "0" && (
-                            <Button
-                                onClick={() => handleChangeStatusApprove(record)}
-                                style={{ color: "white", backgroundColor: "grey" }}
-                                icon={<PlusCircleOutlined />}
-                            ></Button>
-                        )}
-                        {record.status == "2" && (
-                            <Button
-                                onClick={() => handleChangeStatusOpen(record)}
-                                style={{ color: "white", backgroundColor: "green" }}
-                                icon={<CheckCircleOutlined />}
-                            ></Button>
-                        )}
                     </>
                 );
             },
         },
     ]
+    const [showCreateForm, setShowCreateForm] = useState(false);
+    const [topic, setTopic] = useState("");
+    const [createData, setCreateData] = useState({
+        createLevelId: "Chọn cấp độ",
+        createQuestionContent: "",
+        createOptionA: "",
+        createOptionB: "",
+        createOptionC: "",
+        createOptionD: "",
+        createAnswerId: "Chọn đáp án",
+        createSolution: "",
+    });
 
     const [showEditForm, setShowEditForm] = useState(false);
     const [editData, setEditData] = useState({
@@ -357,7 +356,16 @@ export default function ManageQuestion() {
         editAnswerId: "",
         editSolution: "",
     })
+
     const [errors, setErrors] = useState({
+        createQuestionContent: "",
+        createOptionA: "",
+        createOptionB: "",
+        createOptionC: "",
+        createOptionD: "",
+        createAnswerId: "",
+        createSolution: "",
+        createLevelId: "",
         editLevelId: "",
         editQuestionContent: "",
         editOptionA: "",
@@ -369,15 +377,35 @@ export default function ManageQuestion() {
     })
 
     const [imageUpload, setImageUpload] = useState(null);
-
     //#endregion
 
     //#region - Function - hiển thị thông báo
     const [api, contextHolder] = notification.useNotification();
-    const openNotificationChangeStatus200 = (placement) => {
+    const openNotificationEnable = (placement) => {
         api.success({
             message: `Thông báo`,
-            description: "Thay đổi trạng thái thành công",
+            description: 'Lấy dữ liệu thành công',
+            placement,
+        });
+    };
+    const openNotificationGetData400 = (placement) => {
+        api.error({
+            message: `Thông báo`,
+            description: 'Lấy dữ liệu',
+            placement,
+        });
+    };
+    const openNotificationAdd200 = (placement) => {
+        api.success({
+            message: `Thông báo`,
+            description: 'Thêm câu hỏi thành công',
+            placement,
+        });
+    };
+    const openNotificationAdd400 = (placement) => {
+        api.error({
+            message: `Thông báo`,
+            description: 'Thêm câu hỏi thất bại',
             placement,
         });
     };
@@ -395,37 +423,9 @@ export default function ManageQuestion() {
             placement,
         });
     };
-    const openNotificationChangeStatus400 = (placement) => {
-        api.error({
-            message: `Thông báo`,
-            description: "Thay đổi trạng thái thất bại",
-            placement,
-        });
-    };
-    const openNotificationGetData400 = (placement) => {
-        api.error({
-            message: `Thông báo`,
-            description: 'Lấy dữ liệu thất bại',
-            placement,
-        });
-    };
-    const openNotificationApprove400 = (placement) => {
-        api.error({
-            message: `Thông báo`,
-            description: 'Duyệt thất bại',
-            placement,
-        });
-    };
-    const openNotificationApprove200 = (placement) => {
-        api.success({
-            message: `Thông báo`,
-            description: 'Duyệt thành công',
-            placement,
-        });
-    };
     //#endregion
 
-    //#region - Function - lấy danh sách câu hỏi/ topic detail
+    //#region - Function - lấy danh sách câu hỏi, chi tiết của một topic
     const handleGetAllQuestionByTopic = async () =>{
         try {
             const result = await GetAllQuestionByTopicIdService(id);
@@ -434,7 +434,7 @@ export default function ManageQuestion() {
                 setdataSource(result.data);
             } else {
                 openNotificationGetData400("topRight")
-            } 
+            }
             if(result2.status === 200){
                 setTopic(result2.data);
             } else {
@@ -447,85 +447,183 @@ export default function ManageQuestion() {
 
     useEffect(() => {
         handleGetAllQuestionByTopic();
-    }, []);
+    }, [])
+
     //#endregion
 
-    //#region - Funtion - thay đổi trạng thái câu hỏi
-    const handleChangeStatusClose = async (record) => {
-        Modal.confirm({
-            title: "Bạn muốn khóa câu hỏi này",
-            okText: "Khóa",
-            cancelText: "Thoát",
-            okType: "danger",
-            onOk: async () => {
-                const status = "2";
-                try{
-                    const result = await ChangeStatusQuestionService(record.questionId, status);
-                    if(result.status === 200){
-                        openNotificationChangeStatus200("topRight");
-                        handleGetAllQuestionByTopic();
-                    } else {
-                        openNotificationChangeStatus400("topRight");
-                    }
-                } catch {
-                    openNotificationChangeStatus400("topRight");
-                }
-                
-            },
-            cancelText: "Cancel",
-            onCancel: () => { },
-        });
-    };
+    //#region - Function - thêm mới câu hỏi
 
-    const handleChangeStatusOpen = async (record) => {
-        Modal.confirm({
-            title: "Bạn muốn mở khóa câu hỏi này",
-            okText: "Mở",
-            cancelText: "Thoát",
-            okType: "default",
-            onOk: async () => {
-                const status = "1";
-                try{
-                    const result = await ChangeStatusQuestionService(record.questionId, status);
-                    if(result.status === 200){
-                        openNotificationChangeStatus200("topRight");
-                        handleGetAllQuestionByTopic();
-                    } else {
-                        openNotificationChangeStatus400("topRight");
-                    } 
-                } catch{
-                    openNotificationChangeStatus400("topRight");    
-                }
-            },
-            cancelText: "Cancel",
-            onCancel: () => { },
-        });
+    //#region - Function - Thêm câu hỏi bằng Excel
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [file, setFile] = useState(null);
+    const props = {
+      name: "file",
+      maxCount: 1,
+      accept: ".xls, .xlsx",
+      fileList: file ? [file] : [],
+      beforeUpload: (file) => {
+        setFile(file);
+        return false;
+      },
     };
+    const showModal = () => {
+      setIsModalOpen(true);
+    };
+  
+    const handleCancel = () => {
+      setIsModalOpen(false);
+      setFile();
+    };
+    
+    const handleUpload = async () => {
+        try {
+            if (file) {
+                const rows = await readXlsxFile(file);
+                console.log(rows);
+                setIsModalOpen(!isModalOpen);
+                setFile();
+                const data = {
+                    subjectId: topic.subjectId,
+                    accountId: user.accountId,
+                    topicId: topic.topicId,
+                    records: rows,
+                };
+                await axios.post("https://localhost:7207/api/Question/addQuestionByExcel", data,{
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: "Bearer YOUR_AUTH_TOKEN",
+                    },
+                });
 
-    const handleChangeStatusApprove = async (record) => {
-        Modal.confirm({
-            title: "Bạn muốn duyệt câu hỏi này",
-            okText: "Duyệt",
-            cancelText: "Thoát",
-            okType: "default",
-            onOk: async () => {
-                const status = "1";
-                try{
-                    const result = await ChangeStatusQuestionService(record.questionId, status);
-                    if(result.status === 200){
-                        openNotificationChangeStatus200("topRight");
-                        handleGetAllQuestionByTopic();
-                    } else {
-                        openNotificationChangeStatus400("topRight");
-                    }
-                }catch{
-                    openNotificationChangeStatus400("topRight");    
-                }
-            },
-            cancelText: "Cancel",
-            onCancel: () => { },
-        });
+                setIsModalOpen(!isModalOpen);
+                setFile();
+                CommonNotification(
+                    "Thông báo",
+                    "Thêm questions bằng file excel thành công!",
+                    "success"
+                );
+                handleGetAllQuestionByTopic();
+                onSetRender();
+            } else {
+                console.log("Chọn file để upload.");
+            }
+        } catch (error) {
+            CommonNotification(
+                "Thông báo",
+                "Lỗi khi thêm file!",
+                "warning"
+            );
+        }
     };
+    //#endregion
+
+    //#region - Function - Thêm câu hỏi
+    const handleSubmitCreate = async () => {
+        let errors = {};
+        console.log(createData)
+        handleValidationCreateQuestion(createData, errors);
+        if(Object.keys(errors).length === 0){
+            const data = {
+                subjectId: topic.subjectId,
+                accountId: user.accountId,
+                answerId: createData.createAnswerId,
+                topicId: topic.topicId,
+                levelId: createData.createLevelId,
+                image: imageUpload,
+                questionContent: createData.createQuestionContent,
+                optionA: createData.createOptionA,
+                optionB: createData.createOptionB,
+                optionC: createData.createOptionC,
+                optionD: createData.createOptionD,
+                solution: createData.createSolution,
+            }
+            const result = await AddQuestionService(data);
+            if(result.status === 200){
+                handleGetAllQuestionByTopic();
+                setErrors([]);
+                setShowCreateForm(false);
+                setCreateData({
+                    createLevelId: "Chọn cấp độ",
+                    createQuestionContent: "",
+                    createOptionA: "",
+                    createOptionB: "",
+                    createOptionC: "",
+                    createOptionD: "",
+                    createAnswerId: "Chọn đáp án",
+                    createSolution: "",
+                    createLevelId: "",
+                });
+                setImageUpload(null);
+                openNotificationAdd200("topRight");
+            } else {
+                openNotificationAdd400("topRight")
+            }
+        }else{
+            setErrors(errors);  
+        }
+    }
+
+    const onClickCancelCreateForm = () => {
+        setShowCreateForm(false);
+        setErrors([]);
+        setCreateData({
+            createLevelId: "Chọn cấp độ",
+            createQuestionContent: "",
+            createOptionA: "",
+            createOptionB: "",
+            createOptionC: "",
+            createOptionD: "",
+            createAnswerId: "Chọn đáp án",
+            createSolution: "",
+            createLevelId: "",
+        });
+        setImageUpload(null);
+    }
+    //#endregion
+
+    //#region - Function - nhận giá trị input
+    const handleCreateInputFile = async (event) => {
+        if(event == null){
+            return;
+        }
+        const file = event.target.files[0]; 
+        const imgRef = ref(storage, `images/question_images/${createData.createLevelId + v4()}`);
+        try{
+            const snapshoot = await uploadBytes(imgRef, file);
+            const url = await getDownloadURL(snapshoot.ref);
+            setImageUpload(url);
+        } catch (error) {
+            console.error('Failed to upload', error);
+        }
+    }
+
+    const handleCreateInputChange = (event) => {
+        const field = event.target.name;
+        const value = event.target.value;
+
+        setCreateData((createData) => ({...createData, [field]: value}));
+    }
+    const handleEditInputChange = (event) => {
+        const field = event.target.name;
+        const value = event.target.value;
+
+        setEditData((editData) => ({...editData, [field]: value}));
+    }
+
+    const handleEditInputFile = async (event) => {
+        if(event == null){
+            return;
+        }
+        const file = event.target.files[0]; 
+        const imgRef = ref(storage, `images/question_images/${editData.editLevelId + v4()}`);
+        try{
+            const snapshoot = await uploadBytes(imgRef, file);
+            const url = await getDownloadURL(snapshoot.ref);
+            setImageUpload(url);
+        } catch (error) {
+            console.error('Failed to upload', error);
+        }
+    }
     //#endregion
 
     //#region - Function - chỉnh sửa question
@@ -619,66 +717,13 @@ export default function ManageQuestion() {
     }
     //#endregion
 
-
-    //#region - Function - nhận giá trị input
-    const handleEditInputChange = (event) => {
-        const field = event.target.name;
-        const value = event.target.value;
-
-        setEditData((editData) => ({...editData, [field]: value}));
-    }
-
-    const handleEditInputFile = async (event) => {
-        if(event == null){
-            return;
-        }
-        const file = event.target.files[0]; 
-        const imgRef = ref(storage, `images/question_images/${editData.editLevelId + v4()}`);
-        try{
-            const snapshoot = await uploadBytes(imgRef, file);
-            const url = await getDownloadURL(snapshoot.ref);
-            setImageUpload(url);
-        } catch (error) {
-            console.error('Failed to upload', error);
-        }
-    }
-    //#endregion
-
-    //#region - Function Duyệt tất cả câu hỏi
-    const handleApproveAllQuestion = async () => {
-        Modal.confirm({
-            title: "Bạn muốn duyệt tất cả câu hỏi",
-            okText: "Duyệt",
-            cancelText: "Thoát",
-            okType: "default",
-            onOk: async () => {
-                try{
-                    const result = await ApproveAllQuestionService(id);
-                         if (result.status === 200){
-                            handleGetAllQuestionByTopic();
-                            openNotificationApprove200("topRight");
-                        } else{
-                            openNotificationApprove400("topRight");
-                    }
-                } catch {
-                    openNotificationApprove400("topRight");
-                }
-                
-            },
-            cancelText: "Cancel",
-            onCancel: () => { },
-        });
-        
-    } 
-    //#endregion
-
     return (
         <>
         <Layout
             style={{ minHeight: '100vh' }}
         >
-        {contextHolder} 
-            <SiderAdmin />
+           <SiderAdmin/>
+           {contextHolder} 
             <Layout className="site-layout">
                 <HeaderAdmin />
                 <Content
@@ -715,12 +760,27 @@ export default function ManageQuestion() {
                             >
                                 Danh sách câu hỏi<i></i>
                             </h1>
-                            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                 <Button type="primary" style={{ marginBottom: '20px', marginRight: '10px' }} onClick={() => handleApproveAllQuestion()}>
-                                    Duyệt tất cả
-                                </Button>
-                            </div>
                         </div>
+                        <Button type="primary" style={{ marginBottom: '20px', marginRight: '10px' }} onClick={() => setShowCreateForm(true)}>
+                            Thêm mới câu hỏi
+                        </Button>
+                        
+                        <Button type="primary" onClick={showModal}>
+                         Thêm Question bằng Excel
+                        </Button>
+                        <Modal
+                            title="Tải bằng file Excel"
+                            open={isModalOpen}
+                            onOk={handleUpload}
+                            okText="Thêm"
+                            cancelText="Thoát"
+                            onCancel={handleCancel}
+                        >
+                            <Upload {...props}>
+                                <Button icon={<UploadOutlined />}>Chọn File</Button>
+                            </Upload>
+                        </Modal>
+
                         <Table
                             columns={columns}
                             dataSource={dataSource}
@@ -731,6 +791,164 @@ export default function ManageQuestion() {
                               },
                             }}
                         />
+
+
+                        {/* Thêm câu hỏi */}
+                        <Modal
+                            title='Thêm mới câu hỏi'
+                            visible={showCreateForm}
+                            okText='Thêm'
+                            cancelText='Đóng'
+                            onCancel={() => onClickCancelCreateForm()}
+                            onOk={() => handleSubmitCreate()}
+                        >
+                           
+                           <Form>
+                                <Form.Item>
+                                    <label>Cấp độ</label>
+                                    <select
+                                       name="createLevelId"
+                                       value={createData.createLevelId}
+                                       allowclear
+                                       className="form-control"
+                                       onChange={handleCreateInputChange}
+                                    >
+                                    <option value="Chọn cấp độ">Chọn cấp độ</option>
+                                    <option value="1">Thông hiểu</option>
+                                    <option value="2">Vận dụng thấp</option>
+                                    <option value="3">Vận dụng cao</option>
+                                    </select>
+                                    {errors.createLevelId && (
+                                        <div
+                                            className="invalid-feedback"
+                                            style={{ display: "block", color: "red" }}
+                                        >
+                                            {errors.createLevelId}
+                                        </div>
+                                    )}
+                                </Form.Item>
+                                <Form.Item>
+                                    <label>Nội dung câu hỏi</label>
+                                    <ReactQuill className="quill-editor" value={createData?.createQuestionContent}
+                                    onChange={(value) => setCreateData({ ...createData, createQuestionContent: value })}
+                                    />
+                                    {errors.createQuestionContent && (
+                                        <div
+                                            className="invalid-feedback"
+                                            style={{ display: "block", color: "red" }}
+                                        >
+                                            {errors.createQuestionContent}
+                                        </div>
+                                    )}
+                                </Form.Item>
+                                <Form.Item>
+                                    <label>Hình ảnh</label>
+                                    <div className="w-100">
+                                        {imageUpload == null || imageUpload == "" ? (
+                                            <img src="" alt=""/>
+                                        ) : (
+                                            <>
+                                                {imageUpload && (
+                                                    <img
+                                                        src={imageUpload}
+                                                        alt=''
+                                                        className="w-100"
+                                                        style={{overflow: 'hidden', objectFit: 'cover'}}
+                                                    />
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
+                                    <input type="file" onChange={handleCreateInputFile}/>
+                                </Form.Item>
+                                <Form.Item>
+                                    <label>Lựa chọn A</label>
+                                    <ReactQuill className="quill-editor" value={createData?.createOptionA}
+                                    onChange={(value) => setCreateData({ ...createData, createOptionA: value })}
+                                    />
+                                    {errors.createOptionA && (
+                                        <div
+                                            className="invalid-feedback"
+                                            style={{ display: "block", color: "red" }}
+                                        >
+                                            {errors.createOptionA}
+                                        </div>
+                                    )}
+                                </Form.Item>
+                                <Form.Item>
+                                    <label>Lựa chọn B</label>
+                                    <ReactQuill className="quill-editor" value={createData?.createOptionB}
+                                     onChange={(value) => setCreateData({ ...createData, createOptionB: value })}
+                                     />
+                                     {errors.createOptionB && (
+                                        <div
+                                            className="invalid-feedback"
+                                            style={{ display: "block", color: "red" }}
+                                        >
+                                            {errors.createOptionB}
+                                        </div>
+                                    )}
+                                </Form.Item>
+                                <Form.Item>
+                                    <label>Lựa chọn C</label>
+                                    <ReactQuill className="quill-editor" value={createData?.createOptionC} 
+                                    onChange={(value) => setCreateData({ ...createData, createOptionC: value })}
+                                    />
+                                    {errors.createOptionC && (
+                                        <div
+                                            className="invalid-feedback"
+                                            style={{ display: "block", color: "red" }}
+                                        >
+                                            {errors.createOptionC}
+                                        </div>
+                                    )}
+                                </Form.Item>
+                                <Form.Item>
+                                    <label>Lựa chọn D</label>
+                                    <ReactQuill className="quill-editor" value={createData?.createOptionD}
+                                    onChange={(value) => setCreateData({ ...createData, createOptionD: value })}
+                                    />
+                                    {errors.createOptionD && (
+                                        <div
+                                            className="invalid-feedback"
+                                            style={{ display: "block", color: "red" }}
+                                        >
+                                            {errors.createOptionD}
+                                        </div>
+                                    )}
+                                </Form.Item>
+                                <Form.Item>
+                                    <label>Đáp án</label>
+                                    <select
+                                       name="createAnswerId"
+                                       value={createData.createAnswerId}
+                                       allowclear
+                                       className="form-control"
+                                       onChange={handleCreateInputChange}
+                                    >
+                                    <option value="Chọn đáp án">Chọn đáp án</option>
+                                    <option value="1">A</option>
+                                    <option value="2">B</option>
+                                    <option value="3">C</option>
+                                    <option value="4">D</option>
+                                    </select>
+                                    {errors.createAnswerId && (
+                                        <div
+                                            className="invalid-feedback"
+                                            style={{ display: "block", color: "red" }}
+                                        >
+                                            {errors.createAnswerId}
+                                        </div>
+                                    )}
+                                </Form.Item>
+                                <Form.Item>
+                                    <label>Lời giải</label>
+                                    <ReactQuill className="quill-editor" value={createData?.createSolution}
+                                    onChange={(value) => setCreateData({ ...createData, createSolution: value })}
+                                    />
+                                </Form.Item>
+                           </Form>
+                        </Modal>
 
                         {/* Chỉnh sửa câu hỏi */}
                         <Modal

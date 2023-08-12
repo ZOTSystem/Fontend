@@ -10,19 +10,18 @@ import HeaderAdmin from "../../Layout/Admin/HeaderAdmin";
 import { UserContext } from "../../contexts/UserContext";
 import { Navigate, useNavigate } from 'react-router-dom';
 
-
 import { GetAllTopicService } from "../../services/topicService";
 import { ChangeStatusTopicService } from "../../services/topicService";
 import { GetAllSubjectService } from "../../services/subjectService";
 import { AddTopicService } from "../../services/topicService";
 import { handleValidationCreateTopic } from "../../assets/js/handleValidation";
-import { UpdateTopicService } from "../../services/topicService";
 import { handleValidationUpdateTopic } from "../../assets/js/handleValidation";
+import { UpdateTopicService } from "../../services/topicService";
 
 const { Content } = Layout;
 
 
-export default function ManageTopic() {
+export default function ManageTopicByMod() {
 
     const {
         token: { colorBgContainer },
@@ -188,7 +187,7 @@ export default function ManageTopic() {
                 return (
                     <Input
                         autoFocus
-                        placeholder="Nhập trạng thái"
+                        placeholder="Nhập loại topic"
                         value={selectedKeys[0]}
                         onChange={(e) => {
                             setSelectedKeys(e.target.value ? [e.target.value] : []);
@@ -206,8 +205,8 @@ export default function ManageTopic() {
                 return <SearchOutlined />;
             },
             onFilter: (value, record) => {
-                if (record.status != null) {
-                    return record.status.toLowerCase().includes(value.toLowerCase());
+                if (record.topicTypeName != null) {
+                    return record.topicTypeName.toLowerCase().includes(value.toLowerCase());
                 }
             },
         },
@@ -224,28 +223,6 @@ export default function ManageTopic() {
                             icon={<EditOutlined />}
                         ></Button>{" "}
                         &nbsp;
-                        {record.status == "Đã duyệt" && (
-                            <Button
-                                onClick={() => handleChangeStatusClose(record)}
-                                style={{ color: "white", backgroundColor: "red" }}
-                                icon={<StopOutlined />}
-                            ></Button>
-                        )}
-                        {record.status == "Chờ duyệt" && (
-                            <Button
-                                onClick={() => handleChangeStatusApprove(record)}
-                                style={{ color: "white", backgroundColor: "grey" }}
-                                icon={<PlusCircleOutlined />}
-                            ></Button>
-                        )}
-                        {record.status == "Khóa" && (
-                            <Button
-                                onClick={() => handleChangeStatusOpen(record)}
-                                style={{ color: "white", backgroundColor: "green" }}
-                                icon={<CheckCircleOutlined />}
-                            ></Button>
-                        )}
-                        &nbsp;
                         <Button
                             icon={<FolderOpenOutlined />}
                             style={{background: '#ffa000', color: 'white'}}
@@ -261,8 +238,16 @@ export default function ManageTopic() {
     const {render, onSetRender} = useContext(UserContext);
     const [dataSource, setDataSource] = useState("");
     const [subjectList, setSubjectList] = useState([]);
+    const [showCreateForm, setShowCreateForm] = useState(false);
     const [showEditForm, setShowEditForm] = useState(false);
 
+    const [createData, setCreateData] = useState({
+        createSubjectId: "Chọn môn học",
+        createTopicType: "Chọn loại topic",
+        createGrade: "Chọn lớp",
+        createTopicName: "",
+        createDuration: "Chọn thời gian",
+    });
 
     const [editData, setEditData] = useState({
         editSubjectId: "",
@@ -273,6 +258,11 @@ export default function ManageTopic() {
     });
 
     const [errors, setErrors] = useState({
+        createSubjectId: "",
+        createTopicType: "",
+        createGrade: "",
+        createTopicName: "",
+        createDuration: "",
         editSubjectId: "",
         editTopicType: "",
         editGrade: "",
@@ -308,6 +298,20 @@ export default function ManageTopic() {
         api.error({
             message: `Thông báo`,
             description: "Thay đổi trạng thái thất bại",
+            placement,
+        });
+    };
+    const openNotificationCreate200 = (placement) => {
+        api.success({
+            message: `Thông báo`,
+            description: "Thêm topic thành công",
+            placement,
+        });
+    };
+    const openNotificationCreate400 = (placement) => {
+        api.error({
+            message: `Thông báo`,
+            description: "Thêm topic thất bại",
             placement,
         });
     };
@@ -424,11 +428,58 @@ export default function ManageTopic() {
     //#endregion
 
     //#region - Function - nhận giá trị input
+    const handleCreateInputChange = (event) => {
+        const field = event.target.name;
+        const value = event.target.value;
+        
+        setCreateData((createData) => ({...createData, [field]: value}));
+    }
+
     const handleEditInputChange = (event) => {
         const field = event.target.name;
         const value = event.target.value;
         
         setEditData((editData) => ({...editData, [field]: value}));
+    }
+    //#endregion
+
+    //#region - Function - Thêm mới topic
+    const handleSubmitCreate = async () => {
+        let errors = {};
+        handleValidationCreateTopic(createData, errors);
+        if(Object.keys(errors).length === 0){
+            const data = {
+                topicName: createData.createTopicName,
+                duration: createData.createDuration == "Chọn thời gian" ? null : createData.createDuration,
+                subjectId: createData.createSubjectId,
+                topicType: createData.createTopicType,
+                grade: createData.createGrade
+            };    
+        const result = await AddTopicService(data);
+        if(result.status === 200){
+            handleGetAllTopic();
+            setErrors([]);
+            setShowCreateForm(false);
+            setCreateData('');
+            openNotificationCreate200("topRight");
+        } else {
+            openNotificationCreate400("topRight");
+        }
+        } else {
+            setErrors(errors);
+        }  
+    };
+
+    const onClickCancelCreateForm = () => {
+        setShowCreateForm(false);
+        setErrors([]);
+        setCreateData({
+            createSubjectId: "Chọn môn học",
+            createTopicType: "Chọn loại topic",
+            createGrade: "Chọn lớp",
+            createTopicName: "",
+            createDuration: "Chọn thời gian",
+        });
     }
     //#endregion
 
@@ -446,7 +497,6 @@ export default function ManageTopic() {
     }
 
     const onClickCancelEditForm = () => {
-        console.log(editData);
         setShowEditForm(false);
         setErrors([]);
         setEditData({
@@ -483,18 +533,16 @@ export default function ManageTopic() {
         }
         } else {
             setErrors(errors);
-        }  
+        }
     }
     //#endregion
 
     //#region - Function - hiển thị danh sách question theo topic
     const handleViewListQuestion = (record) => {
         const id = record.topicId;
-        navigate(`/admin/manageQuestion/${id}`);
+        navigate(`/mod/manageQuestion/${id}`);
     }
     //#endregion
-
-
     return (
         <>
             <Layout
@@ -537,6 +585,9 @@ export default function ManageTopic() {
                                 >
                                     Danh sách topic
                                 </h1>
+                                <Button type="primary" style={{ marginBottom: '20px', marginRight: '10px' }} onClick={() => setShowCreateForm(true)}>
+                                    Thêm mới topic
+                                </Button>
                                 <Table
                                     columns={columns}
                                     dataSource={dataSource}
@@ -544,9 +595,142 @@ export default function ManageTopic() {
                             </div>
                         </div>
 
+                        {/* Create form */}
+                        <Modal
+                            title='Thêm mới topic'
+                            visible={showCreateForm}
+                            okText='Thêm mới'
+                            cancelText='Đóng'
+                            onCancel={() => onClickCancelCreateForm()}
+                            onOk={() => handleSubmitCreate()}
+                        >
+                            <Form>
+                                <Form.Item>
+                                    <label>Môn học</label>
+                                    <select
+                                       name="createSubjectId"
+                                       allowclear
+                                       value={createData.createSubjectId}
+                                       className="form-control"
+                                       onChange={handleCreateInputChange}
+                                    >
+                                    <option value="Chọn môn học">Chọn môn học</option>
+                                    {subjectList?.map((item) => (
+                                        <option
+                                            value={item.subjectId}
+                                        >
+                                            {item.subjectName}
+                                        </option>
+                                    ))}
+                                    </select>
+                                    {errors.createSubjectId && (
+                                        <div
+                                            className="invalid-feedback"
+                                            style={{ display: "block", color: "red" }}
+                                        >
+                                            {errors.createSubjectId}
+                                        </div>
+                                    )}
+                                </Form.Item>
+                                <Form.Item>
+                                    <label>Loại Topic</label>
+                                    <select
+                                       name="createTopicType"
+                                       value={createData.createTopicType}
+                                       allowclear
+                                       className="form-control"
+                                       onChange={handleCreateInputChange}
+                                    >
+                                    <option value="Chọn loại topic">Chọn loại topic</option>
+                                    <option value="1">Học</option>
+                                    <option value="2">Thi 15p</option>
+                                    <option value="3">Thi 1 tiết</option>
+                                    <option value="4">Thi học kì</option>
+                                    <option value="5">Thi THPT Quốc gia</option>
+                                    </select>
+                                    {errors.createTopicType && (
+                                        <div
+                                            className="invalid-feedback"
+                                            style={{ display: "block", color: "red" }}
+                                        >
+                                            {errors.createTopicType}
+                                        </div>
+                                    )}
+                                </Form.Item>
+                                <Form.Item>
+                                    <label>Lớp</label>
+                                    <select
+                                       name="createGrade"
+                                       value={createData.createGrade}
+                                       allowclear
+                                       className="form-control"
+                                       onChange={handleCreateInputChange}
+                                    >
+                                    <option value="Chọn lớp">Chọn lớp</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    </select>
+                                    {errors.createGrade && (
+                                        <div
+                                            className="invalid-feedback"
+                                            style={{ display: "block", color: "red" }}
+                                        >
+                                            {errors.createGrade}
+                                        </div>
+                                    )}
+                                </Form.Item>
+                                <Form.Item>
+                                    <label>Tên Topic</label>
+                                    <Input
+                                        type="text"
+                                        placeholder="Nhập tên topic"
+                                        className="form-control"
+                                        value={createData.createTopicName}
+                                        name="createTopicName"
+                                        onChange={handleCreateInputChange}
+                                    />
+                                    {errors.createTopicName && (
+                                        <div
+                                            className="invalid-feedback"
+                                            style={{ display: "block", color: "red" }}
+                                        >
+                                            {errors.createTopicName}
+                                        </div>
+                                    )}
+                                </Form.Item>
+                                {createData.createTopicType != "1" && createData.createTopicType != "Chọn loại topic" && (
+                                    <Form.Item>
+                                    <label>Thời gian làm bài</label>
+                                    <select
+                                       name="createDuration"
+                                       value={createData.createDuration}
+                                       allowclear
+                                       className="form-control"
+                                       onChange={handleCreateInputChange}
+                                    >
+                                    <option value="Chọn lớp">Chọn thời gian </option>
+                                    <option value="15p">15p</option>
+                                    <option value="45p">45p</option>
+                                    <option value="60p">60p</option>
+                                    <option value="120p">120p</option>
+                                    </select>
+                                    {errors.createDuration && (
+                                        <div
+                                            className="invalid-feedback"
+                                            style={{ display: "block", color: "red" }}
+                                        >
+                                            {errors.createDuration}
+                                        </div>
+                                    )}
+                                </Form.Item>
+                                )}
+                            </Form>
+                        </Modal>
+
                         {/* Edit form */}
                         <Modal
-                            title='Chỉnh sửa topic'
+                            title='Chinrh sửa topic'
                             visible={showEditForm}
                             okText='Lưu'
                             cancelText='Đóng'
@@ -609,7 +793,7 @@ export default function ManageTopic() {
                                 <Form.Item>
                                     <label>Lớp</label>
                                     <select
-                                       name="createGrade"
+                                       name="editGrade"
                                        value={editData.editGrade}
                                        allowclear
                                        className="form-control"
@@ -648,7 +832,7 @@ export default function ManageTopic() {
                                         </div>
                                     )}
                                 </Form.Item>
-                                {editData.editTopicType != "1" && editData.editTopicType != "Chọn loại topic" && (
+                                {editData.editTopicType != "1" && (
                                     <Form.Item>
                                     <label>Thời gian làm bài</label>
                                     <select

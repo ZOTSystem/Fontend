@@ -149,7 +149,6 @@ export default function Navbar() {
                                 className='btn btn-secondary'
                             >
                                 <a
-                                    href='#'
                                     className={checkTuHoc ? 'isActive' : ''}
                                 >
                                     <li

@@ -1,18 +1,59 @@
-import { Component, useState, useEffect } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
-import { GetAllSubjectService } from '../../services/subjectService';
-import '../../assets/PracticeQuizStyle.css';
-import '../../assets/Style.css';
-import Header from '../../Layout/User/Header';
+import { Component, useState, useEffect, useContext } from 'react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { GetTopicByGrade } from '../../services/topicService';
+import { UserContext } from '../../contexts/UserContext';
+import { AddTestDetailService } from '../../services/testDetailService';
+import 'bootstrap/dist/css/bootstrap.css';
+import '../../assets/TestSubjectStyle.css'
+import Header from "../../Layout/User/Header";
+import '../../assets/Style.css'
 
-export default function PracticeQuizzes() {
-    const [subjectAll, setSubjectAll] = useState([]);
+export default function Ranking() {
+    const { user } = useContext(UserContext);
 
+    //#region take subjectId
+    const location = useLocation();
+    let subjectId = location.state.subjectId;
+    let subjectName = location.state.subjectName;
+    //#endregion
+
+    //#region move to study screen
+    const navigate = useNavigate();
+
+    const handleClick = async (item) => {
+        const result = await AddTestDetailService(user.accountId);
+        const testDetailId = result.testdetail.testDetailId;
+        if (result) {
+            navigate('/exam', {
+                state: {
+                    testDetailId: testDetailId,
+                    topicId: item.topicId,
+                    duration: item.duration,
+                    topicName: item.topicName,
+                },
+            });
+        }
+    };
+    //#endregion
+
+    //#region move to exam result
+    const handleRanking = async (item) => {
+        navigate('/ranking', {
+            state: {
+                topicId: item.topicId,
+                accountId: user.accountId,
+            },
+        });
+    };
+    //#endregion
+
+    //#region  get topic list by grade and subjecId
+    const [topicStudy, setTopicStudy] = useState([]);
     const handleGetData = async () => {
         try {
-            const result = await GetAllSubjectService();
+            const result = await GetTopicByGrade('', subjectId, 6, user.accountId);
             if (result.status === 200) {
-                setSubjectAll(result.data);
+                setTopicStudy(result.data);
             }
         } catch (error) {
             console.error('Error fetching mod service:', error);
@@ -22,18 +63,7 @@ export default function PracticeQuizzes() {
     useEffect(() => {
         handleGetData();
     }, []);
-
-    const navigate = useNavigate();
-
-    const handleClick = (subjectId, subjectName) => {
-        navigate('/topicStudy', {
-            state: {
-                subjectId: subjectId,
-                subjectName: subjectName,
-            },
-        });
-    };
-
+    //#endregion
     return (
         <>
             <Header />
@@ -57,40 +87,35 @@ export default function PracticeQuizzes() {
                                             fill='#000000'
                                         ></path>
                                     </svg>
-                                    <span>Tự học/Luyện thi trắc nghiệm</span>
+                                    <span>Bảng xếp hạng</span>
+                                    <span className='topic-subject'>Toán</span>
                                 </h2>
-                            </div>
-                            <div className='sc-gGTGfU fSjCQg'>
-                                <div className='sc-gsTCUz gQRQLT'>
-                                    {subjectAll.map((item) => (
-                                        <div
-                                            className='sc-dlfnbm sc-eCssSg fnjxoh ddsNTO'
-                                            onClick={() => handleClick(item.subjectId, item.subjectName)}
-                                        >
-                                            <div className='sc-dcwrBW kLSqMv'>
-                                                <div className='sc-ehsPrw ciEbjT'>
-                                                    <div
-                                                        className='sc-dwqbIM iLQQSn'
-                                                        aria-setsize={70}
-                                                    ></div>
-                                                    <p>{item.subjectName}</p>
-                                                </div>
-                                                <div className='sc-ehsPrw fqtCF'>
-                                                    <img
-                                                        alt=''
-                                                        src='../Image/physics-svgrepo-com.svg'
-                                                        className='icon'
-                                                    ></img>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
                             </div>
                         </div>
                     </div>
+                    <div class="container">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Thứ hạng</th>
+                                    <th scope="col">Tên</th>
+                                    <th scope="col">Điểm</th>
+                                    <th scope="col">Thời gian nộp bài</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <td>Mark</td>
+                                    <td>Otto</td>
+                                    <td>@mdo</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </span>
+            </span >
+
         </>
-    );
+    )
 }

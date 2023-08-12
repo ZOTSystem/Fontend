@@ -6,6 +6,14 @@ import {
     getPostByStatusService,
     getPostBySubjectAndStatusService,
     getPostByIdService,
+    changePostStatusService,
+    likePostService,
+    getApprovedPostBySubjectService,
+    deletePostService,
+    unlikePostService,
+    savePostService,
+    unSavePostService,
+    getSavedPostService,
 } from '../services/postService';
 import postReducer from '../reducers/postReducer';
 
@@ -13,6 +21,7 @@ const initialState = {
     loading: true,
     posts: [],
     currentPost: {},
+    likedNumber: 0,
 };
 
 export const PostContext = createContext(null);
@@ -20,7 +29,7 @@ export const PostContext = createContext(null);
 const PostProvider = ({ children }) => {
     const [state, dispatch] = useReducer(postReducer, initialState);
 
-    const { loading, posts, currentPost } = state;
+    const { loading, posts, currentPost, likedNumber } = state;
 
     const getAllPost = async () => {
         try {
@@ -62,9 +71,9 @@ const PostProvider = ({ children }) => {
         }
     };
 
-    const getPostBySubject = async (subjectId) => {
+    const getApprovedPostBySubject = async (subjectId) => {
         try {
-            const response = await getPostBySubjectService(subjectId);
+            const response = await getApprovedPostBySubjectService(subjectId);
             dispatch({
                 type: 'GET_POSTS',
                 payload: response,
@@ -75,9 +84,9 @@ const PostProvider = ({ children }) => {
         }
     };
 
-    const getPostByStatus = async (status) => {
+    const getPostBySubject = async (subjectId, accountId) => {
         try {
-            const response = await getPostByStatusService(status);
+            const response = await getPostBySubjectService(subjectId, accountId);
             dispatch({
                 type: 'GET_POSTS',
                 payload: response,
@@ -88,9 +97,83 @@ const PostProvider = ({ children }) => {
         }
     };
 
-    const getPostBySubjectAndStatus = async (subjectId, status) => {
+    const getPostByStatus = async (status, accountId) => {
         try {
-            const response = await getPostBySubjectAndStatusService(subjectId, status);
+            const response = await getPostByStatusService(status, accountId);
+            dispatch({
+                type: 'GET_POSTS',
+                payload: response,
+                loading: false,
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const getPostBySubjectAndStatus = async (subjectId, status, accountId) => {
+        try {
+            const response = await getPostBySubjectAndStatusService(subjectId, status, accountId);
+            dispatch({
+                type: 'GET_POSTS',
+                payload: response,
+                loading: false,
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const changePostStatus = async (postId, status) => {
+        try {
+            await changePostStatusService(postId, status);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const likePost = async (postId, accountId) => {
+        try {
+            await likePostService(postId, accountId);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const unlikePost = async (postId, accountId) => {
+        try {
+            await unlikePostService(postId, accountId);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const deletePost = async (postId) => {
+        try {
+            await deletePostService(postId);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const savePost = async (postId, accountId) => {
+        try {
+            await savePostService(postId, accountId);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const unSavePost = async (postId, accountId) => {
+        try {
+            await unSavePostService(postId, accountId);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const getSavedPost = async (accountId) => {
+        try {
+            const response = await getSavedPostService(accountId);
             dispatch({
                 type: 'GET_POSTS',
                 payload: response,
@@ -107,13 +190,23 @@ const PostProvider = ({ children }) => {
                 posts,
                 loading,
                 currentPost,
+                likedNumber,
                 addPost,
                 getAllPost,
                 getPostById,
+                getApprovedPostBySubject,
                 getPostBySubject,
                 getPostByStatus,
                 getPostBySubjectAndStatus,
-            }}>
+                changePostStatus,
+                deletePost,
+                likePost,
+                unlikePost,
+                savePost,
+                unSavePost,
+                getSavedPost,
+            }}
+        >
             {children}
         </PostContext.Provider>
     );
