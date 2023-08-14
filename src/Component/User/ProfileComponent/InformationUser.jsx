@@ -269,7 +269,7 @@ export default function InformationUser() {
     const handleInputFile = async (event) => {
         const file = event.target.files[0];
 
-        const imgRef = ref(storage, `images/${editData.editEmail + v4()}`);
+        const imgRef = ref(storage, `images/avata_images/${editData.editEmail + v4()}`);
         try {
             const snapshot = await uploadBytes(imgRef, file);
             const url = await getDownloadURL(snapshot.ref);

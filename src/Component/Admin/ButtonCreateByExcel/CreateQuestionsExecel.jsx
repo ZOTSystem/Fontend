@@ -39,21 +39,20 @@ export default function CreateQuestionsExcel() {
         setIsModalOpen(!isModalOpen);
         setFile();
         CommonNotification(
-          "Notification",
-          "Upload users by Excel file Successfully !",
+          "Thông báo",
+          "Thêm questions bằng file excel thành công!",
           "success"
         );
         onSetRender();
       } else {
         // Handle file not selected error
-        console.log("Please select a file to upload.");
+        console.log("Chọn file để upload.");
       }
     } catch (error) {
       // Handle error
-      console.log("Error occurred while uploading:", error);
       CommonNotification(
-        "Notification",
-        "Error occurred while uploading users!",
+        "Thông báo",
+        "Lỗi khi thêm file!",
         "warning"
       );
     }
@@ -65,10 +64,11 @@ export default function CreateQuestionsExcel() {
         Thêm Question bằng Excel
       </Button>
       <Modal
-        title="Upload Excel"
+        title="Tải bằng file Excel"
         open={isModalOpen}
         onOk={handleUpload}
-        okText="Create Users"
+        okText="Thêm"
+        cancelText="Thoát"
         onCancel={handleCancel}
       >
         <Upload {...props}>

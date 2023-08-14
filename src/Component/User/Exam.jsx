@@ -3,6 +3,9 @@ import Header from "../../Layout/User/Header";
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
 import { GetQuestionByTopicId } from '../../services/questionService';
+import { AddQuestionTest } from '../../services/questionTestService.jsx';
+import { UpdateTestDetailService } from '../../services/testDetailService';
+import { ExclamationCircleFilled } from '@ant-design/icons';
 import { Modal } from 'antd';
 import "../../assets/Exam.css"
 import '../../assets/Style.css'
@@ -14,7 +17,6 @@ export default function Exam() {
     let topicId = location.state.topicId;
     let testDetailId = location.state.testDetailId;
     let duration = location.state.duration;
-    console.log("testDetailId: " + testDetailId)
     //#endregion
 
     //#region get question
@@ -104,9 +106,33 @@ export default function Exam() {
 
     const navigate = useNavigate();
     const handleSubmit = async () => {
-        navigate('/examResult', {
+        questionDone.map((item) =>
+        (item.answerId != null
+            ?
+            AddQuestionTest(item.questionId, testDetailId, item.answerId)
+            :
+            AddQuestionTest(item.questionId, testDetailId, '')
+        )
+        )
+        await UpdateTestDetailService(testDetailId);
+        navigate('/examFinish', {
             state: {
+                testDetailId: testDetailId
             },
+        });
+    };
+
+    const { confirm } = Modal;
+    const showConfirm = () => {
+        confirm({
+            title: 'Vui lòng kiểm tra thật kĩ trước khi nộp bài',
+            width: 600,
+            icon: <ExclamationCircleFilled />,
+            onOk() {
+                handleSubmit()
+            },
+            okText: 'Nộp bài',
+            cancelText: 'Hủy',
         });
     };
 
@@ -138,7 +164,7 @@ export default function Exam() {
                         </div>
                     </div>
                     <div className='exam-right-button'>
-                        <button className='btn btn-primary' onClick={handleSubmit}>Nộp bài</button>
+                        <button className='btn btn-primary' onClick={showConfirm}>Nộp bài</button>
                     </div>
                 </div>
                 <div className='exam-left'>

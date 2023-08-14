@@ -2,8 +2,8 @@ import { useEffect, useState, useContext } from "react";
 import { DatePicker, Dropdown, Breadcrumb, Layout, Table, Input, Modal, Form, notification, Button, theme, Card, Timeline, Tooltip, Select } from 'antd';
 import { Option } from "antd/es/mentions";
 import {
-    SearchOutlined, ClockCircleOutlined, CheckCircleOutlined,
-    EditOutlined, PoweroffOutlined, ManOutlined, WomanOutlined, HomeOutlined
+    SearchOutlined, CheckCircleOutlined,
+    EditOutlined, MinusCircleOutlined
 } from '@ant-design/icons'
 import SiderAdmin from "../../Layout/Admin/SiderAdmin";
 import HeaderAdmin from "../../Layout/Admin/HeaderAdmin";
@@ -17,13 +17,13 @@ import { v4 } from "uuid";
 import { GetAllNewsService } from "../../services/NewsService";
 import { GetAllNewsCategoryService } from "../../services/NewsService";
 import { UserContext } from "../../contexts/UserContext";
-import { AddNewsService } from "../../services/NewsService";
 import { EditNewsService } from "../../services/NewsService";
+import { ChangeStatusNewsService } from "../../services/NewsService";
 
 const { Content } = Layout;
 
 
-export default function ManageNewsByMod() {
+export default function ManageNews() {
     const {
         token: { colorBgContainer },
     } = theme.useToken();
@@ -198,25 +198,25 @@ export default function ManageNewsByMod() {
                             type="primary"
                             icon={<EditOutlined />}
                         ></Button>{" "}
-                        {/* &nbsp;
-                        {record.status == "Đang hoạt động" ? (
+                        &nbsp;
+                        {record.status == "1" ? (
                             <Button
                                 onClick={() => handleChangeStatusDeActivate(record)}
                                 style={{ color: "white", backgroundColor: "red" }}
-                                icon={<PoweroffOutlined />}
+                                icon={<MinusCircleOutlined />}
                             ></Button>
                         ) : (
                             <></>
                         )}
-                        {record.status == "Đang khóa" ? (
+                        {record.status == "0" ? (
                             <Button
                                 onClick={() => handleChangeStatusActivate(record)}
                                 style={{ color: "white", backgroundColor: "green" }}
-                                icon={<PoweroffOutlined />}
+                                icon={<CheckCircleOutlined />}
                             ></Button>
                         ) : (
                             <></>
-                        )} */}
+                        )}
                     </>
                 );
             },
@@ -224,15 +224,7 @@ export default function ManageNewsByMod() {
     ]
     const [newList, setNewList] = useState([]);
     const [newCategoryList, setNewCategoryList] = useState([]);
-    const [showCreateForm, setShowCreateForm] = useState(false);
     const [showEditForm, setShowEditForm] = useState(false);
-    const [createData, setCreateDate] = useState({
-        createCategory: "",
-        createImage: "",
-        createTitle: "",
-        createSubTitle: "",
-        createContent: "",
-    });
 
     const [editData, setEditData] = useState({
         editNewsId: "",
@@ -255,20 +247,6 @@ export default function ManageNewsByMod() {
 
     //#region - Function - Hiển thị thông báo
     const [api, contextHolder] = notification.useNotification();
-    const openNotificationSuccess = (placement) => {
-        api.success({
-            message: `Thông báo`,
-            description: "Thêm thành công",
-            placement,
-        });
-    };
-    const openNotificationFail = (placement) => {
-        api.error({
-            message: `Thông báo`,
-            description: "Thêm thất bại",
-            placement,
-        });
-    };
     const openNotificationUpdateSuccess = (placement) => {
         api.success({
             message: `Thông báo`,
@@ -280,6 +258,14 @@ export default function ManageNewsByMod() {
         api.error({
             message: `Thông báo`,
             description: "Chỉnh sửa thất bại",
+            placement,
+        });
+    };
+
+    const openNotificationEnable = (placement) => {
+        api.success({
+            message: `Thông báo`,
+            description: "Chỉnh sửa trạng thái thành công",
             placement,
         });
     };
@@ -320,12 +306,6 @@ export default function ManageNewsByMod() {
 
 
     //#region - Function - Nhận giá trị input
-    const handleCreateInputChange = (event) => {
-        const field = event.target.name;
-        const value = event.target.value;
-
-        setCreateDate((createData) => ({ ...createData, [field]: value }));
-    }
 
     const handleEditInputChange = (event) => {
         const field = event.target.name;
@@ -340,7 +320,7 @@ export default function ManageNewsByMod() {
         }
         const file = event.target.files[0];
 
-        const imgRef = ref(storage, `images/news_images/${createData.createTitle + v4()}`);
+        const imgRef = ref(storage, `images/news_images/${editData.editTitle + v4()}`);
         try {
             const snapshoot = await uploadBytes(imgRef, file);
             const url = await getDownloadURL(snapshoot.ref);
@@ -354,39 +334,6 @@ export default function ManageNewsByMod() {
         setEditData((editData) => ({ ...editData, editContent: newValue }));
     }
     //#endregion 
-
-
-    //#region - Function - Thêm mới tin tức
-    const handleAddNews = async () => {
-        try {
-            const convertedContent = createData.createContent
-                .replace(/"/g, "'")
-                .replace(/&apos;/g, "'");
-            const data = {
-                categoryName: createData.createCategory,
-                title: createData.createTitle,
-                image: imageUpload,
-                subTitle: createData.createSubTitle,
-                content: convertedContent,
-                accountId: user.accountId,
-            }
-
-            const jsonData = JSON.stringify(data);
-            const result = await AddNewsService(jsonData);
-            console.log(result);
-            if (result.status === 200) {
-                handleGetAllNew();
-                onSetRender();
-                setShowCreateForm(false);
-                setCreateDate('');
-                openNotificationSuccess('topRight');
-            }
-        } catch {
-            openNotificationFail('topRight')
-        }
-    }
-    //#endregion
-
 
     //#region - Function -  Chỉnh sửa nội dung tin tức
     const handleViewEdit = (record) => {
@@ -422,13 +369,56 @@ export default function ManageNewsByMod() {
                 handleGetAllNew();
                 openNotificationUpdateSuccess('topRight');
             }
-        } catch{
+        } catch {
             openNotificationUpdateFail('topRight');
         }
-       
+
     }
 
     //#endregion
+
+
+    //#region - Function - Phê duyệt bài viết
+    const handleChangeStatusActivate = async (record) => {
+        Modal.confirm({
+            title: "Bạn muốn duyệt bài viết này",
+            okText: "Đồng ý",
+            okType: "default",
+            cancelText: "Thoát",
+            onOk: async () => {
+                const status = "1";
+                const result = await ChangeStatusNewsService(record.newsId, status);
+                if (result.status === 200) {
+                    openNotificationEnable("topRight");
+                }
+                onSetRender();
+            },
+            cancelText: "Cancel",
+            onCancel: () => { },
+        });
+    }
+
+    const handleChangeStatusDeActivate = async (record) => {
+        Modal.confirm({
+            title: "Bạn muốn hủy duyệt bài viết này",
+            okText: "Đồng ý",
+            okType: "danger",
+            cancelText: "Thoát",
+            onOk: async () => {
+                const status = "0";
+                const result = await ChangeStatusNewsService(record.newsId, status);
+                console.log(result);
+                if (result.status === 200) {
+                    openNotificationEnable("topRight");
+                }
+                onSetRender();
+            },
+            cancelText: "Cancel",
+            onCancel: () => { },
+        });
+    }
+    //#endregion
+
 
     return (
         <Layout
@@ -472,159 +462,12 @@ export default function ManageNewsByMod() {
                                 Danh sách tin tức
                             </h1>
                         </div>
-                        <Button
-                            type='primary'
-                            onClick={() => {
-                                setShowCreateForm(true);
-                            }}
-                            style={{ marginBottom: '20px', marginRight: '10px' }}
-                        >
-                            Tạo tin tức
-                        </Button>
+
                         <Table
                             columns={columns}
                             dataSource={newList}
                         // pagination={pagination}
                         />
-
-                        <Modal
-                            title='Tạo tin tức'
-                            visible={showCreateForm}
-                            okText='Thêm'
-                            cancelText='Đóng'
-                            onCancel={() => {
-                                setShowCreateForm(false);
-                                // setErrors([]);
-                                // setEditData('');
-                            }}
-                            onOk={() => handleAddNews()}
-                        >
-                            <Form>
-                                <Form.Item>
-                                    <label>Loại tin tức</label>
-                                    <select
-                                        name="createCategory"
-                                        defaultValue="Chọn loại"
-                                        value={createData.createCategory}
-                                        allowClear
-                                        onChange={handleCreateInputChange}
-                                        className="form-control"
-                                    >
-                                        <option
-                                            value="Chọn loại"
-                                        >
-                                        </option>
-                                        {newCategoryList?.map((item) => (
-                                            <option
-                                                value={item.categoryName}
-                                            >
-                                                {item.categoryName}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {errors.createCategory && (
-                                        <div
-                                            className='invalid-feedback'
-                                            style={{ display: 'block', color: 'red' }}
-                                        >
-                                            {errors.createCategory}
-                                        </div>
-                                    )}
-                                </Form.Item>
-                                <Form.Item>
-                                    <label className="w-100">Ảnh bìa</label>
-                                    <div className="w-100">
-                                        {imageUpload == null || imageUpload == "" ? (
-                                            <img
-                                                src='../Image/Image_Null.png'
-                                                alt=''
-                                            />
-                                        ) : (
-                                            <>
-                                                {imageUpload && (
-                                                    <img
-                                                        src={imageUpload}
-                                                        alt=''
-                                                        className="w-100"
-                                                        style={{ overflow: 'hidden', objectFit: 'cover' }}
-                                                    />
-                                                )}
-                                            </>
-                                        )}
-                                    </div>
-                                    <input
-                                        type="file"
-                                        onChange={handleCreateInputFile}
-                                    />
-                                </Form.Item>
-                                <Form.Item>
-                                    <label>Tiêu đề</label>
-                                    <Input
-                                        type='text'
-                                        placeholder='Nhập tên tiêu đề'
-                                        className='form-control'
-                                        value={createData.createTitle}
-                                        name='createTitle'
-                                        onChange={handleCreateInputChange}
-                                    />
-                                    {errors.createTitle && (
-                                        <div
-                                            className='invalid-feedback'
-                                            style={{ display: 'block', color: 'red' }}
-                                        >
-                                            {errors.createTitle}
-                                        </div>
-                                    )}
-                                </Form.Item>
-                                <Form.Item>
-                                    <label>Phụ đề</label>
-                                    <Input
-                                        type='text'
-                                        placeholder='Nhập phụ đề'
-                                        className='form-control'
-                                        value={createData.createSubTitle}
-                                        name='createSubTitle'
-                                        onChange={handleCreateInputChange}
-                                    />
-                                    {errors.createSubTitle && (
-                                        <div
-                                            className='invalid-feedback'
-                                            style={{ display: 'block', color: 'red' }}
-                                        >
-                                            {errors.createSubTitle}
-                                        </div>
-                                    )}
-                                </Form.Item>
-                                <Form.Item>
-                                    <label>Nội dung</label>
-                                    <Editor
-                                        onEditorChange={(newValue, editor) => {
-                                            // setValue(newValue);
-                                            // setText(editor.getContent({ format: 'text'}))
-                                            setCreateDate((createData) => ({ ...createData, createContent: newValue }));
-                                        }}
-                                        value={createData.createContent}
-                                        apiKey="473lgd6gy45zyks1v354pj67gtbc42mmf136ivyozvne7jgh"
-                                        // onInit={(evt, editor) => editorRef.current = editor}
-                                        initialValue="<p>Nhập nội dung bài viết.</p>"
-                                        init={{
-                                            height: 500,
-                                            menubar: false,
-                                            plugins: [
-                                                'advlist autolink lists link image charmap print preview anchor',
-                                                'searchreplace visualblocks code fullscreen',
-                                                'insertdatetime media table paste code help wordcount'
-                                            ],
-                                            toolbar: 'undo redo | formatselect | ' +
-                                                'bold italic backcolor | alignleft aligncenter ' +
-                                                'alignright alignjustify | bullist numlist outdent indent | ' +
-                                                'removeformat | help',
-                                            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
-                                        }}
-                                    />
-                                </Form.Item>
-                            </Form>
-                        </Modal>
 
                         <Modal
                             title='Chỉnh sửa tin tức'
