@@ -7,8 +7,6 @@ import {
 } from '@ant-design/icons'
 import SiderAdmin from "../../Layout/Admin/SiderAdmin";
 import HeaderAdmin from "../../Layout/Admin/HeaderAdmin";
-import moment from 'moment';
-import dayjs from "dayjs";
 import { UserContext } from "../../contexts/UserContext";
 import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';

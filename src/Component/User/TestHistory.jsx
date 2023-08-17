@@ -347,11 +347,6 @@ export default function TestHistory() {
                             </Select>
                         </div>
                         <div className="statictis">
-                            {/* <div className="w-50 m-auto circleStatics" style={{ height: '250px', background: '#538dd5', borderRadius: '50%', lineHeight: '250px' }}>
-                                <p style={{ display: "inline-block", lineHeight: 1.5, textAlign: "center", width: '100%', fontSize: '30px', color: 'white', fontWeight: 500 }}>
-                                    0%
-                                </p>
-                            </div> */}
                             <Pie {...config} />
                         </div>
                         <div className="mt-3">

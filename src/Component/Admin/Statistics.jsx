@@ -36,7 +36,6 @@ export default function Statistics() {
                         <Breadcrumb.Item>
                             Trang chủ
                         </Breadcrumb.Item>
-                        <Breadcrumb.Item>Quản lý</Breadcrumb.Item>
                         <Breadcrumb.Item>Thống kê</Breadcrumb.Item>
                     </Breadcrumb>
                     <div

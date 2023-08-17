@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 
-import { DatePicker, Dropdown, Breadcrumb, Layout, Table, Input, Modal, Form, notification, Button, theme, Card, Timeline, Tooltip, Select } from 'antd';
+import { DatePicker, Breadcrumb, Layout, Table, Input, Modal, Form, notification, Button, theme, } from 'antd';
 import {
     SearchOutlined, CheckCircleOutlined, FolderOpenOutlined,
     EditOutlined, PoweroffOutlined, StopOutlined, PlusCircleOutlined
@@ -9,6 +9,7 @@ import SiderAdmin from "../../Layout/Admin/SiderAdmin";
 import HeaderAdmin from "../../Layout/Admin/HeaderAdmin";
 import { UserContext } from "../../contexts/UserContext";
 import { Navigate, useNavigate } from 'react-router-dom';
+import moment from 'moment';
 
 import { GetAllTopicService } from "../../services/topicService";
 import { ChangeStatusTopicService } from "../../services/topicService";
@@ -17,15 +18,18 @@ import { AddTopicService } from "../../services/topicService";
 import { handleValidationCreateTopic } from "../../assets/js/handleValidation";
 import { handleValidationUpdateTopic } from "../../assets/js/handleValidation";
 import { UpdateTopicService } from "../../services/topicService";
+import FormItem from "antd/es/form/FormItem";
+import dayjs from "dayjs";
 
 const { Content } = Layout;
-
+const { RangePicker } = DatePicker;
 
 export default function ManageTopicByMod() {
-
+    const dayFormat = "YYYY-MM-DD HH:mm";
     const {
         token: { colorBgContainer },
     } = theme.useToken();
+
 
 
     //#region - Declare - Khai bao cac bien
@@ -225,9 +229,9 @@ export default function ManageTopicByMod() {
                         &nbsp;
                         <Button
                             icon={<FolderOpenOutlined />}
-                            style={{background: '#ffa000', color: 'white'}}
+                            style={{ background: '#ffa000', color: 'white' }}
                             onClick={() => handleViewListQuestion(record)}
-                        >   
+                        >
                         </Button>
                     </>
                 );
@@ -235,7 +239,7 @@ export default function ManageTopicByMod() {
         },
     ]
     const navigate = useNavigate();
-    const {render, onSetRender} = useContext(UserContext);
+    const { render, onSetRender } = useContext(UserContext);
     const [dataSource, setDataSource] = useState("");
     const [subjectList, setSubjectList] = useState([]);
     const [showCreateForm, setShowCreateForm] = useState(false);
@@ -247,6 +251,8 @@ export default function ManageTopicByMod() {
         createGrade: "Chọn lớp",
         createTopicName: "",
         createDuration: "Chọn thời gian",
+        createStartDate: "",
+        createEndDate: "",
     });
 
     const [editData, setEditData] = useState({
@@ -255,6 +261,8 @@ export default function ManageTopicByMod() {
         editGrade: "",
         editTopicName: "",
         editDuration: "",
+        editStartDate: "",
+        editEndDate: "",
     });
 
     const [errors, setErrors] = useState({
@@ -263,12 +271,17 @@ export default function ManageTopicByMod() {
         createGrade: "",
         createTopicName: "",
         createDuration: "",
+        createStartDate: "",
+        createEndDate: "",
         editSubjectId: "",
         editTopicType: "",
         editGrade: "",
         editTopicName: "",
         editDuration: "",
+        editStartDate: "",
+        editEndDate: "",
     })
+
     //#endregion
 
     //#region - Function - hiển thị thông báo create/update/changeStatus
@@ -321,7 +334,7 @@ export default function ManageTopicByMod() {
     const handleGetAllTopic = async () => {
         try {
             const result = await GetAllTopicService();
-            if(result.status === 200){
+            if (result.status === 200) {
                 setDataSource(result.data);
             }
         } catch (e) {
@@ -336,7 +349,7 @@ export default function ManageTopicByMod() {
     const handleGetAllSubject = async () => {
         try {
             const result = await GetAllSubjectService();
-            if(result.status === 200){
+            if (result.status === 200) {
                 setSubjectList(result.data);
             }
         } catch (e) {
@@ -358,9 +371,9 @@ export default function ManageTopicByMod() {
             okType: "danger",
             onOk: async () => {
                 const status = "2";
-                try{
+                try {
                     const result = await ChangeStatusTopicService(record.topicId, status);
-                    if(result.status === 200){
+                    if (result.status === 200) {
                         openNotificationChangeStatus200("topRight");
                         handleGetAllTopic();
                     } else {
@@ -369,7 +382,7 @@ export default function ManageTopicByMod() {
                 } catch {
                     openNotificationChangeStatus400("topRight");
                 }
-                
+
             },
             cancelText: "Cancel",
             onCancel: () => { },
@@ -384,16 +397,16 @@ export default function ManageTopicByMod() {
             okType: "default",
             onOk: async () => {
                 const status = "1";
-                try{
+                try {
                     const result = await ChangeStatusTopicService(record.topicId, status);
-                    if(result.status === 200){
+                    if (result.status === 200) {
                         openNotificationChangeStatus200("topRight");
                         handleGetAllTopic();
                     } else {
                         openNotificationChangeStatus400("topRight");
-                    } 
-                } catch{
-                    openNotificationChangeStatus400("topRight");    
+                    }
+                } catch {
+                    openNotificationChangeStatus400("topRight");
                 }
             },
             cancelText: "Cancel",
@@ -409,16 +422,16 @@ export default function ManageTopicByMod() {
             okType: "default",
             onOk: async () => {
                 const status = "1";
-                try{
+                try {
                     const result = await ChangeStatusTopicService(record.topicId, status);
-                    if(result.status === 200){
+                    if (result.status === 200) {
                         openNotificationChangeStatus200("topRight");
                         handleGetAllTopic();
                     } else {
                         openNotificationChangeStatus400("topRight");
                     }
-                }catch{
-                    openNotificationChangeStatus400("topRight");    
+                } catch {
+                    openNotificationChangeStatus400("topRight");
                 }
             },
             cancelText: "Cancel",
@@ -431,43 +444,62 @@ export default function ManageTopicByMod() {
     const handleCreateInputChange = (event) => {
         const field = event.target.name;
         const value = event.target.value;
-        
-        setCreateData((createData) => ({...createData, [field]: value}));
+
+        setCreateData((createData) => ({ ...createData, [field]: value }));
     }
 
     const handleEditInputChange = (event) => {
         const field = event.target.name;
         const value = event.target.value;
-        
-        setEditData((editData) => ({...editData, [field]: value}));
+
+        setEditData((editData) => ({ ...editData, [field]: value }));
     }
+
+    const onCreateInputStartDateAndEndDate = (value, dateString) => {
+        // const firstSelectedTime = dateString[0];
+        setCreateData((createData) => ({ ...createData, createStartDate: dateString[0] }));
+        setCreateData((createData) => ({ ...createData, createEndDate: dateString[1] }));
+    };
+
+    const onEditInputStartDateAndEndDate = (value, dateString) => {
+        setEditData((editData) => ({ ...editData, editStartDate: dateString[0] }));
+        setEditData((editData) => ({ ...editData, editStartDate: dateString[1] }));
+    };
+
+    function convertToUTCDate(inputTimeString) {
+        const originalDate = new Date(inputTimeString);
+        return originalDate;
+    }
+
     //#endregion
 
     //#region - Function - Thêm mới topic
     const handleSubmitCreate = async () => {
         let errors = {};
         handleValidationCreateTopic(createData, errors);
-        if(Object.keys(errors).length === 0){
+        if (Object.keys(errors).length === 0) {
             const data = {
                 topicName: createData.createTopicName,
                 duration: createData.createDuration == "Chọn thời gian" ? null : createData.createDuration,
                 subjectId: createData.createSubjectId,
                 topicType: createData.createTopicType,
-                grade: createData.createGrade
-            };    
-        const result = await AddTopicService(data);
-        if(result.status === 200){
-            handleGetAllTopic();
-            setErrors([]);
-            setShowCreateForm(false);
-            setCreateData('');
-            openNotificationCreate200("topRight");
-        } else {
-            openNotificationCreate400("topRight");
-        }
+                grade: createData.createGrade,
+                startTestDate: convertToUTCDate(createData.createStartDate),
+                finishTestDate: convertToUTCDate(createData.createEndDate),
+            };
+            const result = await AddTopicService(data);
+            if (result.status === 200) {
+                handleGetAllTopic();
+                setErrors([]);
+                setShowCreateForm(false);
+                setCreateData('');
+                openNotificationCreate200("topRight");
+            } else {
+                openNotificationCreate400("topRight");
+            }
         } else {
             setErrors(errors);
-        }  
+        }
     };
 
     const onClickCancelCreateForm = () => {
@@ -492,7 +524,12 @@ export default function ManageTopicByMod() {
             editGrade: record.grade,
             editTopicName: record.topicName,
             editDuration: record.duration,
+            editStartDate: record.beginTestDate,
+            editEndDate: record.endTestDate,
         });
+        console.log(record.beginTestDate);
+        console.log(dayjs(record.beginTestDate, dayFormat));
+
         setShowEditForm(true);
     }
 
@@ -506,13 +543,15 @@ export default function ManageTopicByMod() {
             editGrade: "",
             editTopicName: "",
             editDuration: "",
+            editStartDate: "",
+            editEndDate: "",
         });
     }
 
     const handleSubmitEdit = async () => {
         let errors = {};
         handleValidationUpdateTopic(editData, errors);
-        if(Object.keys(errors).length === 0){
+        if (Object.keys(errors).length === 0) {
             const data = {
                 topicId: editData.editTopicId,
                 topicName: editData.editTopicName,
@@ -520,17 +559,20 @@ export default function ManageTopicByMod() {
                 subjectId: editData.editSubjectId,
                 topicType: editData.editTopicType,
                 grade: editData.editGrade,
-            };    
-        const result = await UpdateTopicService(data);
-        if(result.status === 200){
-            handleGetAllTopic();
-            setErrors([]);
-            setShowEditForm(false);
-            setEditData('');
-            openNotificationUpdate200("topRight");
-        } else {
-            openNotificationChangeStatus400("topRight");
-        }
+                startTestDate: convertToUTCDate(editData.editStartDate),
+                finishTestDate: convertToUTCDate(editData.editEndDate),
+            };
+            console.log(data);
+            const result = await UpdateTopicService(data);
+            if (result.status === 200) {
+                handleGetAllTopic();
+                setErrors([]);
+                setShowEditForm(false);
+                setEditData('');
+                openNotificationUpdate200("topRight");
+            } else {
+                openNotificationChangeStatus400("topRight");
+            }
         } else {
             setErrors(errors);
         }
@@ -608,20 +650,20 @@ export default function ManageTopicByMod() {
                                 <Form.Item>
                                     <label>Môn học</label>
                                     <select
-                                       name="createSubjectId"
-                                       allowclear
-                                       value={createData.createSubjectId}
-                                       className="form-control"
-                                       onChange={handleCreateInputChange}
+                                        name="createSubjectId"
+                                        allowclear
+                                        value={createData.createSubjectId}
+                                        className="form-control"
+                                        onChange={handleCreateInputChange}
                                     >
-                                    <option value="Chọn môn học">Chọn môn học</option>
-                                    {subjectList?.map((item) => (
-                                        <option
-                                            value={item.subjectId}
-                                        >
-                                            {item.subjectName}
-                                        </option>
-                                    ))}
+                                        <option value="Chọn môn học">Chọn môn học</option>
+                                        {subjectList?.map((item) => (
+                                            <option
+                                                value={item.subjectId}
+                                            >
+                                                {item.subjectName}
+                                            </option>
+                                        ))}
                                     </select>
                                     {errors.createSubjectId && (
                                         <div
@@ -635,18 +677,19 @@ export default function ManageTopicByMod() {
                                 <Form.Item>
                                     <label>Loại Topic</label>
                                     <select
-                                       name="createTopicType"
-                                       value={createData.createTopicType}
-                                       allowclear
-                                       className="form-control"
-                                       onChange={handleCreateInputChange}
+                                        name="createTopicType"
+                                        value={createData.createTopicType}
+                                        allowclear
+                                        className="form-control"
+                                        onChange={handleCreateInputChange}
                                     >
-                                    <option value="Chọn loại topic">Chọn loại topic</option>
-                                    <option value="1">Học</option>
-                                    <option value="2">Thi 15p</option>
-                                    <option value="3">Thi 1 tiết</option>
-                                    <option value="4">Thi học kì</option>
-                                    <option value="5">Thi THPT Quốc gia</option>
+                                        <option value="Chọn loại topic">Chọn loại topic</option>
+                                        <option value="1">Học</option>
+                                        <option value="2">Thi 15p</option>
+                                        <option value="3">Thi 1 tiết</option>
+                                        <option value="4">Thi học kì</option>
+                                        <option value="5">Thi THPT Quốc gia</option>
+                                        <option value="6">Cuộc thi chung</option>
                                     </select>
                                     {errors.createTopicType && (
                                         <div
@@ -660,16 +703,16 @@ export default function ManageTopicByMod() {
                                 <Form.Item>
                                     <label>Lớp</label>
                                     <select
-                                       name="createGrade"
-                                       value={createData.createGrade}
-                                       allowclear
-                                       className="form-control"
-                                       onChange={handleCreateInputChange}
+                                        name="createGrade"
+                                        value={createData.createGrade}
+                                        allowclear
+                                        className="form-control"
+                                        onChange={handleCreateInputChange}
                                     >
-                                    <option value="Chọn lớp">Chọn lớp</option>
-                                    <option value="10">10</option>
-                                    <option value="11">11</option>
-                                    <option value="12">12</option>
+                                        <option value="Chọn lớp">Chọn lớp</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
                                     </select>
                                     {errors.createGrade && (
                                         <div
@@ -701,60 +744,81 @@ export default function ManageTopicByMod() {
                                 </Form.Item>
                                 {createData.createTopicType != "1" && createData.createTopicType != "Chọn loại topic" && (
                                     <Form.Item>
-                                    <label>Thời gian làm bài</label>
-                                    <select
-                                       name="createDuration"
-                                       value={createData.createDuration}
-                                       allowclear
-                                       className="form-control"
-                                       onChange={handleCreateInputChange}
-                                    >
-                                    <option value="Chọn lớp">Chọn thời gian </option>
-                                    <option value="15p">15p</option>
-                                    <option value="45p">45p</option>
-                                    <option value="60p">60p</option>
-                                    <option value="120p">120p</option>
-                                    </select>
-                                    {errors.createDuration && (
-                                        <div
-                                            className="invalid-feedback"
-                                            style={{ display: "block", color: "red" }}
+                                        <label>Thời gian làm bài</label>
+                                        <select
+                                            name="createDuration"
+                                            value={createData.createDuration}
+                                            allowclear
+                                            className="form-control"
+                                            onChange={handleCreateInputChange}
                                         >
-                                            {errors.createDuration}
-                                        </div>
-                                    )}
-                                </Form.Item>
+                                            <option value="Chọn thời gian">Chọn thời gian </option>
+                                            <option value="15">15p</option>
+                                            <option value="45">45p</option>
+                                            <option value="60">60p</option>
+                                            <option value="120">120p</option>
+                                        </select>
+                                        {errors.createDuration && (
+                                            <div
+                                                className="invalid-feedback"
+                                                style={{ display: "block", color: "red" }}
+                                            >
+                                                {errors.createDuration}
+                                            </div>
+                                        )}
+                                    </Form.Item>
+                                )}
+                                {createData.createTopicType == 6 && (
+                                    <Form.Item>
+                                        <label>Thời gian bắt đầu và kết thúc</label>
+                                        <RangePicker
+                                            showTime={{
+                                                format: 'HH:mm',
+                                            }}
+                                            placeholder=""
+                                            format="YYYY-MM-DD HH:mm"
+                                            onChange={onCreateInputStartDateAndEndDate}
+                                        />
+                                        {errors.createStartDate && (
+                                            <div
+                                                className="invalid-feedback"
+                                                style={{ display: "block", color: "red" }}
+                                            >
+                                                {errors.createStartDate}
+                                            </div>
+                                        )}
+                                    </Form.Item>
                                 )}
                             </Form>
                         </Modal>
 
                         {/* Edit form */}
                         <Modal
-                            title='Chinrh sửa topic'
+                            title='Chỉnh sửa sửa topic'
                             visible={showEditForm}
                             okText='Lưu'
                             cancelText='Đóng'
                             onCancel={() => onClickCancelEditForm()}
-                            onOk={() => handleSubmitEdit()}                        
+                            onOk={() => handleSubmitEdit()}
                         >
-                             <Form>
+                            <Form>
                                 <Form.Item>
                                     <label>Môn học</label>
                                     <select
-                                       name="editSubjectId"
-                                       allowclear
-                                       value={editData.editSubjectId}
-                                       className="form-control"
-                                       onChange={handleEditInputChange}
+                                        name="editSubjectId"
+                                        allowclear
+                                        value={editData.editSubjectId}
+                                        className="form-control"
+                                        onChange={handleEditInputChange}
                                     >
-                                    <option value="Chọn môn học">Chọn môn học</option>
-                                    {subjectList?.map((item) => (
-                                        <option
-                                            value={item.subjectId}
-                                        >
-                                            {item.subjectName}
-                                        </option>
-                                    ))}
+                                        <option value="Chọn môn học">Chọn môn học</option>
+                                        {subjectList?.map((item) => (
+                                            <option
+                                                value={item.subjectId}
+                                            >
+                                                {item.subjectName}
+                                            </option>
+                                        ))}
                                     </select>
                                     {errors.editSubjectId && (
                                         <div
@@ -768,18 +832,19 @@ export default function ManageTopicByMod() {
                                 <Form.Item>
                                     <label>Loại Topic</label>
                                     <select
-                                       name="editTopicType"
-                                       value={editData.editTopicType}
-                                       allowclear
-                                       className="form-control"
-                                       onChange={handleEditInputChange}
+                                        name="editTopicType"
+                                        value={editData.editTopicType}
+                                        allowclear
+                                        className="form-control"
+                                        onChange={handleEditInputChange}
                                     >
-                                    <option value="Chọn loại topic">Chọn loại topic</option>
-                                    <option value="1">Học</option>
-                                    <option value="2">Thi 15p</option>
-                                    <option value="3">Thi 1 tiết</option>
-                                    <option value="4">Thi học kì</option>
-                                    <option value="5">Thi THPT Quốc gia</option>
+                                        <option value="Chọn loại topic">Chọn loại topic</option>
+                                        <option value="1">Học</option>
+                                        <option value="2">Thi 15p</option>
+                                        <option value="3">Thi 1 tiết</option>
+                                        <option value="4">Thi học kì</option>
+                                        <option value="5">Thi THPT Quốc gia</option>
+                                        <option value="6">Cuộc thi chung</option>
                                     </select>
                                     {errors.editTopicType && (
                                         <div
@@ -793,16 +858,16 @@ export default function ManageTopicByMod() {
                                 <Form.Item>
                                     <label>Lớp</label>
                                     <select
-                                       name="editGrade"
-                                       value={editData.editGrade}
-                                       allowclear
-                                       className="form-control"
-                                       onChange={handleEditInputChange}
+                                        name="editGrade"
+                                        value={editData.editGrade}
+                                        allowclear
+                                        className="form-control"
+                                        onChange={handleEditInputChange}
                                     >
-                                    <option value="Chọn lớp">Chọn lớp</option>
-                                    <option value="10">10</option>
-                                    <option value="11">11</option>
-                                    <option value="12">12</option>
+                                        <option value="Chọn lớp">Chọn lớp</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
                                     </select>
                                     {errors.editGrade && (
                                         <div
@@ -834,29 +899,55 @@ export default function ManageTopicByMod() {
                                 </Form.Item>
                                 {editData.editTopicType != "1" && (
                                     <Form.Item>
-                                    <label>Thời gian làm bài</label>
-                                    <select
-                                       name="editDuration"
-                                       value={editData.editDuration}
-                                       allowclear
-                                       className="form-control"
-                                       onChange={handleEditInputChange}
-                                    >
-                                    <option value="Chọn lớp">Chọn thời gian </option>
-                                    <option value="15p">15p</option>
-                                    <option value="45p">45p</option>
-                                    <option value="60p">60p</option>
-                                    <option value="120p">120p</option>
-                                    </select>
-                                    {errors.editDuration && (
-                                        <div
-                                            className="invalid-feedback"
-                                            style={{ display: "block", color: "red" }}
+                                        <label>Thời gian làm bài</label>
+                                        <select
+                                            name="editDuration"
+                                            value={editData.editDuration}
+                                            allowclear
+                                            className="form-control"
+                                            onChange={handleEditInputChange}
                                         >
-                                            {errors.editDuration}
+                                            <option value="Chọn lớp">Chọn thời gian </option>
+                                            <option value="15">15p</option>
+                                            <option value="45">45p</option>
+                                            <option value="60">60p</option>
+                                            <option value="120">120p</option>
+                                        </select>
+                                        {errors.editDuration && (
+                                            <div
+                                                className="invalid-feedback"
+                                                style={{ display: "block", color: "red" }}
+                                            >
+                                                {errors.editDuration}
+                                            </div>
+                                        )}
+                                    </Form.Item>
+                                )}
+                                {editData.editTopicType == "6" && (
+                                    <Form.Item>
+                                        <div className="row">
+                                            <Form.Item>
+                                                <label>Thời gian bắt đầu và kết thúc</label>
+                                                <RangePicker
+                                                    showTime={{
+                                                        format: 'HH:mm',
+                                                    }}
+                                                    placeholder=""
+                                                    format="YYYY-MM-DD HH:mm"
+                                                    value={(editData.editStartDate && editData.editEndDate) ? [dayjs(editData.editStartDate, dayFormat), dayjs(editData.editEndDate, dayFormat)] : [null, null]}
+                                                    onChange={onEditInputStartDateAndEndDate}
+                                                />
+                                                {errors.editStartDate && (
+                                                    <div
+                                                        className="invalid-feedback"
+                                                        style={{ display: "block", color: "red" }}
+                                                    >
+                                                        {errors.editStartDate}
+                                                    </div>
+                                                )}
+                                            </Form.Item>
                                         </div>
-                                    )}
-                                </Form.Item>
+                                    </Form.Item>
                                 )}
                             </Form>
                         </Modal>
