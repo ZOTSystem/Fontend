@@ -30,7 +30,7 @@ export const GetAllNewsCategoryService = async () => {
     }
 };
 
-export const AddNewsService = async (jsonData) => {
+export const AddNewsService = async (data) => {
     try {
         const respone = await request({
             method: 'post',
@@ -38,9 +38,8 @@ export const AddNewsService = async (jsonData) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            data: jsonData,
+            data: JSON.stringify(data),
         });
-        console.log(respone);
         return respone;
     } catch (e) {
         return e;
@@ -72,6 +71,53 @@ export const ChangeStatusNewsService = async (newsId, status) => {
                 'Content-Type': 'application/json',
             },
         });
+        return respone;
+    } catch (e) {
+        return e;
+    }
+}
+
+export const GetNewsInUserPageService = async () => {
+    try {
+        const respone = await request({
+            method: 'get',
+            url: `news/displayNewsInUserPage`,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        return respone;
+    } catch (e) {
+        return e;
+    }
+};
+
+export const GetNewsDetailService = async (id) => {
+    try {
+        const respone = await request({
+            method: 'get',
+            url: `news/displayNewDetail?newsId=${id}`,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        return respone;
+    } catch (e) {
+        return e;
+    }
+};
+
+export const GetNewsInPageService = async (currentPage, pageSize) => {
+    console.log(currentPage + " " + pageSize);
+    try {
+        const respone = await request({
+            method: 'get',
+            url: `news/getNewsInPage?page=${currentPage}&pageSize=${pageSize}`,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        console.log("123 " + respone);
         return respone;
     } catch (e) {
         return e;

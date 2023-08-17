@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import {
     UserOutlined,
     FundOutlined,
@@ -18,6 +18,7 @@ const { Sider } = Layout;
 export default function SiderAdmin() {
     const navigate = useNavigate();
     const [collapsed, setCollapsed] = useState(false);
+    const [items, setItems] = useState([]);
 
     const { user } = useContext(UserContext);
 
@@ -45,11 +46,21 @@ export default function SiderAdmin() {
         getItem('Quản lý tin tức', '/mod/manageNews', <HddOutlined />, '/mod/manageNews', null),
     ];
 
-    const items = user.roleId == 2 ? adminMenu : user.roleId == 3 ? modMenu : adminMenu;
+    // const items = user.roleId == 2 ? adminMenu : user.roleId == 3 ? modMenu : adminMenu;
 
     const onClick = (value) => {
-        window.location.href = 'http://localhost:3000' + value.key;
+        navigate(value.key);
     };
+
+    useEffect(() => {
+        if(user.roleId === 2 ){
+            setItems(adminMenu);
+        }else if(user.roleId === 3){
+            setItems(modMenu);
+        }else{
+            setItems(adminMenu)
+        }
+    },[])
 
     return (
         <Sider

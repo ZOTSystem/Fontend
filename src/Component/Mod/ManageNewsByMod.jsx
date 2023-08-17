@@ -12,8 +12,11 @@ import { Editor } from '@tinymce/tinymce-react';
 import { ref, uploadBytes, getDownloadURL, connectStorageEmulator } from "firebase/storage";
 import { storage } from "../../firebase";
 import { v4 } from "uuid";
+import ReactQuill from "react-quill";
+import 'react-quill/dist/quill.snow.css';
 
-
+import { handleValidationEditNew } from "../../assets/js/handleValidation";
+import { handleValidationCreateNew } from "../../assets/js/handleValidation";
 import { GetAllNewsService } from "../../services/NewsService";
 import { GetAllNewsCategoryService } from "../../services/NewsService";
 import { UserContext } from "../../contexts/UserContext";
@@ -227,7 +230,7 @@ export default function ManageNewsByMod() {
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [showEditForm, setShowEditForm] = useState(false);
     const [createData, setCreateDate] = useState({
-        createCategory: "",
+        createCategory: "Chọn loại",
         createImage: "",
         createTitle: "",
         createSubTitle: "",
@@ -249,6 +252,11 @@ export default function ManageNewsByMod() {
         createTitle: "",
         createSubTitle: "",
         createContent: "",
+        editCategory: "",
+        editImage: "",
+        editTitle: "",
+        editSubTitle: "",
+        editContent: "",
     })
     //#endregion
 
@@ -350,36 +358,42 @@ export default function ManageNewsByMod() {
         }
     }
 
-    const handleEditTinyValue = (newValue) => {
-        setEditData((editData) => ({ ...editData, editContent: newValue }));
-    }
     //#endregion 
 
 
     //#region - Function - Thêm mới tin tức
     const handleAddNews = async () => {
         try {
-            const convertedContent = createData.createContent
-                .replace(/"/g, "'")
-                .replace(/&apos;/g, "'");
-            const data = {
-                categoryName: createData.createCategory,
-                title: createData.createTitle,
-                image: imageUpload,
-                subTitle: createData.createSubTitle,
-                content: convertedContent,
-                accountId: user.accountId,
-            }
-
-            const jsonData = JSON.stringify(data);
-            const result = await AddNewsService(jsonData);
-            console.log(result);
-            if (result.status === 200) {
-                handleGetAllNew();
-                onSetRender();
-                setShowCreateForm(false);
-                setCreateDate('');
-                openNotificationSuccess('topRight');
+            let errors = {};
+            handleValidationCreateNew(createData, errors, imageUpload);
+            if (Object.keys(errors).length === 0) {
+                const data = {
+                    categoryName: createData.createCategory,
+                    title: createData.createTitle,
+                    image: imageUpload,
+                    subTitle: createData.createSubTitle,
+                    content: createData.createContent,
+                    accountId: user.accountId,
+                }
+                const result = await AddNewsService(data);
+                if (result.status === 200) {
+                    handleGetAllNew();
+                    setCreateDate({
+                        createCategory: "",
+                        createImage: "",
+                        createTitle: "",
+                        createSubTitle: "",
+                        createContent: "",
+                    });
+                    setImageUpload(null);
+                    openNotificationSuccess('topRight');
+                    setShowCreateForm(false);
+                    onSetRender();
+                } else {
+                    openNotificationFail('topRight')
+                }
+            } else {
+                setErrors(errors);
             }
         } catch {
             openNotificationFail('topRight')
@@ -392,40 +406,39 @@ export default function ManageNewsByMod() {
     const handleViewEdit = (record) => {
         setImageUpload(record.image);
         console.log(record);
-        setEditData({
-            editNewsId: record.newsId,
-            editCategory: record.categoryName,
-            editTitle: record.title,
-            editSubTitle: record.subTitle,
-            editImage: record.image,
-            editContent: record.content,
-        });
+        setEditData('');
         setShowEditForm(true);
     }
 
     const handleEditNews = async () => {
         try {
-            const convertedContent = editData.editContent
-                .replace(/"/g, "'")
-                .replace(/&apos;/g, "'");
-            const data = {
-                newsId: editData.editNewsId,
-                categoryName: editData.editCategory,
-                title: editData.editTitle,
-                image: imageUpload,
-                subTitle: editData.editSubTitle,
-                content: convertedContent,
+            let errors = {}
+            handleValidationEditNew(editData, errors, imageUpload);
+            if (Object.keys(errors).length === 0) {
+                const convertedContent = editData.editContent
+                    .replace(/"/g, "'")
+                    .replace(/&apos;/g, "'");
+                const data = {
+                    newsId: editData.editNewsId,
+                    categoryName: editData.editCategory,
+                    title: editData.editTitle,
+                    image: imageUpload,
+                    subTitle: editData.editSubTitle,
+                    content: convertedContent,
+                }
+                const result = await EditNewsService(data);
+                console.log(result);
+                if (result.status === 200) {
+                    handleGetAllNew();
+                    openNotificationUpdateSuccess('topRight');
+                }
+            } else {
+                setErrors(errors);
             }
-            const result = await EditNewsService(data);
-            console.log(result);
-            if (result.status === 200) {
-                handleGetAllNew();
-                openNotificationUpdateSuccess('topRight');
-            }
-        } catch{
+        } catch {
             openNotificationUpdateFail('topRight');
         }
-       
+
     }
 
     //#endregion
@@ -494,8 +507,9 @@ export default function ManageNewsByMod() {
                             cancelText='Đóng'
                             onCancel={() => {
                                 setShowCreateForm(false);
-                                // setErrors([]);
-                                // setEditData('');
+                                setErrors([]);
+                                setCreateDate('');
+                                setImageUpload(null);
                             }}
                             onOk={() => handleAddNews()}
                         >
@@ -513,6 +527,7 @@ export default function ManageNewsByMod() {
                                         <option
                                             value="Chọn loại"
                                         >
+                                            Chọn loại
                                         </option>
                                         {newCategoryList?.map((item) => (
                                             <option
@@ -556,6 +571,14 @@ export default function ManageNewsByMod() {
                                         type="file"
                                         onChange={handleCreateInputFile}
                                     />
+                                    {errors.createImage && (
+                                        <div
+                                            className='invalid-feedback'
+                                            style={{ display: 'block', color: 'red' }}
+                                        >
+                                            {errors.createImage}
+                                        </div>
+                                    )}
                                 </Form.Item>
                                 <Form.Item>
                                     <label>Tiêu đề</label>
@@ -597,31 +620,17 @@ export default function ManageNewsByMod() {
                                 </Form.Item>
                                 <Form.Item>
                                     <label>Nội dung</label>
-                                    <Editor
-                                        onEditorChange={(newValue, editor) => {
-                                            // setValue(newValue);
-                                            // setText(editor.getContent({ format: 'text'}))
-                                            setCreateDate((createData) => ({ ...createData, createContent: newValue }));
-                                        }}
-                                        value={createData.createContent}
-                                        apiKey="473lgd6gy45zyks1v354pj67gtbc42mmf136ivyozvne7jgh"
-                                        // onInit={(evt, editor) => editorRef.current = editor}
-                                        initialValue="<p>Nhập nội dung bài viết.</p>"
-                                        init={{
-                                            height: 500,
-                                            menubar: false,
-                                            plugins: [
-                                                'advlist autolink lists link image charmap print preview anchor',
-                                                'searchreplace visualblocks code fullscreen',
-                                                'insertdatetime media table paste code help wordcount'
-                                            ],
-                                            toolbar: 'undo redo | formatselect | ' +
-                                                'bold italic backcolor | alignleft aligncenter ' +
-                                                'alignright alignjustify | bullist numlist outdent indent | ' +
-                                                'removeformat | help',
-                                            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
-                                        }}
+                                    <ReactQuill className="quill-editor" value={createData?.createContent}
+                                        onChange={(value) => setCreateDate({ ...createData, createContent: value })}
                                     />
+                                    {errors.createContent && (
+                                        <div
+                                            className="invalid-feedback"
+                                            style={{ display: "block", color: "red" }}
+                                        >
+                                            {errors.createContent}
+                                        </div>
+                                    )}
                                 </Form.Item>
                             </Form>
                         </Modal>
@@ -736,31 +745,8 @@ export default function ManageNewsByMod() {
                                 </Form.Item>
                                 <Form.Item>
                                     <label>Nội dung</label>
-                                    <Editor
-                                        onEditorChange={(newValue, editor) => {
-                                            // setValue(newValue);
-                                            // setText(editor.getContent({ format: 'text'}))
-                                            // setEditData((editData) => ({ ...editData, editContent: newValue }));
-                                            handleEditTinyValue(newValue);
-                                        }}
-                                        value={editData.editContent}
-                                        apiKey="473lgd6gy45zyks1v354pj67gtbc42mmf136ivyozvne7jgh"
-                                        // onInit={(evt, editor) => editorRef.current = editor}
-                                        initialValue={editData.editContent}
-                                        init={{
-                                            height: 500,
-                                            menubar: false,
-                                            plugins: [
-                                                'advlist autolink lists link image charmap print preview anchor',
-                                                'searchreplace visualblocks code fullscreen',
-                                                'insertdatetime media table paste code help wordcount'
-                                            ],
-                                            toolbar: 'undo redo | formatselect | ' +
-                                                'bold italic backcolor | alignleft aligncenter ' +
-                                                'alignright alignjustify | bullist numlist outdent indent | ' +
-                                                'removeformat | help',
-                                            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
-                                        }}
+                                    <ReactQuill className="quill-editor" value={editData?.editContent}
+                                        onChange={(value) => setEditData({ ...editData, editContent: value })}
                                     />
                                 </Form.Item>
                             </Form>

@@ -88,7 +88,6 @@ export const LoginByGoogleService = async (data) => {
             },
             data: JSON.stringify(data),
         });
-        console.log(response);
         return response;
     } catch (e) {
         return e;
@@ -97,7 +96,6 @@ export const LoginByGoogleService = async (data) => {
 
 
 export const UpdateUserService = async (data) => {
-    console.log(data);
     try {
         const response = await request({
             method: "post",
@@ -134,6 +132,22 @@ export const ChangePassowrdService = async (accountId, newPassword) => {
         const response = await request({
             method: "post",
             url: `user/changePassword?accountId=${accountId}&newPassword=${newPassword}`,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        return response;
+    } catch(e){
+        return e;
+    }
+}
+
+
+export const GetPhoneWithoutThisPhonedService = async (phone) => {
+    try {
+        const response = await request({
+            method: "get",
+            url: `user/getPhoneWithoutThisPhone?phone=${phone}`,
             headers: {
                 "Content-Type": "application/json",
             },

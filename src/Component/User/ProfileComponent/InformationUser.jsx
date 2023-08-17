@@ -16,6 +16,7 @@ import { GetInforByEmailService } from "../../../services/userService";
 import { handleValidationUpdateUser } from "../../../assets/js/handleValidation";
 import { handleValidationChangePassword } from "../../../assets/js/handleValidation";
 import { ChangePassowrdService } from "../../../services/userService";
+import { GetPhoneWithoutThisPhonedService } from '../../../services/userService';
 
 //format datatime
 const formatDate = (dateString) => {
@@ -31,7 +32,7 @@ const formatDate = (dateString) => {
 };
 const dayFormat = 'YYYY-MM-DD';
 
-export default function InformationUser() {
+export default function     InformationUser() {
 
     
     //#region - Function - Ẩn hiện mật khẩu
@@ -115,24 +116,6 @@ export default function InformationUser() {
     };
     //#endregion
 
-    //#region - Function - lấy danh sách số phone
-    const getPhoneList = () => {
-        const url = 'https://localhost:7207/api/home/getAllPhone';
-        axios
-            .get(url)
-            .then((result) => {
-                setPhoneList(result.data);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    };
-
-    useEffect(() => {
-        getPhoneList();
-    }, [render]);
-    //#endregion
-
     //#region - Function - Nhận giá trị input
     const handleInputChange = (event) => {
         const field = event.target.name;
@@ -181,7 +164,8 @@ export default function InformationUser() {
             schoolName: editData.editSchoolName,
             avatar: imageUpload,
         };
-        handleValidationUpdateUser(editData, errors, phoneList);
+        var result = await GetPhoneWithoutThisPhonedService(editData.editPhone);
+        handleValidationUpdateUser(editData, errors, result.data);
         if (Object.keys(errors).length === 0) {
             const result = await UpdateUserService(data);
             if (result) {

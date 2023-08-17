@@ -2,19 +2,99 @@ import Header from '../../Layout/User/Header';
 import Footer from '../../Layout/User/Footer';
 import 'bootstrap/dist/css/bootstrap.css';
 import { Pagination } from 'antd';
+import { useState, useEffect } from 'react';
+import { notification } from 'antd';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { GetNewsInPageService } from '../../services/NewsService';
+
+
+
+import { GetNewsInUserPageService } from '../../services/NewsService';
 
 export default function News() {
+    const navigate = useNavigate();
 
-    const backgroundImageUrl = "../Image/lartgestNew.jpg";
-    const imgae1 = "../Image/Image1.jpg";
-    const imgae2 = "../Image/Image2.jpg";
-    const imgae3 = "../Image/Image3.jpg";
-    const imgae4 = "../Image/Image4.jpg";
+    //#region - Declare - khai báo biến
+    const [dataSource, setDataSource] = useState({
+        firstNew: "",
+        dailyNew: [],
+        // listNew: [],
+    })
+    const [newsInPage, setNewInPage] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(3);
+    const [totalPosts, setTotalPosts] = useState(0);
+
+    //#endregion
+
+    //#region - Function - hiển thị thông báo
+    const [api, contextHolder] = notification.useNotification();
+    const openNotificationGetData400 = (placement) => {
+        api.error({
+            message: `Thông báo`,
+            description: 'Lấy dữ liệu',
+            placement,
+        });
+    };
+    //#endregion
+
+    //#region - Function - hiển thị tin tức
+    const handleGetAllNews = async () => {
+        try {
+            const result = await GetNewsInUserPageService();
+            const result2 = await GetNewsInPageService(currentPage, pageSize);
+            console.log(result2);
+            if (result.status === 200) {
+                setDataSource({
+                    firstNew: result.firstNew,
+                    dailyNew: result.dailyNew,
+                    // otherNew: result.otherNew,
+                });
+            } else {
+                openNotificationGetData400("topRight")
+            }
+            if (result2.status === 200) {
+                setNewInPage(result2.data);
+                setTotalPosts(result2.totalCount);
+            } else {
+                openNotificationGetData400("topRight")
+            }
+
+        } catch (error) {
+            openNotificationGetData400("topRight");
+        }
+    }
+
+    useEffect(() => {
+        handleGetAllNews();
+    }, [])
+    //#endregion 
+
+
+    //#region - Function - chuyển đến bài viết chi tiết
+    const handleDivClick = (id) => {
+        navigate(`/news/newDetail/${id}`);
+    }
+    //#endregion
+
+    //#region - Function - chuyển trang
+    const handlePaginationChange = async (page) => {
+        const result2 = await GetNewsInPageService(page, pageSize);
+        if (result2.status === 200) {
+            setNewInPage(result2.data);
+            setTotalPosts(result2.totalCount);
+        } else {
+            openNotificationGetData400("topRight")
+        }
+        setCurrentPage(page);
+    };
+    //#endregion
 
     return (
         <>
+            {contextHolder}
             <Header />
-            <div className='m-auto news' style={{width: '80%'}}>
+            <div className='m-auto news' style={{ width: '80%' }}>
                 <h2 className="sc-cRoahL jMEXQr mb-5" style={{ color: '#black' }}>
                     <svg width="20" height="20" viewBox="0 0 18 18" fill="none" class="nav-icon"><path d="M9.52732 1.05469C9.44336 1.05469 8.35953 1.05469 7.94529 1.05469C7.94529 0.472183 7.47311 0 6.8906 0C6.3081 0 5.83592 0.472183 5.83592 1.05469C5.45328 1.05469 5.2377 1.05469 4.25389 1.05469C3.96266 1.05469 3.72655 1.32595 3.72655 1.61718V2.14453C3.72655 2.72703 4.19873 3.19921 4.78123 3.19921H8.99997C9.58248 3.19921 10.0547 2.72703 10.0547 2.14453V1.61718C10.0547 1.32595 9.81855 1.05469 9.52732 1.05469Z" fill="#000000">
                     </path>
@@ -32,11 +112,7 @@ export default function News() {
                 <div className='content'>
                     <div className='headerContent row dl-flex justify-content-between mb-3'>
                         <div className='col-lg-5 '>
-                            <select class="form-select w-75" aria-label="Default select example">
-                                <option selected>Chọn chuyên mục</option>
-                                <option value="Thi cử">Thi cử</option>
-                                <option value="Tin mới nhất">Tin mới nhất</option>
-                            </select>
+                            <h3 style={{ textAlign: 'left', color: '#565656', fontWeight: 'bold' }}>Bảng tin mới nhất</h3>
                         </div>
                         <div className='col-lg-5'>
                             <h3 style={{ textAlign: 'right', color: '#565656', fontWeight: 'bold' }}>Bảng tin trong ngày</h3>
@@ -44,108 +120,63 @@ export default function News() {
                     </div>
                     <div className='mainNews row mb-4 dl-flex justify-content-around'>
                         <div style={{ width: '65%' }}>
-                            <div className="w-100 position-relative mb-4" style={{ maxHeight: '500px' }}>
-                                <img src={backgroundImageUrl} alt="Background Image" className='w-100 h-100 object-fit-cover' style={{ maxHeight: '500px' }} />
+                            <div className="w-100 position-relative mb-4" style={{ maxHeight: '500px' }} onClick={() => handleDivClick(dataSource.firstNew.newsId)}>
+                                <img src={dataSource.firstNew.image} alt="Background Image" className='w-100 h-100 object-fit-cover' style={{ maxHeight: '500px' }} />
                                 <div className='position-absolute w-100 h-100' style={{ top: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)' }}></div>
                                 <div style={{ left: '20px', bottom: 0 }} className='position-absolute'>
-                                    <p className='m-1' style={{ color: '#dfdfdf' }}>THPT Quốc gia</p>
-                                    <p className='text-white m-1' style={{ fontSize: '30px', fontWeight: 'bold' }}>Hướng dẫn dẫn chi tiết 2 cách xem số báo danh THPT Quốc gia 2023</p>
-                                    <p className='m-1' style={{ color: '#dfdfdf' }}>19/06/2023</p>
+                                    <p className='m-1' style={{ color: '#dfdfdf' }}>{dataSource.firstNew.categoryName}</p>
+                                    <p className='text-white m-1' style={{ fontSize: '30px', fontWeight: 'bold' }}>{dataSource.firstNew.title}</p>
+                                    <p className='m-1' style={{ color: '#dfdfdf' }}>{dataSource.firstNew.createdDay}</p>
                                 </div>
                             </div>
                             <div className='w-100'>
                                 <div style={{ borderBottom: '1px solid #e5e5e5' }} className='mb-2'>
                                     <p className='' style={{ fontSize: '30px', fontWeight: 'bold', color: '#565656' }}>Các bài viết khác</p>
                                 </div>
-                                <div className='row mb-2 pb-2 pt-2' style={{ borderBottom: '1px solid #e5e5e5' }}>
-                                    <div className='col-lg-3'>
-                                        <img src="../Image/Image1.jpg" alt="" className='w-100' style={{ overflow: 'hidden' }} />
+                                {newsInPage?.map((item) => (
+                                    <div className='row mb-2 pb-2 pt-2' style={{ borderBottom: '1px solid #e5e5e5' }}
+                                        onClick={() => handleDivClick(item.newId)}>
+                                        <div className='col-lg-3'>
+                                            <img src={item.image} alt="" className='w-100' style={{ overflow: 'hidden' }} />
+                                        </div>
+                                        <div className='col-lg-8'>
+                                            <p className='m-1'>{item.categoryName}</p>
+                                            <p className='text-black m-1' style={{ fontSize: '20px', fontWeight: 'bold' }}>{item.title}</p>
+                                            <p className='text-black'
+                                                style={{ width: '500px', maxWidth: '500px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                                            >
+                                                {item.subTitle}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div className='col-lg-8'>
-                                        <p className='m-1'>THPT Quốc gia</p>
-                                        <p className='text-black m-1' style={{ fontSize: '20px', fontWeight: 'bold' }}>Hướng dẫn dẫn chi tiết 2 cách xem số báo danh THPT Quốc gia 2023</p>
-                                        <p className='text-black'
-                                            style={{ width: '500px', maxWidth: '500px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                                        >
-                                            Những năm trước, Bộ GD&ĐT chỉ quy định ngày công bố điểm thi tốt nghiệp THPT trên cả nước, do đó tại các địa phương cũng như Bộ GD&ĐT
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className='row mb-2 pb-2 pt-2' style={{ borderBottom: '1px solid #e5e5e5' }}>
-                                    <div className='col-lg-3'>
-                                        <img src="../Image/Image2.jpg" alt="" className='w-100' style={{ overflow: 'hidden' }} />
-                                    </div>
-                                    <div className='col-lg-8'>
-                                        <p className='m-1'>THPT Quốc gia</p>
-                                        <p className='text-black m-1' style={{ fontSize: '20px', fontWeight: 'bold' }}>Hướng dẫn dẫn chi tiết 2 cách xem số báo danh THPT Quốc gia 2023</p>
-                                        <p className='text-black'
-                                            style={{ width: '500px', maxWidth: '500px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                                        >
-                                            Những năm trước, Bộ GD&ĐT chỉ quy định ngày công bố điểm thi tốt nghiệp THPT trên cả nước, do đó tại các địa phương cũng như Bộ GD&ĐT
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className='row mb-2 pb-2 pt-2' style={{ borderBottom: '1px solid #e5e5e5' }}>
-                                    <div className='col-lg-3'>
-                                        <img src="../Image/Image3.jpg" alt="" className='w-100' style={{ overflow: 'hidden' }} />
-                                    </div>
-                                    <div className='col-lg-8'>
-                                        <p className='m-1'>THPT Quốc gia</p>
-                                        <p className='text-black m-1' style={{ fontSize: '20px', fontWeight: 'bold' }}>Hướng dẫn dẫn chi tiết 2 cách xem số báo danh THPT Quốc gia 2023</p>
-                                        <p className='text-black'
-                                            style={{ width: '500px', maxWidth: '500px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                                        >
-                                            Những năm trước, Bộ GD&ĐT chỉ quy định ngày công bố điểm thi tốt nghiệp THPT trên cả nước, do đó tại các địa phương cũng như Bộ GD&ĐT
-                                        </p>
-                                    </div>
-                                </div>
+                                ))}
                                 <div className='w-100'>
-                                    <Pagination defaultCurrent={1} total={50} className='w-50'/>
+                                    <Pagination
+                                        defaultCurrent={1}
+                                        current={currentPage}
+                                        total={totalPosts}
+                                        pageSize={pageSize}
+                                        onChange={handlePaginationChange}
+                                        className='w-50'
+                                    />
                                 </div>
                             </div>
                         </div>
                         <div className='dl-flex' style={{ width: '30%' }}>
                             <div className='row w-100'>
-                                <div className='col-lg-6 w-100 mb-2'>
-                                    <div className="w-100 position-relative" style={{ maxHeight: '200px' }}>
-                                        <img src={imgae1} alt="Background Image" className='w-100 h-100 object-fit-cover' style={{ maxHeight: '200px' }} />
-                                        <div className='position-absolute w-100 h-100' style={{ top: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)' }}></div>
-                                        <div style={{ left: '20px', bottom: 0 }} className='position-absolute'>
-                                            <p className='m-1' style={{ color: '#dfdfdf' }}>Writing</p>
-                                            <p className='text-white m-1' style={{ fontSize: '20px', fontWeight: 'bold' }}>Đề bài, bài mẫu writing IELTS Writting 2</p>
+                                {dataSource.dailyNew?.map((item) => (
+                                    <div className='col-lg-6 w-100 mb-2'
+                                        onClick={() => handleDivClick(item.newsId)}>
+                                        <div className="w-100 position-relative" style={{ maxHeight: '200px' }}>
+                                            <img src={item.image} alt="Background Image" className='w-100 h-100 object-fit-cover' style={{ maxHeight: '200px' }} />
+                                            <div className='position-absolute w-100 h-100' style={{ top: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)' }}></div>
+                                            <div style={{ left: '20px', bottom: 0 }} className='position-absolute'>
+                                                <p className='m-1' style={{ color: '#dfdfdf' }}>{item.categoryName}</p>
+                                                <p className='text-white m-1' style={{ fontSize: '20px', fontWeight: 'bold' }}>{item.title}</p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div className='col-lg-6 w-100 mb-2'>
-                                    <div className="w-100 position-relative" style={{ maxHeight: '200px' }}>
-                                        <img src={imgae2} alt="Background Image" className='w-100 h-100 object-fit-cover' style={{ maxHeight: '200px' }} />
-                                        <div className='position-absolute w-100 h-100' style={{ top: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)' }}></div>
-                                        <div style={{ left: '20px', bottom: 0 }} className='position-absolute'>
-                                            <p className='m-1' style={{ color: '#dfdfdf' }}>Writing</p>
-                                            <p className='text-white m-1' style={{ fontSize: '20px', fontWeight: 'bold' }}>Đề bài, bài mẫu writing IELTS Writting 2: Importance Of Socail Skills and qualification at work</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className='col-lg-6 w-100 mb-2'>
-                                    <div className="w-100 position-relative" style={{ maxHeight: '200px' }}>
-                                        <img src={imgae3} alt="Background Image" className='w-100 h-100 object-fit-cover' style={{ maxHeight: '200px' }} />
-                                        <div className='position-absolute w-100 h-100' style={{ top: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)' }}></div>
-                                        <div style={{ left: '20px', bottom: 0 }} className='position-absolute'>
-                                            <p className='m-1' style={{ color: '#dfdfdf' }}>THPT Quốc gia</p>
-                                            <p className='text-white m-1' style={{ fontSize: '20px', fontWeight: 'bold' }}>Lịch thi trung học phổ thông quốc gia chính thức: 26/06/2023</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className='col-lg-6 w-100 mb-2'>
-                                    <div className="w-100 position-relative" style={{ maxHeight: '200px' }}>
-                                        <img src={imgae4} alt="Background Image" className='w-100 h-100 object-fit-cover' style={{ maxHeight: '200px' }} />
-                                        <div className='position-absolute w-100 h-100' style={{ top: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)' }}></div>
-                                        <div style={{ left: '20px', bottom: 0 }} className='position-absolute'>
-                                            <p className='m-1' style={{ color: '#dfdfdf' }}>Grammar</p>
-                                            <p className='text-white m-1' style={{ fontSize: '20px', fontWeight: 'bold' }}>Kiến thức về mệnh đề quan hệ (Relative Clause) trong tiếng Anh</p>
-                                        </div>
-                                    </div>
-                                </div>
+                                ))}
                             </div>
                         </div>
                     </div>

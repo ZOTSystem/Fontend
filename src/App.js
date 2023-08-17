@@ -3,6 +3,7 @@ import { Fragment } from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { useContext, useState, useEffect } from 'react';
 import { UserContext } from './contexts/UserContext';
+import CommentProvider from './contexts/CommentContext';
 
 //#Region Auth Routes
 import Login from './Component/Auth/Login';
@@ -24,6 +25,7 @@ import ExamFinish from './Component/User/ExamFinish';
 import TopicStudy from './Component/User/TopicStudy';
 import Contest from './Component/User/Contest'  
 import Ranking from './Component/User/Ranking'  
+import NewsDetail from './Component/User/NewsDetail';
 
 //#Region Admin Routes
 import ManageUser from './Component/Admin/ManageUser';
@@ -61,6 +63,7 @@ function App() {
               <Route path="/practiceQuizz" element={<PracticeQuizzes />}></Route>
               <Route path="/testSubject" element={<TestSubject />}></Route>
               <Route path="/test" element={<Testfirebase />}></Route>
+              <Route path="/news/newDetail/:id" element={<NewsDetail />} />
 
               <Route path="/*" element={<Navigate to="/login" />} />
             </> :
@@ -83,7 +86,7 @@ function App() {
                     <Route path="/topicStudy" element={<TopicStudy />}></Route>
                     <Route path="/contest" element={<Contest />}></Route>
                     <Route path="/ranking" element={<Ranking />}></Route>
-
+                    <Route path="/news/newDetail/:id" element={<NewsDetail />} />
 
                     <Route path="/*" element={<Navigate to="/" />} />
                   </> :
@@ -91,30 +94,34 @@ function App() {
                     {
                       user.roleId == '2' ?
                         <>
+                          <Route path="/admin/statictis" element={<Statistics />}/>
                           <Route path="/admin/manageUser" element={<ManageUser />} />
                           <Route path="/admin/manageMod" element={<ManageMod />} />
                           <Route path="/admin/manageTopic" element={<ManageTopic />} />
+                          <Route path="/admin/manageNew" element={<ManageNews />} />
                           <Route path="/admin/manageQuestion/:id" element={<ManageQuestion />} />
                           <Route path="/admin/manageForum" element={<PostProvider><SubjectProvider><CommentProvider><ManageForum /></CommentProvider></SubjectProvider></PostProvider>} />
                           
-                          <Route path="/*" element={<Navigate to="/admin/manageUser" />} />
+                          <Route path="/*" element={<Navigate to="/admin/statictis" />} />
                         </> :
                         user.roleId == '3' ?
                           <>
+                            <Route path="/mod/manageNews" element={<ManageNewsByMod />} />
                             <Route path="/mod/manageTopic" element={<ManageTopicByMod />} />
                             <Route path="mod/manageQuestion/:id" element={<ManageQuestionByMod />} />
-                            <Route path="/mod/manageNews" element={<ManageNewsByMod />} />
 
                             <Route path="/*" element={<Navigate to="/mod/manageTopic" />} />
                           </> :
                           <>
+                          <Route path="/admin/statictis" element={<Statistics />}/>
                           <Route path="/admin/manageUser" element={<ManageUser />} />
                           <Route path="/admin/manageMod" element={<ManageMod />} />
                           <Route path="/admin/manageTopic" element={<ManageTopic />} />
                           <Route path="/admin/manageQuestion/:id" element={<ManageQuestion />} />
                           <Route path="/admin/manageForum" element={<PostProvider><SubjectProvider><CommentProvider><ManageForum /></CommentProvider></SubjectProvider></PostProvider>} />
+                          <Route path="/admin/manageTopic" element={<ManageTopic />} />
 
-                          <Route path="/*" element={<Navigate to="/admin/manageUser" />} />
+                          <Route path="/*" element={<Navigate to="/admin/statictis" />} />
 
                           </>
                     } 
