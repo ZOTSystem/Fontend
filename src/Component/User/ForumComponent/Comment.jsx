@@ -92,10 +92,8 @@ export default function Comment({ comment, isEditing, onEditComment, onCancelEdi
                             caretPos.current = getPointerContentEditable(contentRef.current);
                             if (!e.target.textContent) {
                                 setIsEmptyContent(true);
-                                setEndOfContentEditable(contentRef.current);
                             } else {
                                 setIsEmptyContent(false);
-                                setEndOfContentEditable(contentRef.current);
                             }
                         }}
                     >

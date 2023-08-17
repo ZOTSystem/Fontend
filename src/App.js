@@ -45,6 +45,7 @@ import ManageNewsByMod from './Component/Mod/ManageNewsByMod';
 import ManageForum from './Component/Admin/ManageForum';
 import ManageTopicByMod from './Component/Mod/ManageTopicByMod';
 import ManageQuestionByMod from './Component/Mod/ManageQuestionByMod';
+import CommentProvider from './contexts/CommentContext';
 
 
 function App() {
@@ -124,7 +125,7 @@ function App() {
                           <Route path="/*" element={<Navigate to="/admin/statictis" />} />
 
                           </>
-                    } 
+                    }
                   </>
               }
             </>
