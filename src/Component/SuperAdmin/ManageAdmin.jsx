@@ -4,29 +4,22 @@ import { DatePicker, Breadcrumb, Layout, Table, Input, Modal, Form, notification
 import { SearchOutlined, EditOutlined, PoweroffOutlined } from '@ant-design/icons';
 import SiderAdmin from '../../Layout/Admin/SiderAdmin';
 import HeaderAdmin from '../../Layout/Admin/HeaderAdmin';
-import hanldeValidationEditUser, { hanldeValidationCreateMod } from '../../assets/js/handleValidation';
-import dayjs from 'dayjs';
 import axios from 'axios';
-import { GetAllModService } from '../../services/modService';
-import { AddModService } from '../../services/modService';
-import { ChangeStatusService } from '../../services/modService';
-import { UpdateModService } from '../../services/modService';
+
+import { GetAllSAdmin } from '../../services/SuperAdminService';
+import { GetAllEmail } from '../../services/SuperAdminService';
+import { ChangeStatusAdminService } from '../../services/SuperAdminService';
+import { UpdateAdminService } from '../../services/SuperAdminService';
+import { hanldeValidationEditAdmin } from '../../assets/js/handleValidation';
+import { hanldeValidationCreateAdmin } from '../../assets/js/handleValidation';
+import { AddAdminService } from '../../services/SuperAdminService';
 
 const { Content } = Layout;
 
-const formatDate = (dateString) => {
-    const date = new Date(dateString);
-
-    const year = date.getFullYear().toString().padStart(4, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-
-    const formattedDate = `${year}-${month}-${day}`;
-
-    return formattedDate;
-};
-
-export default function ManageMod() {
+export default function ManageAdmin() {
+    const {
+        token: { colorBgContainer },
+    } = theme.useToken();
     //#region - Declare - tên cột trong table
     const columns = [
         {
@@ -36,38 +29,7 @@ export default function ManageMod() {
             fixed: 'left',
         },
         {
-            title: 'Avatar',
-            dataIndex: 'avatar',
-            key: 'avatar',
-            fixed: 'left',
-            render: (record) => {
-                return (
-                    <>
-                        {record && record.avatar != null ? (
-                            <img
-                                src={record}
-                                alt='Pic'
-                                width={70}
-                                height={70}
-                                style={{ borderRadius: '50%' }}
-                                className='borederRadius50'
-                            />
-                        ) : (
-                            <img
-                                src='../Image/Avatar_Null.png'
-                                alt='Pic'
-                                width={70}
-                                height={70}
-                                style={{ borderRadius: '50%' }}
-                                className='borederRadius50'
-                            />
-                        )}
-                    </>
-                );
-            },
-        },
-        {
-            title: 'Tên mod',
+            title: 'Tên admin',
             dataIndex: 'fullName',
             key: 3,
             fixed: 'left',
@@ -159,6 +121,13 @@ export default function ManageMod() {
             },
         },
         {
+            title: 'Mật khẩu',
+            // width: 100,
+            dataIndex: 'password',
+            key: 1,
+            fixed: 'left',
+        },
+        {
             title: 'Trạng thái',
             // width: 100,
             dataIndex: 'status',
@@ -204,86 +173,111 @@ export default function ManageMod() {
     ];
     //#endregion
 
-    //#region - Declare - các biến dùng
-    const dayFormat = 'YYYY-MM-DD';
+    //#region - Function - Khai báo các biến cần dùng
     const [dataSource, setDataSource] = useState('');
     const [show, setShow] = useState(false);
     const [showCreate, setShowCreate] = useState(false);
     const [emailList, setEmailList] = useState('');
-    const {
-        token: { colorBgContainer },
-    } = theme.useToken();
     const pagination = {
         pageSize: 5,
         total: dataSource.length,
     };
-    //#endregion
-
-    //#region - Declare - input và lỗi của mỗi input
-    const [errors, setErrors] = useState({
-        editFullName: '',
-        editPhoneNumber: '',
-        editBirthDay: '',
-        createFullName: '',
-        createEmail: '',
-        createPhoneNumber: '',
-        createBirthDay: '',
-        createGender: '',
-    });
-
-    const [editData, setEditData] = useState({
-        editUserId: '',
-        editAvatar: '',
-        editEmail: '',
-        editPhoneNumber: '',
-        editGender: '',
-        editBirthDay: '',
-    });
-
     const [createData, setCreateData] = useState({
         createFullName: '',
         createEmail: '',
         createPhoneNumber: '',
-        createGender: '',
-        createBirthDay: '',
+        createPassword: '',
+    });
+    const [editData, setEditData] = useState({
+        editUserId: '',
+        editEmail: '',
+        editFullName: '',
+        editPhoneNumber: '',
+        editPassword: '',
     });
 
+    const [errors, setErrors] = useState({
+        editEmail: '',
+        editFullName: '',
+        editPhoneNumber: '',
+        editPasswod: '',
+        createFullName: '',
+        createEmail: '',
+        createPhoneNumber: '',
+        createPassword: '',
+    });
     //#endregion
 
     //#region - Function - Hien thi thong bao khi update/changestatus/create
     const [api, contextHolder] = notification.useNotification();
-    const openNotificationCreate = (placement) => {
+    const openNotificationGetData400 = (placement) => {
+        api.error({
+            message: `Thông báo`,
+            description: 'Lấy dữ liệu thất bại',
+            placement,
+        });
+    };
+    const openNotificationCreate200 = (placement) => {
         api.success({
             message: `Thông báo`,
             description: 'Tạo thành công',
             placement,
         });
     };
-    const openNotificationUpdate = (placement) => {
+    const openNotificationCreate400 = (placement) => {
+        api.error({
+            message: `Thông báo`,
+            description: 'Tạo thất bại',
+            placement,
+        });
+    };
+    const openNotificationUpdate200 = (placement) => {
         api.success({
             message: `Thông báo`,
             description: 'Chỉnh sửa thành công',
             placement,
         });
     };
-    const openNotificationEnable = (placement) => {
+    const openNotificationUpdate400 = (placement) => {
+        api.error({
+            message: `Thông báo`,
+            description: 'Chỉnh sửa thất bại',
+            placement,
+        });
+    };
+    const openNotificationEnable200 = (placement) => {
         api.success({
             message: `Thông báo`,
             description: 'Thay đổi trạng thái thành công',
             placement,
         });
     };
+    const openNotificationEnable400 = (placement) => {
+        api.error({
+            message: `Thông báo`,
+            description: 'Thay đổi trạng thái thất bại',
+            placement,
+        });
+    };
     //#endregion
 
-    //#region - Function - lấy danh sách mod, email
+    //#region - Function - lấy danh sách admin, email
     const handleGetData = async () => {
         try {
-            const result = await GetAllModService();
+            const result = await GetAllSAdmin();
             if (result.status === 200) {
                 setDataSource(result.data);
+            } else {
+                openNotificationGetData400("topRight");
+            }
+            const result2 = await GetAllEmail();
+            if (result2.status === 200) {
+                setEmailList(result2.data);
+            } else {
+                openNotificationGetData400("topRight");
             }
         } catch (error) {
-            console.error('Error fetching mod service:', error);
+            openNotificationGetData400("topRight");
         }
     };
 
@@ -291,123 +285,71 @@ export default function ManageMod() {
         handleGetData();
     }, []);
 
-    const getEmailList = () => {
-        const url = 'https://localhost:7207/api/account/getAllEmail';
-        axios
-            .get(url)
-            .then((result) => {
-                setEmailList(result.data);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    };
-
-    useEffect(() => {
-        getEmailList();
-    }, []);
-
     //#endregion
 
-    //#region - Function - Deactivate/Activate tài khoản của mod
+    //#region - Function - thay đổi trạng thái
     const handleChangeStatusDeActivate = (record) => {
         Modal.confirm({
             title: 'Bạn có muốn khóa tài khoản: ' + record.email + ' ?',
             okText: 'Khóa',
             okType: 'danger',
             onOk: async () => {
-                const result = await ChangeStatusService(record.accountId, 'Đang khóa');
-                if (result) {
+                const result = await ChangeStatusAdminService(record.accountId, 'Đang khóa');
+                if (result.status === 200) {
                     handleGetData();
-                    openNotificationEnable('topRight');
+                    openNotificationEnable200('topRight');
+                } else {
+                    openNotificationEnable400("topRight");
                 }
             },
-            cancelText: 'Hủy',
-            onCancel: () => {},
+            cancelText: 'Đóng',
+            onCancel: () => { },
         });
     };
 
     const handleChangeStatusActivate = (record) => {
         Modal.confirm({
-            title: 'Bạn có muốn mở khóa tài khoản này: ' + record.email + ' ?',
-            okText: 'Mở',
+            title: 'Bạn có muốn kích hoạt tài khoản này: ' + record.email + ' ?',
+            okText: 'Kích hoạt',
             okType: 'default',
             onOk: async () => {
-                const result = await ChangeStatusService(record.accountId, 'Đang hoạt động');
-                if (result) {
+                const result = await ChangeStatusAdminService(record.accountId, 'Đang hoạt động');
+                if (result.status === 200) {
                     handleGetData();
-                    openNotificationEnable('topRight');
+                    openNotificationEnable200('topRight');
+                } else {
+                    openNotificationEnable400("topRight")
                 }
             },
-            cancelText: 'Hủy',
-            onCancel: () => {},
+            cancelText: 'Đóng',
+            onCancel: () => { },
         });
     };
     //#endregion
 
-    //#region - Function - nhận giá trị trong ô input
-    const handleInputChange = (event) => {
-        const field = event.target.name;
-        const value = event.target.value;
-
-        setEditData((editData) => ({ ...editData, [field]: value }));
-    };
-
-    const handleInputChangeDate = (date, name) => {
-        setEditData({
-            ...editData,
-            [name]: formatDate(date),
-        });
-    };
-
-    const handleInputChangeGender = (value) => {
-        setEditData({
-            editUserId: editData.editUserId,
-            editAvatar: editData.editAvatar,
-            editFullName: editData.editFullName,
-            editEmail: editData.editEmail,
-            editPhoneNumber: editData.editPhoneNumber,
-            editBirthDay: editData.editBirthDay,
-            editGender: value,
-        });
-    };
-
+    //#region - Function - nhận giá trị input
     const handleInputChangeCreate = (event) => {
         const field = event.target.name;
         const value = event.target.value;
 
         setCreateData((createData) => ({ ...createData, [field]: value }));
     };
+    const handleInputChange = (event) => {
+        const field = event.target.name;
+        const value = event.target.value;
 
-    const handleInputChangeDateCreate = (date, name) => {
-        setCreateData({
-            ...createData,
-            [name]: formatDate(date),
-        });
+        setEditData((editData) => ({ ...editData, [field]: value }));
     };
-
-    const handleInputChangeCreateGender = (value) => {
-        setCreateData({
-            createFullName: createData.createFullName,
-            createEmail: createData.createEmail,
-            createPhoneNumber: createData.createPhoneNumber,
-            createBirthDay: createData.createBirthDay,
-            createGender: value,
-        });
-    };
-
     //#endregion
 
-    //#region - Function - hiển thị và edit user
+    //#region - Function - hiển thị và edit admin
     const handleEdit = (record) => {
         setEditData({
             editUserId: record.accountId,
-            editAvatar: record.avatar,
             editFullName: record.fullName,
             editEmail: record.email,
             editPhoneNumber: record.phone,
-            editBirthDay: record.birthDay,
-            editGender: record.gender,
+            editPassword: record.password,
         });
         setShow(true);
     };
@@ -416,21 +358,22 @@ export default function ManageMod() {
         let errors = {};
         var data = {
             accountId: editData.editUserId,
+            email: editData.editEmail,
             fullName: editData.editFullName,
             phone: editData.editPhoneNumber,
-            gender: editData.editGender,
-            birthDay: editData.editBirthDay,
+            password: editData.editPassword,
         };
-        hanldeValidationEditUser(editData, errors);
+        hanldeValidationEditAdmin(editData, errors);
         if (Object.keys(errors).length === 0) {
-            const result = await UpdateModService(data.accountId, data);
-            console.log(result);
-            if (result) {
+            const result = await UpdateAdminService(data);
+            if (result.status === 200) {
                 handleGetData();
-                openNotificationUpdate('topRight');
+                openNotificationUpdate200('topRight');
                 setErrors([]);
                 setShow(false);
                 setEditData('');
+            } else {
+                openNotificationUpdate400('topRight');
             }
         } else {
             setErrors(errors);
@@ -438,25 +381,27 @@ export default function ManageMod() {
     };
     //#endregion
 
-    //#region - Function - Thêm mod
+
+    //#region - Function - thêm admin
     const handleSubmitCreate = async () => {
         let errors = {};
         const data = {
             email: createData.createEmail,
             fullName: createData.createFullName,
-            birthDay: createData.createBirthDay,
             phone: createData.createPhoneNumber,
-            gender: createData.createGender,
+            password: createData.createPassword,
         };
-        hanldeValidationCreateMod(createData, errors, emailList);
+        hanldeValidationCreateAdmin(createData, errors, emailList);
         if (Object.keys(errors).length === 0) {
-            const result = await AddModService(data);
-            if (result) {
+            const result = await AddAdminService(data);
+            if (result.status === 200) {
                 handleGetData();
                 setErrors([]);
-                openNotificationCreate('topRight');
+                openNotificationCreate200('topRight');
                 setShowCreate(false);
                 setCreateData('');
+            } else {
+                openNotificationCreate400("topRight");
             }
         } else {
             setErrors(errors);
@@ -483,7 +428,7 @@ export default function ManageMod() {
                     >
                         <Breadcrumb.Item>Trang chủ</Breadcrumb.Item>
                         <Breadcrumb.Item>Quản lý</Breadcrumb.Item>
-                        <Breadcrumb.Item>Mod</Breadcrumb.Item>
+                        <Breadcrumb.Item>Admin</Breadcrumb.Item>
                     </Breadcrumb>
                     <div
                         style={{
@@ -500,7 +445,7 @@ export default function ManageMod() {
                                     marginBottom: '20px',
                                 }}
                             >
-                                Danh sách Mod
+                                Danh sách Admin
                             </h1>
                         </div>
                         <Button
@@ -510,7 +455,7 @@ export default function ManageMod() {
                             }}
                             style={{ marginBottom: '20px', marginRight: '10px' }}
                         >
-                            Tạo mới mod
+                            Tạo mới Admin
                         </Button>
                         <Table
                             columns={columns}
@@ -519,7 +464,7 @@ export default function ManageMod() {
                         />
                         {/* Form Edit */}
                         <Modal
-                            title='Chỉnh sửa thông tin mod'
+                            title='Chỉnh sửa thông tin admin'
                             visible={show}
                             okText='Lưu'
                             cancelText='Đóng'
@@ -530,45 +475,6 @@ export default function ManageMod() {
                             }}
                             onOk={() => handleFunctionEdit()}
                         >
-                            <div
-                                style={{
-                                    width: '100%',
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    marginBottom: '20px',
-                                }}
-                            >
-                                <div>
-                                    <p
-                                        style={{
-                                            textAlign: 'center',
-                                            marginBottom: '10px',
-                                            fontSize: '15px',
-                                            fontWeight: '600',
-                                        }}
-                                    >
-                                        Avatar
-                                    </p>
-                                    {editData.editAvatar != null ? (
-                                        <img
-                                            src={editData.editAvatar}
-                                            alt='Pic'
-                                            width={70}
-                                            height={70}
-                                            className='borederRadius50'
-                                        />
-                                    ) : (
-                                        <img
-                                            src='../Image/Avatar_Null.png'
-                                            alt='Pic'
-                                            width={70}
-                                            height={70}
-                                            className='borederRadius50'
-                                        />
-                                    )}
-                                </div>
-                            </div>
-
                             <Form>
                                 <Form.Item>
                                     <label>Tên</label>
@@ -597,7 +503,6 @@ export default function ManageMod() {
                                         className='form-control'
                                         value={editData.editEmail}
                                         name='editEmail'
-                                        onChange={handleInputChange}
                                         disabled
                                     />
                                 </Form.Item>
@@ -621,34 +526,21 @@ export default function ManageMod() {
                                     )}
                                 </Form.Item>
                                 <Form.Item>
-                                    <label style={{ display: 'block' }}>Giới tính</label>
-                                    <Select
-                                        value={editData.editGender}
-                                        name='editGender'
-                                        style={{ width: '100%' }}
-                                        onChange={handleInputChangeGender}
-                                        options={[
-                                            { value: 'Nam', label: 'Nam' },
-                                            { value: 'Nữ', label: 'Nữ' },
-                                            { value: 'Khác', label: 'Khác' },
-                                        ]}
-                                    />
-                                </Form.Item>
-                                <Form.Item>
-                                    <label>Ngày sinh:</label>
-                                    <DatePicker
+                                    <label>Mật khẩu</label>
+                                    <Input
+                                        type='phonenumber'
+                                        placeholder='Nhập mật khẩu'
                                         className='form-control'
-                                        style={{ width: '100%' }}
-                                        name='editBirthDay'
-                                        value={editData.editBirthDay ? dayjs(editData.editBirthDay, dayFormat) : null}
-                                        onChange={(date) => handleInputChangeDate(date, 'editBirthDay')}
+                                        value={editData.editPassword}
+                                        name='editPassword'
+                                        onChange={handleInputChange}
                                     />
-                                    {errors.editBirthDay && (
+                                    {errors.editPassword && (
                                         <div
                                             className='invalid-feedback'
                                             style={{ display: 'block', color: 'red' }}
                                         >
-                                            {errors.editBirthDay}
+                                            {errors.editPassword}
                                         </div>
                                     )}
                                 </Form.Item>
@@ -657,7 +549,7 @@ export default function ManageMod() {
 
                         {/* Create form */}
                         <Modal
-                            title='Thêm mới mod'
+                            title='Thêm mới admin'
                             visible={showCreate}
                             okText='Thêm mới'
                             cancelText='Đóng'
@@ -727,43 +619,21 @@ export default function ManageMod() {
                                     )}
                                 </Form.Item>
                                 <Form.Item>
-                                    <label style={{ display: 'block' }}>Giới tính</label>
-                                    <Select
-                                        placeholder='Chọn giới tính'
-                                        name='createGender'
-                                        style={{ width: '100%' }}
-                                        onChange={handleInputChangeCreateGender}
-                                        options={[
-                                            { value: 'Nam', label: 'Nam' },
-                                            { value: 'Nữ', label: 'Nữ' },
-                                            { value: 'Khác', label: 'Khác' },
-                                        ]}
-                                    />
-                                    {errors.createGender && (
-                                        <div
-                                            className='invalid-feedback'
-                                            style={{ display: 'block', color: 'red' }}
-                                        >
-                                            {errors.createGender}
-                                        </div>
-                                    )}
-                                </Form.Item>
-                                <Form.Item>
-                                    <label>Ngày sinh:</label>
-
-                                    <DatePicker
+                                    <label>Mật khẩu</label>
+                                    <Input
+                                        type='phonenumber'
+                                        placeholder='Nhập mật khẩu'
                                         className='form-control'
-                                        style={{ width: '100%' }}
-                                        name='createBirthDay'
-                                        placeholder='Chọn ngày'
-                                        onChange={(date) => handleInputChangeDateCreate(date, 'createBirthDay')}
+                                        value={createData.createPassword}
+                                        name='createPassword'
+                                        onChange={handleInputChangeCreate}
                                     />
-                                    {errors.createBirthDay && (
+                                    {errors.createPassword && (
                                         <div
                                             className='invalid-feedback'
                                             style={{ display: 'block', color: 'red' }}
                                         >
-                                            {errors.createBirthDay}
+                                            {errors.createPassword}
                                         </div>
                                     )}
                                 </Form.Item>
@@ -773,5 +643,5 @@ export default function ManageMod() {
                 </Content>
             </Layout>
         </Layout>
-    );
+    ); 
 }

@@ -12,15 +12,6 @@ import { useNavigate } from 'react-router-dom';
 
 export default function HomePage() {
 
-    const phoneNumber = '0328284430';
-    const navigate = useNavigate();
-
-    const handleZaloCall = () => {
-        const zaloChatLink = `https://zalo.me/${phoneNumber}`;
-        window.open(zaloChatLink, '_blank');
-        navigate('/'); // Replace '/next-page' with the URL of your desired next page
-    };
-
     return (
         <>
             <Header />
@@ -42,11 +33,7 @@ export default function HomePage() {
                     </div>
                 </div>
             </span>
-            <div className="zalo-icon-container" onClick={handleZaloCall} style={{ position: 'fixed', bottom: '20px', right: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', zIndex: '9999' }}>
-                    {/* <FaZalo size={24} /> */}
-                    <img src="../Image/7044033_zalo_icon.png" alt="" width={60}/>
-                    <div id="zalo-chat-widget" />
-                </div>
+            
             <Footer />
 
         </>

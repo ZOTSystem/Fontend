@@ -23,7 +23,8 @@ export default function HeaderAdmin() {
     }
     
     const onLogOut = () => {
-        removeCookie('token', { path: '/' });
+        // removeCookie('token', { path: '/' });
+        localStorage.removeItem('authToken');
         onSetUser({
             data: "",
             token: "",
@@ -32,7 +33,7 @@ export default function HeaderAdmin() {
     };
 
     const items = [
-        getItem(<a href={process.env.REACT_APP_CLIENT_HOST + "/four-season/user-profile"}>View Profile</a>,'1', <UserOutlined />),
+        // getItem(<a href={process.env.REACT_APP_CLIENT_HOST + "/four-season/user-profile"}>View Profile</a>,'1', <UserOutlined />),
         getItem(<a onClick={() =>onLogOut()}>Log out</a>, '3', <LogoutOutlined />),
     ];
 

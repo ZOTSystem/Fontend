@@ -14,7 +14,8 @@ export default function Header() {
     const navigate = useNavigate();
 
     const onLogOut = () => {
-        removeCookie('token', { path: '/' });
+        // removeCookie('token', { path: '/' });
+        localStorage.removeItem('authToken');
         onSetUser({
             data: "",
             token: "",
