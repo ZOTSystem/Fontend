@@ -39,25 +39,22 @@ export default function Study() {
     const [current, setCurrent] = useState(0);
     const length = questions.length;
     function nextQuestion() {
-        setResetQuestion(true);
-        setDisableChoose(false);
-        setSolution(false);
-        setRight1Answer();
-        setRight2Answer();
-        setRight3Answer();
-        setRight4Answer();
-        setWrong1Answer();
-        setWrong2Answer();
-        setWrong3Answer();
-        setWrong4Answer();
-
-        if (current == 0) {
-            setCurrent(current + 1);
+        if (current === length - 1) {
+            document.addEventListener('mousedown', nextQuestion);
         }
-        if (current != 0) {
-            setCurrent(current === length - 1 ? 0 : current + 1);
+        else {
+            setResetQuestion(true);
+            setDisableChoose(false);
+            setSolution(false);
+            setRight1Answer();
+            setRight2Answer();
+            setRight3Answer();
+            setRight4Answer();
+            setWrong1Answer();
+            setWrong2Answer();
+            setWrong3Answer();
+            setWrong4Answer();
         }
-
     }
 
     function prevQuestion() {
@@ -164,7 +161,7 @@ export default function Study() {
             <Header />
             <div className='study'>
                 <div className='study-left'>
-                    {questions.map(
+                    {questions?.map(
                         (item, index) =>
                             index === current && (
                                 <>
@@ -186,10 +183,10 @@ export default function Study() {
                                                 resetQuestion && !disableChoose
                                                     ? '3px solid white'
                                                     : right1Answer == item.answerId
-                                                    ? '3px solid #00CC33'
-                                                    : wrong1Answer == 1
-                                                    ? '3px solid red'
-                                                    : '3px solid white',
+                                                        ? '3px solid #00CC33'
+                                                        : wrong1Answer == 1
+                                                            ? '3px solid red'
+                                                            : '3px solid white',
                                         }}
                                     >
                                         <div
@@ -199,10 +196,10 @@ export default function Study() {
                                                     resetQuestion && !disableChoose
                                                         ? ''
                                                         : right1Answer == item.answerId
-                                                        ? '#00cc33'
-                                                        : wrong1Answer == 1
-                                                        ? '#ff0000'
-                                                        : '',
+                                                            ? '#00cc33'
+                                                            : wrong1Answer == 1
+                                                                ? '#ff0000'
+                                                                : '',
                                             }}
                                         >
                                             <p>A</p>
@@ -219,10 +216,10 @@ export default function Study() {
                                                 resetQuestion && !disableChoose
                                                     ? '3px solid white'
                                                     : right2Answer == item.answerId
-                                                    ? '3px solid #00CC33'
-                                                    : wrong2Answer == 2
-                                                    ? '3px solid red'
-                                                    : '3px solid white',
+                                                        ? '3px solid #00CC33'
+                                                        : wrong2Answer == 2
+                                                            ? '3px solid red'
+                                                            : '3px solid white',
                                         }}
                                     >
                                         <div
@@ -232,10 +229,10 @@ export default function Study() {
                                                     resetQuestion && !disableChoose
                                                         ? ''
                                                         : right2Answer == item.answerId
-                                                        ? '#00cc33'
-                                                        : wrong2Answer == 2
-                                                        ? '#ff0000'
-                                                        : '',
+                                                            ? '#00cc33'
+                                                            : wrong2Answer == 2
+                                                                ? '#ff0000'
+                                                                : '',
                                             }}
                                         >
                                             <p>B</p>
@@ -252,10 +249,10 @@ export default function Study() {
                                                 resetQuestion && !disableChoose
                                                     ? '3px solid white'
                                                     : right3Answer == item.answerId
-                                                    ? '3px solid #00CC33'
-                                                    : wrong3Answer == 3
-                                                    ? '3px solid red'
-                                                    : '3px solid white',
+                                                        ? '3px solid #00CC33'
+                                                        : wrong3Answer == 3
+                                                            ? '3px solid red'
+                                                            : '3px solid white',
                                         }}
                                     >
                                         <div
@@ -265,10 +262,10 @@ export default function Study() {
                                                     resetQuestion && !disableChoose
                                                         ? ''
                                                         : right3Answer == item.answerId
-                                                        ? '#00cc33'
-                                                        : wrong3Answer == 3
-                                                        ? '#ff0000'
-                                                        : '',
+                                                            ? '#00cc33'
+                                                            : wrong3Answer == 3
+                                                                ? '#ff0000'
+                                                                : '',
                                             }}
                                         >
                                             <p>C</p>
@@ -285,10 +282,10 @@ export default function Study() {
                                                 resetQuestion && !disableChoose
                                                     ? '3px solid white'
                                                     : right4Answer == item.answerId
-                                                    ? '3px solid #00CC33'
-                                                    : wrong4Answer == 4
-                                                    ? '3px solid red'
-                                                    : '3px solid white',
+                                                        ? '3px solid #00CC33'
+                                                        : wrong4Answer == 4
+                                                            ? '3px solid red'
+                                                            : '3px solid white',
                                         }}
                                     >
                                         <div
@@ -298,10 +295,10 @@ export default function Study() {
                                                     resetQuestion && !disableChoose
                                                         ? ''
                                                         : right4Answer == item.answerId
-                                                        ? '#00cc33'
-                                                        : wrong4Answer == 4
-                                                        ? '#ff0000'
-                                                        : '',
+                                                            ? '#00cc33'
+                                                            : wrong4Answer == 4
+                                                                ? '#ff0000'
+                                                                : '',
                                             }}
                                         >
                                             <p>D</p>

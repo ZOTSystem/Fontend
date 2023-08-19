@@ -43,6 +43,8 @@ export default function Contest() {
             state: {
                 topicId: item.topicId,
                 accountId: user.accountId,
+                subjectName: subjectName,
+                topicName: item.topicName,
             },
         });
     };
@@ -79,7 +81,7 @@ export default function Contest() {
             cancelText: 'Hủy',
         });
     };
-    
+
     return (
         <>
             <Header />

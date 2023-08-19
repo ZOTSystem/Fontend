@@ -6,7 +6,7 @@ import { useEffect, useState, useContext } from "react";
 import 'bootstrap/dist/css/bootstrap.css';
 import moment from "moment";
 import { Pie } from '@ant-design/plots';
-
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import { UserContext } from "../../contexts/UserContext";
 import { GetTestDetailService } from "../../services/HistoryService";
@@ -15,6 +15,18 @@ import { StatictisService } from "../../services/HistoryService";
 
 export default function TestHistory() {
 
+    const navigate = useNavigate();
+    const handleTestDetail = async (item) => {
+        navigate('/examResult', {
+            state: {
+                testDetailId: item.testDetailId,
+                topicName: item.topic,
+                score: item.score,
+                answerRight: item.answerRight,
+                totalQuestion: item.totalQuestion,
+            },
+        });
+    };
     //#region - Declare - Khai báo các biến cần dùng
     const columns = [
         {
@@ -113,7 +125,7 @@ export default function TestHistory() {
             render: (record) => {
                 return (
                     <>
-                        <a style={{ color: "#538dd5", textAlign: "center" }}>Chi tiết</a>
+                        <a style={{ color: "#538dd5", textAlign: "center" }} onClick={() => handleTestDetail(record)}>Chi tiết</a>
                     </>
                 );
             },
@@ -199,7 +211,7 @@ export default function TestHistory() {
         })
         try {
             const result = await StatictisService(user.accountId, value);
-            if(result.status === 400){
+            if (result.status === 400) {
                 setDataSource(result.data);
                 setDataChart([
                     {
@@ -352,11 +364,11 @@ export default function TestHistory() {
                         <div className="mt-3">
                             <p>
                                 * Mức độ thành thạo được tính toán và phân tích dựa trên dữ liệu làm bài của bạn trên toàn bộ hệ thống.
-                                <div style={{ display: "flex", marginLeft: "50px"}}>
+                                <div style={{ display: "flex", marginLeft: "50px" }}>
                                     <div style={{ background: "#538dd5", width: "10px", height: "10px", margin: "auto 0" }}></div>
                                     : am hiểu
                                 </div>
-                                <div style={{ display: "flex", marginLeft: "50px"}}>
+                                <div style={{ display: "flex", marginLeft: "50px" }}>
                                     <div style={{ background: "black", width: "10px", height: "10px", margin: "auto 0" }}></div>
                                     : ôn lại
                                 </div>
