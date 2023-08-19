@@ -9,7 +9,7 @@ export const GetAllModService = async () => {
                 'Content-Type': 'application/json',
             },
         });
-        return respone.data;
+        return respone;
     } catch (e) {
         return e;
     }

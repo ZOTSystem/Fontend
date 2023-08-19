@@ -659,10 +659,10 @@ export default function ManageTopic() {
                                        onChange={handleEditInputChange}
                                     >
                                     <option value="Chọn lớp">Chọn thời gian </option>
-                                    <option value="15p">15p</option>
-                                    <option value="45p">45p</option>
-                                    <option value="60p">60p</option>
-                                    <option value="120p">120p</option>
+                                    <option value="15">15p</option>
+                                    <option value="45">45p</option>
+                                    <option value="60">60p</option>
+                                    <option value="120">120p</option>
                                     </select>
                                     {errors.editDuration && (
                                         <div

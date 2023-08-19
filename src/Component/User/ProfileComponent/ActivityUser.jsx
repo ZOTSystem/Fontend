@@ -40,7 +40,8 @@ export default function ActivityUser() {
                 openNotificationGet400("topRight")
             }
         } catch (e) {
-            openNotificationGet400("topRight")
+            // console.log("catch")
+            // openNotificationGet400("topRight")
         }
     }
 

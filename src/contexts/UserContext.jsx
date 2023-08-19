@@ -4,9 +4,11 @@ import { GetInforService } from '../services/userService';
 
 export const UserContext = createContext();
 const UserContextProvider = (props) => {
+    var authToken = localStorage.getItem('authToken');
     const [cookies] = useCookies(['token']);
     const [user, setUser] = useState('');
-    const [token, setToken] = useState(cookies?.token ? cookies.token : '');
+    // const [token, setToken] = useState(cookies?.token ? cookies.token : '');
+    const [token, setToken] = useState(authToken !=null ? authToken : '');
     const [render, setRender] = useState('');
     const HandleGetInfo = async () => {
         const result = await GetInforService(token);

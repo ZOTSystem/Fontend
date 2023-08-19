@@ -297,3 +297,44 @@ export function handleValidationEditNew(editData, errors, imageUpload) {
     }
 }
 
+export function hanldeValidationEditAdmin(editData, errors) {
+    if (!/^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/.test(editData.editPhoneNumber)) {
+        errors.editPhoneNumber = 'Số điện thoại phải 10 chữ số';
+    }
+    if (editData.editPhoneNumber == '' || editData.editPhoneNumber == null || editData.editPhoneNumber == " ") {
+        errors.editPhoneNumber = "Số điện thoại không được để trống";
+    }
+    if (editData.editFullName == '' || editData.editFullName == null || editData.editFullName == " ") {
+        errors.editFullName = "Tên không được để trống";
+    }
+
+    if (editData.editPassword == "" || editData.editPassword == null || editData.editPassword == " ") {
+        errors.editPassword = "Không được để trống"
+    }
+}
+
+
+export function hanldeValidationCreateAdmin(creataData, errors, emailList) {
+    if (!/^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/.test(creataData.createPhoneNumber)) {
+        errors.createPhoneNumber = 'Số điện thoại phải 10 chữ số';
+    }
+    if (creataData.createPhoneNumber == '' || creataData.createPhoneNumber == null || creataData.createPhoneNumber == " ") {
+        errors.createPhoneNumber = "Số điện thoại không được để trống";
+    }
+    if (creataData.createFullName == '' || creataData.createFullName == null || creataData.createFullName == " ") {
+        errors.createFullName = "Tên không được để trống";
+    }
+    if (creataData.createEmail == '' || creataData.createEmail == null || creataData.createEmail == " ") {
+        errors.createEmail = "Email không được để trống"
+    } else {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(creataData.createEmail)) {
+            errors.createEmail = "Email sai định dạng";
+        }
+    }
+    if (emailList.includes(creataData.createEmail)) {
+        errors.createEmail = "Email đã được đăng ký";
+    }
+    if (creataData.createPassword == '' || creataData.createPassword == null || creataData.createPassword == " ") {
+        errors.createPassword = "Tên không được để trống";
+    }
+}

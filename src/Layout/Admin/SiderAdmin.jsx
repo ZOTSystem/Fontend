@@ -46,6 +46,10 @@ export default function SiderAdmin() {
         getItem('Quản lý tin tức', '/mod/manageNews', <HddOutlined />, '/mod/manageNews', null),
     ];
 
+    const superAdminMenu = [
+        getItem('Quản lý admin', '/superAdmin/manageAdmin', <FolderOpenOutlined />, '/superAdmin/manageAdmin', null),
+    ]
+
     // const items = user.roleId == 2 ? adminMenu : user.roleId == 3 ? modMenu : adminMenu;
 
     const onClick = (value) => {
@@ -58,7 +62,7 @@ export default function SiderAdmin() {
         }else if(user.roleId === 3){
             setItems(modMenu);
         }else{
-            setItems(adminMenu)
+            setItems(superAdminMenu)
         }
     },[])
 

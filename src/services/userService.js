@@ -157,3 +157,18 @@ export const GetPhoneWithoutThisPhonedService = async (phone) => {
         return e;
     }
 }
+
+export const GetAllPhoneService = async () => {
+    try {
+        const response = await request({
+            method: "get",
+            url: `home/getAllPhone`,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        return response;
+    } catch(e){
+        return e;
+    }
+}

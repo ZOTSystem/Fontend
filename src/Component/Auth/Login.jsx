@@ -14,6 +14,8 @@ import { RegisterService } from '../../services/userService';
 import { ForgorPasswordService } from '../../services/userService';
 import { handleValidationForgotPassword } from '../../assets/js/handleValidation';
 import { LoginByGoogleService } from '../../services/userService';
+import { GetAllPhoneService } from '../../services/userService';
+import { GetAllEmail } from '../../services/SuperAdminService';
 
 //# Css form login
 const headerStyle = {
@@ -80,37 +82,56 @@ export default function Login() {
     const [emailList, setEmailList] = useState('');
     const [phoneList, setPhoneList] = useState('');
 
-    const getEmailList = () => {
-        const url = 'https://localhost:7207/api/account/getAllEmail';
-        axios
-            .get(url)
-            .then((result) => {
-                setEmailList(result.data);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    };
+    const handleGetData = async () => {
+        try{
+            const resulst = await GetAllEmail();
+            const result2 = await GetAllPhoneService();
+            if(resulst){
+                setPhoneList(result2);
+            } 
+            if(resulst.status === 200){
+                setEmailList(resulst.data);
+            }
+        } catch (e){
+            console.log(e);
+        }
+    }
 
     useEffect(() => {
-        getEmailList();
-    }, [render]);
+        handleGetData();
+    }, [])
 
-    const getPhoneList = () => {
-        const url = 'https://localhost:7207/api/home/getAllPhone';
-        axios
-            .get(url)
-            .then((result) => {
-                setPhoneList(result.data);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    };
+    // const getEmailList = () => {
+    //     const url = 'https://localhost:7207/api/account/getAllEmail';
+    //     axios
+    //         .get(url)
+    //         .then((result) => {
+    //             setEmailList(result.data);
+    //         })
+    //         .catch((error) => {
+    //             console.log(error);
+    //         });
+    // };
 
-    useEffect(() => {
-        getPhoneList();
-    }, [render]);
+    // useEffect(() => {
+    //     getEmailList();
+    // }, [render]);
+
+    // const getPhoneList = () => {
+    //     const url = 'https://localhost:7207/api/home/getAllPhone';
+    //     axios
+    //         .get(url)
+    //         .then((result) => {
+    //             setPhoneList(result.data);
+    //         })
+    //         .catch((error) => {
+    //             console.log(error);
+    //         });
+    // };
+
+    // useEffect(() => {
+    //     getPhoneList();
+    // }, [render]);
     //#endregion
 
     //#region - Function - nhận giá trị input
@@ -180,9 +201,9 @@ export default function Login() {
     //#endregion
 
     //#region - Function - Login, Save Cookie
-    const handleSetCookie = (value) => {
-        setCookie('token', value);
-    };
+    // const handleSetCookie = (value) => {
+    //     setCookie('token', value);
+    // };
 
     const handleLogin = async () => {
         const data = {
@@ -192,13 +213,16 @@ export default function Login() {
         const result = await LoginService(data);
         if (result.status === 200) {
             onSetUser(result);
-            handleSetCookie(result.token);
+            // handleSetCookie(result.token);
+            localStorage.setItem('authToken', result.token);
             if (result.roleId === 4) {
                 navigate('/');
             } else if (result.roleId === 2) {
                 navigate('/admin/manageUser');
             } else if (result.roleId === 3) {
-                navigate('/admin/manageQuestion');
+                navigate('/mod/manageTopic');
+            } else {
+                navigate('/superAdmin/manageAdmin');
             }
         } else {
             openNotificationLoginFailly('topRight');
@@ -238,11 +262,13 @@ export default function Login() {
             const result = await LoginByGoogleService(data);
             if (result.status === 400) {
                 onSetUser(result);
-                handleSetCookie(result.token);
+                // handleSetCookie(result.token);
+                localStorage.setItem('authToken', result.token);
                 navigate('/');
             } else if (result.status === 200) {
                 onSetUser(result);
-                handleSetCookie(result.token);
+                // handleSetCookie(result.token);
+                localStorage.setItem('authToken', result.token);
                 if (result.roleId === 4) {
                     navigate('/');
                 } else if (result.roleId === 1) {
