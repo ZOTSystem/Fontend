@@ -59,3 +59,18 @@ export const GetQuestionTestByTestDetailId = async (testDetailId) => {
         return e;
     }
 };
+
+export const GetUserDoTest = async () => {
+    try {
+        const respone = await request({
+            method: 'get',
+            url: `TestDetail/getUserDoTest`,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        return respone;
+    } catch (e) {
+        return e;
+    }
+};

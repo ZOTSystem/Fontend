@@ -92,3 +92,33 @@ export const UpdateTopicService = async (data) => {
         return e;
     }
 };
+
+export const GetRankingOfTopic = async (topicId, topicType) => {
+    try {
+        const respone = await Request({
+            method: 'get',
+            url: `Topics/getRankingOfTopic?topicId=${topicId}&topicType=${topicType}`,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        return respone;
+    } catch (e) {
+        return e;
+    }
+};
+
+export const GetTopicByTopicType = async (topicType) => {
+    try {
+        const respone = await Request({
+            method: 'get',
+            url: `Topics/getTopicByTopicType?topicType=${topicType}`,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        return respone;
+    } catch (e) {
+        return e;
+    }
+};

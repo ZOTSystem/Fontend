@@ -1,59 +1,30 @@
-import { Component, useState, useEffect, useContext } from 'react';
+import { Component, useState, useEffect, useContext, useRef } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { GetTopicByGrade } from '../../services/topicService';
+import { GetRankingOfTopic } from '../../services/topicService';
 import { UserContext } from '../../contexts/UserContext';
-import { AddTestDetailService } from '../../services/testDetailService';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../../assets/TestSubjectStyle.css'
 import Header from "../../Layout/User/Header";
+import ReactDOM from 'react-dom'
 import '../../assets/Style.css'
 
 export default function Ranking() {
     const { user } = useContext(UserContext);
-
     //#region take subjectId
     const location = useLocation();
-    let subjectId = location.state.subjectId;
+    let topicId = location.state.topicId;
     let subjectName = location.state.subjectName;
+    let topicName = location.state.topicName;
     //#endregion
 
-    //#region move to study screen
-    const navigate = useNavigate();
-
-    const handleClick = async (item) => {
-        const result = await AddTestDetailService(user.accountId);
-        const testDetailId = result.testdetail.testDetailId;
-        if (result) {
-            navigate('/exam', {
-                state: {
-                    testDetailId: testDetailId,
-                    topicId: item.topicId,
-                    duration: item.duration,
-                    topicName: item.topicName,
-                },
-            });
-        }
-    };
-    //#endregion
-
-    //#region move to exam result
-    const handleRanking = async (item) => {
-        navigate('/ranking', {
-            state: {
-                topicId: item.topicId,
-                accountId: user.accountId,
-            },
-        });
-    };
-    //#endregion
 
     //#region  get topic list by grade and subjecId
-    const [topicStudy, setTopicStudy] = useState([]);
+    const [ranking, setRanking] = useState([]);
     const handleGetData = async () => {
         try {
-            const result = await GetTopicByGrade('', subjectId, 6, user.accountId);
+            const result = await GetRankingOfTopic(topicId, 6);
             if (result.status === 200) {
-                setTopicStudy(result.data);
+                setRanking(result.data);
             }
         } catch (error) {
             console.error('Error fetching mod service:', error);
@@ -64,6 +35,15 @@ export default function Ranking() {
         handleGetData();
     }, []);
     //#endregion
+    const scrollTo = (item) => {
+        if (item.accountId == user.accountId) {
+            const element = document.getElementById(item.accountId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+      }
+    
     return (
         <>
             <Header />
@@ -88,15 +68,16 @@ export default function Ranking() {
                                         ></path>
                                     </svg>
                                     <span>Bảng xếp hạng</span>
-                                    <span className='topic-subject'>Toán</span>
+                                    <span className='topic-subject'>{subjectName}</span>
                                 </h2>
                             </div>
                         </div>
                     </div>
+                    <h4 style={{ textAlign: 'center', color: '' }}>{topicName}</h4>
                     <div class="container">
                         <table class="table table-hover">
                             <thead>
-                                <tr>
+                                <tr style={{ textAlign: 'center' }}>
                                     <th scope="col">Thứ hạng</th>
                                     <th scope="col">Tên</th>
                                     <th scope="col">Điểm</th>
@@ -104,12 +85,14 @@ export default function Ranking() {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    <td>@mdo</td>
-                                </tr>
+                                {ranking.map((item, index) =>
+                                    <tr style={{ textAlign: 'center' }} id={item.accountId} ref={scrollTo(item)}>
+                                        <th scope="row" style={{backgroundColor: item.accountId == user.accountId && '#33FF33'}}>{index + 1}</th>
+                                        <td style={{backgroundColor: item.accountId == user.accountId && '#33FF33'}}>{item.fullName}</td>
+                                        <td style={{backgroundColor: item.accountId == user.accountId && '#33FF33'}}>{item.score}</td>
+                                        <td style={{backgroundColor: item.accountId == user.accountId && '#33FF33'}}>{item.dateSubmit}</td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>

@@ -40,7 +40,9 @@ export default function ExamFinish() {
             },
         });
     };
-
+    const handleHome = async () => {
+        navigate('/home');
+    };
 
     return (
         <>
@@ -61,19 +63,19 @@ export default function ExamFinish() {
                         <p>Số câu đúng: <span style={{ color: item.score < 5 && 'red' }}>{item.answerRight}/{item.totalQuestion}</span></p>
                         <p>Điểm: <span style={{ color: item.score < 5 && 'red' }}>{item.score}</span></p>
                         {
-                            item.score < 5 
-                            ? <p style={{ fontStyle: 'italic' }}>• Bạn cần cố gắng thêm để có kết quả tốt hơn</p>
-                            :
-                            item.score >=5 && item.score < 7 
-                            ? <p style={{ fontStyle: 'italic' }}>• Điểm của bạn đang ở mức trung bình, cố gắng thêm chút nữa bạn nhé</p>
-                            :
-                            <p style={{ fontStyle: 'italic' }}>• Kết quả của bạn rất tốt, cố lên bạn nhé</p>
+                            item.score < 5
+                                ? <p style={{ fontStyle: 'italic' }}>• Bạn cần cố gắng thêm để có kết quả tốt hơn</p>
+                                :
+                                item.score >= 5 && item.score < 7
+                                    ? <p style={{ fontStyle: 'italic' }}>• Điểm của bạn đang ở mức trung bình, cố gắng thêm chút nữa bạn nhé</p>
+                                    :
+                                    <p style={{ fontStyle: 'italic' }}>• Kết quả của bạn rất tốt, cố lên bạn nhé</p>
                         }
                         <div className='exam-finish-result-button'>
-                            <div className='exam-finish-result-button-other'>
+                            <div className='exam-finish-result-button-other' onClick={() => handleHome()}>
                                 Trang chủ
                             </div>
-                            <div className='exam-finish-result-button-detail' onClick={()=>handleTestDetail(item)}>
+                            <div className='exam-finish-result-button-detail' onClick={() => handleTestDetail(item)}>
                                 Chi tiết
                             </div>
                         </div>

@@ -57,7 +57,7 @@ export default function PracticeQuizzes() {
                                             fill='#000000'
                                         ></path>
                                     </svg>
-                                    <span>Tự học/Luyện thi trắc nghiệm</span>
+                                    <span>Luyện thi trắc nghiệm/Chọn môn học</span>
                                 </h2>
                             </div>
                             <div className='sc-gGTGfU fSjCQg'>
@@ -78,7 +78,7 @@ export default function PracticeQuizzes() {
                                                 <div className='sc-ehsPrw fqtCF'>
                                                     <img
                                                         alt=''
-                                                        src='../Image/physics-svgrepo-com.svg'
+                                                        src={item.imgLink}
                                                         className='icon'
                                                     ></img>
                                                 </div>

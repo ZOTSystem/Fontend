@@ -48,7 +48,7 @@ export default function ChooseSubject() {
                                     <div className='sc-dlfnbm sc-eCssSg bpiLsA drBkXF' onClick={()=>handleSubject(item)}>
                                         <div class="sc-laRPJI CxaAG">
                                             <span class="sc-jeGSBP heALfe icon">
-                                                <img src="../Image/physics-svgrepo-com.svg" alt="" />
+                                            <img src={item.imgLink} alt="" />
                                             </span>
                                             <p>{item.subjectName}</p></div>
                                     </div>

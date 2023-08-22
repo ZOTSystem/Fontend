@@ -15,6 +15,7 @@ export default function Exam() {
     //#region take subjectId
     const location = useLocation();
     let topicId = location.state.topicId;
+    let topicName = location.state.topicName;
     let testDetailId = location.state.testDetailId;
     let duration = location.state.duration;
     //#endregion
@@ -147,7 +148,7 @@ export default function Exam() {
             <div className='exam'>
                 <div className='exam-right'>
                     <div className='exam-right-title'>
-                        <h6>15 phút môn toán đề 1</h6>
+                        <h6>{topicName}</h6>
                     </div>
                     <div className='exam-right-question'>
                         <p>Câu hỏi</p>
