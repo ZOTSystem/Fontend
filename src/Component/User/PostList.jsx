@@ -76,7 +76,7 @@ const PostList = ({ posts }) => {
     return (
         <div className='post'>
             {contextHolder}
-            {posts.length > 0 ? (
+            {posts?.length > 0 ? (
                 posts.map((post) => (
                     <div
                         key={post.postId}

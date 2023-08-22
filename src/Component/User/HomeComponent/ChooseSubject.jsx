@@ -33,7 +33,6 @@ export default function ChooseSubject() {
         handleGetData();
     }, []);
 
-    console.log(subjects)
     return (
         <>
             <div className='sc-eJMQSu eMtKRF'>

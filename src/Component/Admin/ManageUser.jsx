@@ -224,6 +224,7 @@ export default function ManageUser() {
         editUserId: "",
         editAvatar: "",
         editEmail: "",
+        editFullName: "",
         editPhoneNumber: "",
         editGender: "",
         editBirthDay: "",

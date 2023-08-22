@@ -101,39 +101,6 @@ export default function Login() {
         handleGetData();
     }, [])
 
-    // const getEmailList = () => {
-    //     const url = 'https://localhost:7207/api/account/getAllEmail';
-    //     axios
-    //         .get(url)
-    //         .then((result) => {
-    //             setEmailList(result.data);
-    //         })
-    //         .catch((error) => {
-    //             console.log(error);
-    //         });
-    // };
-
-    // useEffect(() => {
-    //     getEmailList();
-    // }, [render]);
-
-    // const getPhoneList = () => {
-    //     const url = 'https://localhost:7207/api/home/getAllPhone';
-    //     axios
-    //         .get(url)
-    //         .then((result) => {
-    //             setPhoneList(result.data);
-    //         })
-    //         .catch((error) => {
-    //             console.log(error);
-    //         });
-    // };
-
-    // useEffect(() => {
-    //     getPhoneList();
-    // }, [render]);
-    //#endregion
-
     //#region - Function - nhận giá trị input
     const handleInputLogin = (event) => {
         const field = event.target.name;

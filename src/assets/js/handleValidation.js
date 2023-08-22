@@ -19,9 +19,9 @@ export default function hanldeValidationEditUser(editData, errors) {
     if (editData.editFullName == '' || editData.editFullName == null || editData.editFullName == " ") {
         errors.editFullName = "Tên không được để trống";
     }
-    if (/^[a-zA-Z0-9ÀÁÂÃÈÉÊẾÌÍÒÓÔÕÙÚÝàáâãèéêếìíòóôõùúýĂăĐđĨĩŨũƠơƯưỠốộỐỘỒỚỜỬỨỮửỷỶỳỴỵỸỹ\s]+$/.test(editData.editFullName)) {
-        errors.editFullName = "Tên không chứa kí tự đặc biệt";
-    }
+    // if (/^[a-zA-Z0-9ÀÁÂÃÈÉÊẾÌÍÒÓÔÕÙÚÝàáâãèéêếìíòóôõùúýĂăĐđĨĩŨũƠơƯưỠốộỐỘỒỚỜỬỨỮửỷỶỳỴỵỸỹ\s]+$/.test(editData.editFullName)) {
+    //     errors.editFullName = "Tên không chứa kí tự đặc biệt";
+    // }
     // if (editData.editBirthDay == '' || editData.editBirthDay == null || editData.editBirthDay == " ") {
     //     errors.editBirthDay = "Ngày sinh không được để trống";
     // }
@@ -77,17 +77,16 @@ export function handleValidationRegister(registerInput, errors, emailList, phone
     if (registerInput.inputHo == '' || registerInput.inputHo == null || registerInput.inputHo == " ") {
         errors.inputHo = "Họ không được để trống";
     }
-    // if (/^[a-zA-Z0-9ÀÁÂÃÈÉÊẾÌÍÒÓÔÕÙÚÝàáâãèéêếìíòóôõùúýĂăĐđĨĩŨũƠơƯưỠốộỐỘỒỚỜỬỨỮửỷỶỳỴỵỸỹ\s]+$/.test(registerInput.inputHo)) {
-    //     errors.inputHo = "Họ không chứa kí tự đặc biệt";
-    // }
+    if (!/^[\p{L}\s]+$/u.test(registerInput.inputHo)) {
+        errors.inputHo = "Họ không chứa kí tự đặc biệt";
+    }
 
     if (registerInput.inputTen == "" || registerInput.inputTen == null || registerInput.inputTen == " ") {
         errors.inputTen = "Tên không được để trống";
     }
-    // if (/^[a-zA-Z0-9ÀÁÂÃÈÉÊẾÌÍÒÓÔÕÙÚÝàáâãèéêếìíòóôõùúýĂăĐđĨĩŨũƠơƯưỠốộỐỘỒỚỜỬỨỮửỷỶỳỴỵỸỹ\s]+$/.test(registerInput.inputTen)) {
-    //     errors.inputTen = "Tên không chứa kí tự đặc biệt";
-    // }
-
+    if (!/^[\p{L}\s]+$/u.test(registerInput.inputTen)) {
+        errors.inputTen = "Tên không chứa kí tự đặc biệt";
+    }
 
     if (registerInput.inputEmail == '' || registerInput.inputEmail == null || registerInput.inputEmail == " ") {
         errors.inputEmail = "Email không được để trống"
@@ -124,6 +123,9 @@ export function handleValidationUpdateUser(editData, errors, phoneList) {
     if (editData.editFullName == "" || editData.editFullName == null || editData.editFullName == " ") {
         errors.editFullName = "Tên không được để trống";
     }
+    if (!/^[\p{L}\s]+$/u.test(editData.editFullName)) {
+        errors.editFullName = "Tên không chứa kí tự đặc biệt";
+    }
 
     if (!/^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/.test(editData.editPhone)) {
         errors.editPhone = 'Số điện thoại phải 10 chữ số';
@@ -131,9 +133,9 @@ export function handleValidationUpdateUser(editData, errors, phoneList) {
     if (editData.editPhone == '' || editData.editPhone == null || editData.editPhone == " ") {
         errors.editPhone = "Số điện thoại không được để trống";
     }
-    // if (phoneList.includes(editData.editPhone)) {
-    //     errors.editPhone = "Số điện thoại đã được đăng ký";
-    // }
+    if (phoneList.includes(editData.editPhone)) {
+        errors.editPhone = "Số điện thoại đã được đăng ký";
+    }
 
     const currentDate = new Date();
     const year = currentDate.getFullYear();

@@ -11,7 +11,7 @@ export const GetAllModService = async () => {
         });
         return respone;
     } catch (e) {
-        return e;
+        return e;   
     }
 };
 
@@ -33,7 +33,7 @@ export const AddModService = async (data) => {
 
 export const ChangeStatusService = async (accountId, string) => {
     try {
-        const respone = await Request({
+        const respone = await request({
             method: 'post',
             url: `account/changeStatus?accountId=${accountId}&status=${string}`,
             headers: {
@@ -48,7 +48,7 @@ export const ChangeStatusService = async (accountId, string) => {
 
 export const UpdateModService = async (accountId, data) => {
     try {
-        const respone = await Request({
+        const respone = await request({
             method: 'post',
             url: `account/updateMod?accountId=${accountId}`,
             headers: {

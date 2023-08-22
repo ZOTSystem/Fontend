@@ -317,6 +317,7 @@ export default function ManageMod() {
             okType: 'danger',
             onOk: async () => {
                 const result = await ChangeStatusService(record.accountId, 'Đang khóa');
+                console.log(result);
                 if (result) {
                     handleGetData();
                     openNotificationEnable('topRight');
@@ -424,7 +425,6 @@ export default function ManageMod() {
         hanldeValidationEditUser(editData, errors);
         if (Object.keys(errors).length === 0) {
             const result = await UpdateModService(data.accountId, data);
-            console.log(result);
             if (result) {
                 handleGetData();
                 openNotificationUpdate('topRight');
