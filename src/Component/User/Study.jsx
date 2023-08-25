@@ -22,6 +22,7 @@ export default function Study() {
         try {
             const result = await GetQuestionByTopicId(topicId);
             if (result.status === 200) {
+                console.log(result.status);
                 setQuestions(result.data);
             }
         } catch (error) {
@@ -54,6 +55,7 @@ export default function Study() {
             setWrong2Answer();
             setWrong3Answer();
             setWrong4Answer();
+            setCurrent(current + 1);
         }
     }
 
@@ -171,7 +173,9 @@ export default function Study() {
                                                 <img src={study1}></img>
                                                 <p style={{ fontWeight: 'bold' }}>Câu {index + 1}:</p>
                                             </div>
-                                            <p>{item.questionContext}</p>
+                                            {/* <div className='questionContent' dangerouslySetInnerHTML={{ __html: item.questionContext }}>
+                                            </div> */}
+                                            <p dangerouslySetInnerHTML={{ __html: item.questionContext }}></p>
                                         </div>
                                         <img src={item.image}></img>
                                     </div>
@@ -205,7 +209,7 @@ export default function Study() {
                                             <p>A</p>
                                         </div>
                                         <div className='study-left-answer-right'>
-                                            <p style={{ marginBottom: 0, marginTop: 7 }}>{item.optionA}</p>
+                                            <p style={{ marginBottom: 0, marginTop: 7 }} dangerouslySetInnerHTML={{ __html: item.optionA }}></p>
                                         </div>
                                     </div>
                                     <div
@@ -238,7 +242,7 @@ export default function Study() {
                                             <p>B</p>
                                         </div>
                                         <div className='study-left-answer-right'>
-                                            <p style={{ marginBottom: 0, marginTop: 7 }}>{item.optionB}</p>
+                                            <p style={{ marginBottom: 0, marginTop: 7 }} dangerouslySetInnerHTML={{ __html: item.optionB }}></p>
                                         </div>
                                     </div>
                                     <div
@@ -271,7 +275,7 @@ export default function Study() {
                                             <p>C</p>
                                         </div>
                                         <div className='study-left-answer-right'>
-                                            <p style={{ marginBottom: 0, marginTop: 7 }}>{item.optionC}</p>
+                                            <p style={{ marginBottom: 0, marginTop: 7 }} dangerouslySetInnerHTML={{ __html: item.optionC }}></p>
                                         </div>
                                     </div>
                                     <div
@@ -304,7 +308,7 @@ export default function Study() {
                                             <p>D</p>
                                         </div>
                                         <div className='study-left-answer-right'>
-                                            <p style={{ marginBottom: 0, marginTop: 7 }}>{item.optionD}</p>
+                                            <p style={{ marginBottom: 0, marginTop: 7 }} dangerouslySetInnerHTML={{ __html: item.optionD }}></p>
                                         </div>
                                     </div>
                                     {solution && (
@@ -325,8 +329,9 @@ export default function Study() {
                                             <div
                                                 className='study-left-solution-detail'
                                                 style={{ fontWeight: 400 }}
+                                                dangerouslySetInnerHTML={{ __html: item.solution }}
                                             >
-                                                {item.solution}
+                                                {/* {item.solution} */}
                                             </div>
                                         </div>
                                     )}

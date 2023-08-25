@@ -23,8 +23,8 @@ import ExamResult from './Component/User/ExamResult';
 import Study from './Component/User/Study';
 import ExamFinish from './Component/User/ExamFinish';
 import TopicStudy from './Component/User/TopicStudy';
-import Contest from './Component/User/Contest'  
-import Ranking from './Component/User/Ranking'  
+import Contest from './Component/User/Contest'
+import Ranking from './Component/User/Ranking'
 import NewsDetail from './Component/User/NewsDetail';
 
 //#Region Admin Routes
@@ -52,87 +52,85 @@ import ManageAdmin from './Component/SuperAdmin/ManageAdmin';
 
 
 function App() {
-    const { token, user } = useContext(UserContext);
-    return (
-      <Fragment>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<HomePage />}></Route>
-            {!token ?
-              <>
-                <Route path="/login" element={<Login />}></Route>
-                <Route path="/forum" element={<PostProvider><SubjectProvider><CommentProvider><Forum /></CommentProvider></SubjectProvider></PostProvider>}></Route>
-                <Route path="/news" element={<News />}></Route>
-                <Route path="confirm/:email" element={<ConfirmEmail />} />
-                <Route path="/practiceQuizz" element={<PracticeQuizzes />}></Route>
-                <Route path="/testSubject" element={<TestSubject />}></Route>
-                <Route path="/test" element={<Testfirebase />}></Route>
-                <Route path="/news/newDetail/:id" element={<NewsDetail />} />
+  const { token, user } = useContext(UserContext);
+  return (
+    <Fragment>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<HomePage />}></Route>
+          {!token ?
+            <>
+              <Route path="/login" element={<Login />}></Route>
+              <Route path="/forum" element={<PostProvider><SubjectProvider><CommentProvider><Forum /></CommentProvider></SubjectProvider></PostProvider>}></Route>
+              <Route path="/news" element={<News />}></Route>
+              <Route path="confirm/:email" element={<ConfirmEmail />} />
+              <Route path="/practiceQuizz" element={<PracticeQuizzes />}></Route>
+              <Route path="/testSubject" element={<TestSubject />}></Route>
+              <Route path="/test" element={<Testfirebase />}></Route>
+              <Route path="/news/newDetail/:id" element={<NewsDetail />} />
 
-                <Route path="/*" element={<Navigate to="/login" />} />
-              </> :
-              <>
-                {
-                  user.roleId == '4' ?
-                    <>
-                      <Route path="/news" element={<News />}></Route>
-                      <Route path="/testSubject" element={<TestSubject />}></Route>
-                      <Route path="/test" element={<Testfirebase />}></Route>
-                      <Route path="/practiceQuizz" element={<PracticeQuizzes />}></Route>
-                      <Route path="/profile" element={<Profile />}></Route>
-                      <Route path='/testHistory' element={<TestHistory />}></Route>
-                      <Route path="/takeExam" element={<TakeExam />}></Route>
-                      <Route path="/exam" element={<Exam />}></Route>
-                      <Route path="/forum" element={<PostProvider><SubjectProvider><CommentProvider><Forum /></CommentProvider></SubjectProvider></PostProvider>}></Route>
-                      <Route path="/examResult" element={<ExamResult />}></Route>
-                      <Route path="/study" element={<Study />}></Route>
-                      <Route path="/examFinish" element={<ExamFinish />}></Route>
-                      <Route path="/topicStudy" element={<TopicStudy />}></Route>
-                      <Route path="/contest" element={<Contest />}></Route>
-                      <Route path="/ranking" element={<Ranking />}></Route>
-                      <Route path="/news/newDetail/:id" element={<NewsDetail />} />
+              <Route path="/*" element={<Navigate to="/login" />} />
+            </> :
+            <>
+              {
+                user.roleId == '4' ?
+                  <>
+                    <Route path="/news" element={<News />}></Route>
+                    <Route path="/testSubject" element={<TestSubject />}></Route>
+                    <Route path="/test" element={<Testfirebase />}></Route>
+                    <Route path="/practiceQuizz" element={<PracticeQuizzes />}></Route>
+                    <Route path="/profile" element={<Profile />}></Route>
+                    <Route path='/testHistory' element={<TestHistory />}></Route>
+                    <Route path="/takeExam" element={<TakeExam />}></Route>
+                    <Route path="/exam" element={<Exam />}></Route>
+                    <Route path="/forum" element={<PostProvider><SubjectProvider><CommentProvider><Forum /></CommentProvider></SubjectProvider></PostProvider>}></Route>
+                    <Route path="/examResult" element={<ExamResult />}></Route>
+                    <Route path="/study" element={<Study />}></Route>
+                    <Route path="/examFinish" element={<ExamFinish />}></Route>
+                    <Route path="/topicStudy" element={<TopicStudy />}></Route>
+                    <Route path="/contest" element={<Contest />}></Route>
+                    <Route path="/ranking" element={<Ranking />}></Route>
+                    <Route path="/news/newDetail/:id" element={<NewsDetail />} />
 
-                    
+                    <Route path="/*" element={<Navigate to="/" />} />
+                  </> :
+                  <>
+                    {
+                      user.roleId == '2' ?
+                        <>
+                          <Route path="/admin/statictis" element={<Statistics />} />
+                          <Route path="/admin/manageUser" element={<ManageUser />} />
+                          <Route path="/admin/manageMod" element={<ManageMod />} />
+                          <Route path="/admin/manageTopic" element={<ManageTopic />} />
+                          <Route path="/admin/manageNew" element={<ManageNews />} />
+                          <Route path="/admin/manageQuestion/:id" element={<ManageQuestion />} />
+                          <Route path="/admin/manageForum" element={<PostProvider><SubjectProvider><CommentProvider><ManageForum /></CommentProvider></SubjectProvider></PostProvider>} />
 
-                      <Route path="/*" element={<Navigate to="/" />} />
-                    </> :
-                    <>
-                      {
-                        user.roleId == '2' ?
+                          <Route path="/*" element={<Navigate to="/admin/statictis" />} />
+                        </> :
+                        user.roleId == '3' ?
                           <>
-                            <Route path="/admin/statictis" element={<Statistics />}/>
-                            <Route path="/admin/manageUser" element={<ManageUser />} />
-                            <Route path="/admin/manageMod" element={<ManageMod />} />
-                            <Route path="/admin/manageTopic" element={<ManageTopic />} />
-                            <Route path="/admin/manageNew" element={<ManageNews />} />
-                            <Route path="/admin/manageQuestion/:id" element={<ManageQuestion />} />
-                            <Route path="/admin/manageForum" element={<PostProvider><SubjectProvider><CommentProvider><ManageForum /></CommentProvider></SubjectProvider></PostProvider>} />
-                            
-                            <Route path="/*" element={<Navigate to="/admin/statictis" />} />
-                          </> :
-                          user.roleId == '3' ?
-                            <>
-                              <Route path="/mod/manageNews" element={<ManageNewsByMod />} />
-                              <Route path="/mod/manageTopic" element={<ManageTopicByMod />} />
-                              <Route path="mod/manageQuestion/:id" element={<ManageQuestionByMod />} />
+                            <Route path="/mod/manageNews" element={<ManageNewsByMod />} />
+                            <Route path="/mod/manageTopic" element={<ManageTopicByMod />} />
+                            <Route path="mod/manageQuestion/:id" element={<ManageQuestionByMod />} />
 
-                              <Route path="/*" element={<Navigate to="/mod/manageTopic" />} />
-                            </> :
-                            <>
-                            <Route path="/superAdmin/manageAdmin" element={<ManageAdmin />}/>
+                            <Route path="/*" element={<Navigate to="/mod/manageTopic" />} />
+                          </> :
+                          <>
+                            <Route path="/superAdmin/manageAdmin" element={<ManageAdmin />} />
 
                             <Route path="/*" element={<Navigate to="/superAdmin/manageAdmin" />} />
 
-                            </>
-                      }
-                    </>
-                }
-              </>
-            }
-          </Routes>
-        </BrowserRouter>
-      </Fragment >
-    );
+                          </>
+                    }
+                  </>
+              }
+            </>
+          }
+        </Routes>
+      </BrowserRouter>
+    </Fragment >
+  );
 }
 
 export default App;

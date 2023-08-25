@@ -11,6 +11,10 @@ import { GetAllModService } from '../../services/modService';
 import { AddModService } from '../../services/modService';
 import { ChangeStatusService } from '../../services/modService';
 import { UpdateModService } from '../../services/modService';
+import { GetPhoneWithoutThisPhonedService } from '../../services/userService';
+import { GetAllEmail } from '../../services/SuperAdminService';
+import { hanldeValidationEditMod } from '../../assets/js/handleValidation';
+import { GetAllPhoneService } from '../../services/userService';
 
 const { Content } = Layout;
 
@@ -133,30 +137,6 @@ export default function ManageMod() {
             dataIndex: 'phone',
             key: 1,
             fixed: 'left',
-            filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
-                return (
-                    <Input
-                        autoFocus
-                        placeholder='Nhập số điện thoại'
-                        value={selectedKeys[0]}
-                        onChange={(e) => {
-                            setSelectedKeys(e.target.value ? [e.target.value] : []);
-                        }}
-                        onPressEnter={() => {
-                            confirm();
-                        }}
-                        onBlur={() => {
-                            confirm();
-                        }}
-                    ></Input>
-                );
-            },
-            filterIcon: () => {
-                return <SearchOutlined />;
-            },
-            onFilter: (value, record) => {
-                return record.phoneNumber.toLowerCase().includes(value.toLowerCase());
-            },
         },
         {
             title: 'Trạng thái',
@@ -206,6 +186,7 @@ export default function ManageMod() {
 
     //#region - Declare - các biến dùng
     const dayFormat = 'YYYY-MM-DD';
+    const [originPhone, setOriginPhone] = useState('');
     const [dataSource, setDataSource] = useState('');
     const [show, setShow] = useState(false);
     const [showCreate, setShowCreate] = useState(false);
@@ -291,22 +272,6 @@ export default function ManageMod() {
         handleGetData();
     }, []);
 
-    const getEmailList = () => {
-        const url = 'https://localhost:7207/api/account/getAllEmail';
-        axios
-            .get(url)
-            .then((result) => {
-                setEmailList(result.data);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    };
-
-    useEffect(() => {
-        getEmailList();
-    }, []);
-
     //#endregion
 
     //#region - Function - Deactivate/Activate tài khoản của mod
@@ -317,13 +282,13 @@ export default function ManageMod() {
             okType: 'danger',
             onOk: async () => {
                 const result = await ChangeStatusService(record.accountId, 'Đang khóa');
-                if (result) {
+                if (result.status === 200) {
                     handleGetData();
                     openNotificationEnable('topRight');
                 }
             },
             cancelText: 'Hủy',
-            onCancel: () => {},
+            onCancel: () => { },
         });
     };
 
@@ -340,7 +305,7 @@ export default function ManageMod() {
                 }
             },
             cancelText: 'Hủy',
-            onCancel: () => {},
+            onCancel: () => { },
         });
     };
     //#endregion
@@ -409,6 +374,7 @@ export default function ManageMod() {
             editBirthDay: record.birthDay,
             editGender: record.gender,
         });
+        setOriginPhone(record.phone);
         setShow(true);
     };
 
@@ -421,20 +387,27 @@ export default function ManageMod() {
             gender: editData.editGender,
             birthDay: editData.editBirthDay,
         };
-        hanldeValidationEditUser(editData, errors);
+        const resultcheckPhone = await GetPhoneWithoutThisPhonedService(originPhone);
+        hanldeValidationEditMod(editData, errors, resultcheckPhone.data);
         if (Object.keys(errors).length === 0) {
             const result = await UpdateModService(data.accountId, data);
-            console.log(result);
-            if (result) {
+            if (result.status === 200) {
                 handleGetData();
                 openNotificationUpdate('topRight');
                 setErrors([]);
                 setShow(false);
-                setEditData('');
+                setEditData({
+                    createFullName: '',
+                    createEmail: '',
+                    createPhoneNumber: '',
+                    createGender: '',
+                    createBirthDay: '',
+                });
             }
         } else {
             setErrors(errors);
         }
+
     };
     //#endregion
 
@@ -448,10 +421,12 @@ export default function ManageMod() {
             phone: createData.createPhoneNumber,
             gender: createData.createGender,
         };
-        hanldeValidationCreateMod(createData, errors, emailList);
+        const resultcheckPhone = await GetAllPhoneService();
+        const resultcheckEmail = await GetAllEmail();
+        hanldeValidationCreateMod(createData, errors, resultcheckEmail.data, resultcheckPhone);
         if (Object.keys(errors).length === 0) {
             const result = await AddModService(data);
-            if (result) {
+            if (result.status === 200) {
                 handleGetData();
                 setErrors([]);
                 openNotificationCreate('topRight');

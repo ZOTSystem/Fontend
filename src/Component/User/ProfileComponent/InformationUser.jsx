@@ -164,7 +164,7 @@ export default function     InformationUser() {
             schoolName: editData.editSchoolName,
             avatar: imageUpload,
         };
-        var result = await GetPhoneWithoutThisPhonedService(editData.editPhone);
+        var result = await GetPhoneWithoutThisPhonedService(user.phone);
         handleValidationUpdateUser(editData, errors, result.data);
         if (Object.keys(errors).length === 0) {
             const result = await UpdateUserService(data);

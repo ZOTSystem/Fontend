@@ -16,6 +16,8 @@ export default function Header() {
     const onLogOut = () => {
         // removeCookie('token', { path: '/' });
         localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        localStorage.clear();
         onSetUser({
             data: "",
             token: "",
@@ -65,7 +67,7 @@ export default function Header() {
                         <img src="../Image/Logo.png" alt="" />
                     </div>
                     <div className="slogun">
-                        <span>Website luyện thi đại học tốt nhất Việt Nam</span>
+                        <span>Đồng hành cùng bạn trong học tập</span>
                     </div>
                 </div>
                 <div className="headerRight">

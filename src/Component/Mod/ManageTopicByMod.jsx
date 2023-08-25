@@ -187,32 +187,6 @@ export default function ManageTopicByMod() {
             dataIndex: "status",
             key: 7,
             fixed: "left",
-            filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
-                return (
-                    <Input
-                        autoFocus
-                        placeholder="Nhập loại topic"
-                        value={selectedKeys[0]}
-                        onChange={(e) => {
-                            setSelectedKeys(e.target.value ? [e.target.value] : []);
-                        }}
-                        onPressEnter={() => {
-                            confirm();
-                        }}
-                        onBlur={() => {
-                            confirm();
-                        }}
-                    />
-                );
-            },
-            filterIcon: () => {
-                return <SearchOutlined />;
-            },
-            onFilter: (value, record) => {
-                if (record.topicTypeName != null) {
-                    return record.topicTypeName.toLowerCase().includes(value.toLowerCase());
-                }
-            },
         },
         {
             title: "Điều hướng",
@@ -463,7 +437,7 @@ export default function ManageTopicByMod() {
 
     const onEditInputStartDateAndEndDate = (value, dateString) => {
         setEditData((editData) => ({ ...editData, editStartDate: dateString[0] }));
-        setEditData((editData) => ({ ...editData, editStartDate: dateString[1] }));
+        setEditData((editData) => ({ ...editData, editEndDate: dateString[1] }));
     };
 
     function convertToUTCDate(inputTimeString) {
@@ -480,12 +454,12 @@ export default function ManageTopicByMod() {
         if (Object.keys(errors).length === 0) {
             const data = {
                 topicName: createData.createTopicName,
-                duration: createData.createDuration == "Chọn thời gian" ? null : createData.createDuration,
+                duration: createData.createDuration != "Chọn thời gian" ? createData.createDuration : null,
                 subjectId: createData.createSubjectId,
                 topicType: createData.createTopicType,
-                grade: createData.createGrade,
-                startTestDate: convertToUTCDate(createData.createStartDate),
-                finishTestDate: convertToUTCDate(createData.createEndDate),
+                grade: createData.createGrade != "Chọn lớp" ? createData.createGrade : null,
+                startTestDate: convertToUTCDate(createData.createStartDate) != null ? convertToUTCDate(createData.createStartDate) : null,
+                finishTestDate: convertToUTCDate(createData.createEndDate) != null ? convertToUTCDate(createData.createEndDate) : null,
             };
             const result = await AddTopicService(data);
             if (result.status === 200) {
@@ -527,8 +501,8 @@ export default function ManageTopicByMod() {
             editStartDate: record.beginTestDate,
             editEndDate: record.endTestDate,
         });
-        console.log(record.beginTestDate);
-        console.log(dayjs(record.beginTestDate, dayFormat));
+        // console.log(record.beginTestDate);
+        // console.log(dayjs(record.beginTestDate, dayFormat));
 
         setShowEditForm(true);
     }
@@ -555,14 +529,13 @@ export default function ManageTopicByMod() {
             const data = {
                 topicId: editData.editTopicId,
                 topicName: editData.editTopicName,
-                duration: editData.editDuration,
+                duration: editData.editDuration != "Chọn thời gian" ? editData.editDuration : null,
                 subjectId: editData.editSubjectId,
                 topicType: editData.editTopicType,
-                grade: editData.editGrade,
-                startTestDate: convertToUTCDate(editData.editStartDate),
-                finishTestDate: convertToUTCDate(editData.editEndDate),
+                grade: editData.editGrade != null ? editData.editGrade : null,
+                startTestDate: convertToUTCDate(editData.editStartDate) != null ? convertToUTCDate(editData.editStartDate) : null,
+                finishTestDate: convertToUTCDate(editData.editEndDate) != null ? convertToUTCDate(editData.editEndDate) : null,
             };
-            console.log(data);
             const result = await UpdateTopicService(data);
             if (result.status === 200) {
                 handleGetAllTopic();
@@ -700,29 +673,31 @@ export default function ManageTopicByMod() {
                                         </div>
                                     )}
                                 </Form.Item>
-                                <Form.Item>
-                                    <label>Lớp</label>
-                                    <select
-                                        name="createGrade"
-                                        value={createData.createGrade}
-                                        allowclear
-                                        className="form-control"
-                                        onChange={handleCreateInputChange}
-                                    >
-                                        <option value="Chọn lớp">Chọn lớp</option>
-                                        <option value="10">10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                    </select>
-                                    {errors.createGrade && (
-                                        <div
-                                            className="invalid-feedback"
-                                            style={{ display: "block", color: "red" }}
+                                {createData.createTopicType != 5 && createData.createTopicType != 6 &&
+                                    <Form.Item>
+                                        <label>Lớp</label>
+                                        <select
+                                            name="createGrade"
+                                            value={createData.createGrade}
+                                            allowclear
+                                            className="form-control"
+                                            onChange={handleCreateInputChange}
                                         >
-                                            {errors.createGrade}
-                                        </div>
-                                    )}
-                                </Form.Item>
+                                            <option value="Chọn lớp">Chọn lớp</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                            <option value="12">12</option>
+                                        </select>
+                                        {errors.createGrade && (
+                                            <div
+                                                className="invalid-feedback"
+                                                style={{ display: "block", color: "red" }}
+                                            >
+                                                {errors.createGrade}
+                                            </div>
+                                        )}
+                                    </Form.Item>
+                                }
                                 <Form.Item>
                                     <label>Tên Topic</label>
                                     <Input
@@ -855,29 +830,31 @@ export default function ManageTopicByMod() {
                                         </div>
                                     )}
                                 </Form.Item>
-                                <Form.Item>
-                                    <label>Lớp</label>
-                                    <select
-                                        name="editGrade"
-                                        value={editData.editGrade}
-                                        allowclear
-                                        className="form-control"
-                                        onChange={handleEditInputChange}
-                                    >
-                                        <option value="Chọn lớp">Chọn lớp</option>
-                                        <option value="10">10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                    </select>
-                                    {errors.editGrade && (
-                                        <div
-                                            className="invalid-feedback"
-                                            style={{ display: "block", color: "red" }}
+                                {editData.editTopicType != 5 && editData.editTopicType != 6 &&
+                                    <Form.Item>
+                                        <label>Lớp</label>
+                                        <select
+                                            name="editGrade"
+                                            value={editData.editGrade}
+                                            allowclear
+                                            className="form-control"
+                                            onChange={handleEditInputChange}
                                         >
-                                            {errors.editGrade}
-                                        </div>
-                                    )}
-                                </Form.Item>
+                                            <option value="Chọn lớp">Chọn lớp</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                            <option value="12">12</option>
+                                        </select>
+                                        {errors.editGrade && (
+                                            <div
+                                                className="invalid-feedback"
+                                                style={{ display: "block", color: "red" }}
+                                            >
+                                                {errors.editGrade}
+                                            </div>
+                                        )}
+                                    </Form.Item>
+                                }
                                 <Form.Item>
                                     <label>Tên Topic</label>
                                     <Input

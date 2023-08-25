@@ -101,39 +101,6 @@ export default function Login() {
         handleGetData();
     }, [])
 
-    // const getEmailList = () => {
-    //     const url = 'https://localhost:7207/api/account/getAllEmail';
-    //     axios
-    //         .get(url)
-    //         .then((result) => {
-    //             setEmailList(result.data);
-    //         })
-    //         .catch((error) => {
-    //             console.log(error);
-    //         });
-    // };
-
-    // useEffect(() => {
-    //     getEmailList();
-    // }, [render]);
-
-    // const getPhoneList = () => {
-    //     const url = 'https://localhost:7207/api/home/getAllPhone';
-    //     axios
-    //         .get(url)
-    //         .then((result) => {
-    //             setPhoneList(result.data);
-    //         })
-    //         .catch((error) => {
-    //             console.log(error);
-    //         });
-    // };
-
-    // useEffect(() => {
-    //     getPhoneList();
-    // }, [render]);
-    //#endregion
-
     //#region - Function - nhận giá trị input
     const handleInputLogin = (event) => {
         const field = event.target.name;
@@ -211,10 +178,12 @@ export default function Login() {
             password: loginInput.inputPassword,
         };
         const result = await LoginService(data);
-        if (result.status === 200) {
+
+        if (result.status != undefined && result.status === 200) {
             onSetUser(result);
             // handleSetCookie(result.token);
             localStorage.setItem('authToken', result.token);
+            localStorage.setItem('user', result.data);
             if (result.roleId === 4) {
                 navigate('/');
             } else if (result.roleId === 2) {
@@ -228,6 +197,7 @@ export default function Login() {
             openNotificationLoginFailly('topRight');
         }
     };
+    
     //#endregion
 
     //#region - Function - Forgot Password

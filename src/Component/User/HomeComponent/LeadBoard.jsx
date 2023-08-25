@@ -35,7 +35,6 @@ export default function LeadBoard() {
             const result = await GetUserDoTest();
             if (result.newData != null) {
                 setUserHard(result.newData)
-                console.log(result.newData)
             }
         } catch (error) {
             console.error('Error fetching testdetail service:', error);

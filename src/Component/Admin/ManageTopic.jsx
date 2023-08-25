@@ -9,6 +9,7 @@ import SiderAdmin from "../../Layout/Admin/SiderAdmin";
 import HeaderAdmin from "../../Layout/Admin/HeaderAdmin";
 import { UserContext } from "../../contexts/UserContext";
 import { Navigate, useNavigate } from 'react-router-dom';
+import dayjs from "dayjs";
 
 
 import { GetAllTopicService } from "../../services/topicService";
@@ -20,10 +21,11 @@ import { UpdateTopicService } from "../../services/topicService";
 import { handleValidationUpdateTopic } from "../../assets/js/handleValidation";
 
 const { Content } = Layout;
+const { RangePicker } = DatePicker;
 
 
 export default function ManageTopic() {
-
+    const dayFormat = "YYYY-MM-DD HH:mm";
     const {
         token: { colorBgContainer },
     } = theme.useToken();
@@ -184,32 +186,6 @@ export default function ManageTopic() {
             dataIndex: "status",
             key: 7,
             fixed: "left",
-            filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
-                return (
-                    <Input
-                        autoFocus
-                        placeholder="Nhập trạng thái"
-                        value={selectedKeys[0]}
-                        onChange={(e) => {
-                            setSelectedKeys(e.target.value ? [e.target.value] : []);
-                        }}
-                        onPressEnter={() => {
-                            confirm();
-                        }}
-                        onBlur={() => {
-                            confirm();
-                        }}
-                    />
-                );
-            },
-            filterIcon: () => {
-                return <SearchOutlined />;
-            },
-            onFilter: (value, record) => {
-                if (record.status != null) {
-                    return record.status.toLowerCase().includes(value.toLowerCase());
-                }
-            },
         },
         {
             title: "Điều hướng",
@@ -248,9 +224,9 @@ export default function ManageTopic() {
                         &nbsp;
                         <Button
                             icon={<FolderOpenOutlined />}
-                            style={{background: '#ffa000', color: 'white'}}
+                            style={{ background: '#ffa000', color: 'white' }}
                             onClick={() => handleViewListQuestion(record)}
-                        >   
+                        >
                         </Button>
                     </>
                 );
@@ -258,7 +234,7 @@ export default function ManageTopic() {
         },
     ]
     const navigate = useNavigate();
-    const {render, onSetRender} = useContext(UserContext);
+    const { render, onSetRender } = useContext(UserContext);
     const [dataSource, setDataSource] = useState("");
     const [subjectList, setSubjectList] = useState([]);
     const [showEditForm, setShowEditForm] = useState(false);
@@ -270,6 +246,8 @@ export default function ManageTopic() {
         editGrade: "",
         editTopicName: "",
         editDuration: "",
+        editStartDate: "",
+        editEndDate: "",
     });
 
     const [errors, setErrors] = useState({
@@ -278,6 +256,8 @@ export default function ManageTopic() {
         editGrade: "",
         editTopicName: "",
         editDuration: "",
+        editStartDate: "",
+        editEndDate: "",
     })
     //#endregion
 
@@ -317,7 +297,7 @@ export default function ManageTopic() {
     const handleGetAllTopic = async () => {
         try {
             const result = await GetAllTopicService();
-            if(result.status === 200){
+            if (result.status === 200) {
                 setDataSource(result.data);
             }
         } catch (e) {
@@ -332,7 +312,7 @@ export default function ManageTopic() {
     const handleGetAllSubject = async () => {
         try {
             const result = await GetAllSubjectService();
-            if(result.status === 200){
+            if (result.status === 200) {
                 setSubjectList(result.data);
             }
         } catch (e) {
@@ -354,9 +334,9 @@ export default function ManageTopic() {
             okType: "danger",
             onOk: async () => {
                 const status = "2";
-                try{
+                try {
                     const result = await ChangeStatusTopicService(record.topicId, status);
-                    if(result.status === 200){
+                    if (result.status === 200) {
                         openNotificationChangeStatus200("topRight");
                         handleGetAllTopic();
                     } else {
@@ -365,7 +345,7 @@ export default function ManageTopic() {
                 } catch {
                     openNotificationChangeStatus400("topRight");
                 }
-                
+
             },
             cancelText: "Cancel",
             onCancel: () => { },
@@ -380,16 +360,16 @@ export default function ManageTopic() {
             okType: "default",
             onOk: async () => {
                 const status = "1";
-                try{
+                try {
                     const result = await ChangeStatusTopicService(record.topicId, status);
-                    if(result.status === 200){
+                    if (result.status === 200) {
                         openNotificationChangeStatus200("topRight");
                         handleGetAllTopic();
                     } else {
                         openNotificationChangeStatus400("topRight");
-                    } 
-                } catch{
-                    openNotificationChangeStatus400("topRight");    
+                    }
+                } catch {
+                    openNotificationChangeStatus400("topRight");
                 }
             },
             cancelText: "Cancel",
@@ -405,16 +385,16 @@ export default function ManageTopic() {
             okType: "default",
             onOk: async () => {
                 const status = "1";
-                try{
+                try {
                     const result = await ChangeStatusTopicService(record.topicId, status);
-                    if(result.status === 200){
+                    if (result.status === 200) {
                         openNotificationChangeStatus200("topRight");
                         handleGetAllTopic();
                     } else {
                         openNotificationChangeStatus400("topRight");
                     }
-                }catch{
-                    openNotificationChangeStatus400("topRight");    
+                } catch {
+                    openNotificationChangeStatus400("topRight");
                 }
             },
             cancelText: "Cancel",
@@ -427,8 +407,17 @@ export default function ManageTopic() {
     const handleEditInputChange = (event) => {
         const field = event.target.name;
         const value = event.target.value;
-        
-        setEditData((editData) => ({...editData, [field]: value}));
+
+        setEditData((editData) => ({ ...editData, [field]: value }));
+    }
+    const onEditInputStartDateAndEndDate = (value, dateString) => {
+        setEditData((editData) => ({ ...editData, editStartDate: dateString[0] }));
+        setEditData((editData) => ({ ...editData, editEndDate: dateString[1] }));
+    };
+
+    function convertToUTCDate(inputTimeString) {
+        const originalDate = new Date(inputTimeString);
+        return originalDate;
     }
     //#endregion
 
@@ -441,6 +430,8 @@ export default function ManageTopic() {
             editGrade: record.grade,
             editTopicName: record.topicName,
             editDuration: record.duration,
+            editStartDate: record.beginTestDate,
+            editEndDate: record.endTestDate,
         });
         setShowEditForm(true);
     }
@@ -456,34 +447,40 @@ export default function ManageTopic() {
             editGrade: "",
             editTopicName: "",
             editDuration: "",
+            editStartDate: "",
+            editEndDate: "",
         });
     }
 
     const handleSubmitEdit = async () => {
         let errors = {};
         handleValidationUpdateTopic(editData, errors);
-        if(Object.keys(errors).length === 0){
+        if (Object.keys(errors).length === 0) {
+            console.log(editData);
             const data = {
                 topicId: editData.editTopicId,
                 topicName: editData.editTopicName,
-                duration: editData.editDuration,
+                duration: editData.editDuration != "Chọn thời gian" ? editData.editDuration : null,
                 subjectId: editData.editSubjectId,
                 topicType: editData.editTopicType,
-                grade: editData.editGrade,
-            };    
-        const result = await UpdateTopicService(data);
-        if(result.status === 200){
-            handleGetAllTopic();
-            setErrors([]);
-            setShowEditForm(false);
-            setEditData('');
-            openNotificationUpdate200("topRight");
-        } else {
-            openNotificationChangeStatus400("topRight");
-        }
+                grade: editData.editGrade != null ? editData.editGrade : null,
+                startTestDate: convertToUTCDate(editData.editStartDate) != null ? convertToUTCDate(editData.editStartDate) : null,
+                finishTestDate: convertToUTCDate(editData.editEndDate) != null ? convertToUTCDate(editData.editEndDate) : null,
+            };
+            console.log(data);
+            const result = await UpdateTopicService(data);
+            if (result.status === 200) {
+                handleGetAllTopic();
+                setErrors([]);
+                setShowEditForm(false);
+                setEditData('');
+                openNotificationUpdate200("topRight");
+            } else {
+                openNotificationChangeStatus400("topRight");
+            }
         } else {
             setErrors(errors);
-        }  
+        }
     }
     //#endregion
 
@@ -551,26 +548,26 @@ export default function ManageTopic() {
                             okText='Lưu'
                             cancelText='Đóng'
                             onCancel={() => onClickCancelEditForm()}
-                            onOk={() => handleSubmitEdit()}                        
+                            onOk={() => handleSubmitEdit()}
                         >
-                             <Form>
+                            <Form>
                                 <Form.Item>
                                     <label>Môn học</label>
                                     <select
-                                       name="editSubjectId"
-                                       allowclear
-                                       value={editData.editSubjectId}
-                                       className="form-control"
-                                       onChange={handleEditInputChange}
+                                        name="editSubjectId"
+                                        allowclear
+                                        value={editData.editSubjectId}
+                                        className="form-control"
+                                        onChange={handleEditInputChange}
                                     >
-                                    <option value="Chọn môn học">Chọn môn học</option>
-                                    {subjectList?.map((item) => (
-                                        <option
-                                            value={item.subjectId}
-                                        >
-                                            {item.subjectName}
-                                        </option>
-                                    ))}
+                                        <option value="Chọn môn học">Chọn môn học</option>
+                                        {subjectList?.map((item) => (
+                                            <option
+                                                value={item.subjectId}
+                                            >
+                                                {item.subjectName}
+                                            </option>
+                                        ))}
                                     </select>
                                     {errors.editSubjectId && (
                                         <div
@@ -584,18 +581,19 @@ export default function ManageTopic() {
                                 <Form.Item>
                                     <label>Loại Topic</label>
                                     <select
-                                       name="editTopicType"
-                                       value={editData.editTopicType}
-                                       allowclear
-                                       className="form-control"
-                                       onChange={handleEditInputChange}
+                                        name="editTopicType"
+                                        value={editData.editTopicType}
+                                        allowclear
+                                        className="form-control"
+                                        onChange={handleEditInputChange}
                                     >
-                                    <option value="Chọn loại topic">Chọn loại topic</option>
-                                    <option value="1">Học</option>
-                                    <option value="2">Thi 15p</option>
-                                    <option value="3">Thi 1 tiết</option>
-                                    <option value="4">Thi học kì</option>
-                                    <option value="5">Thi THPT Quốc gia</option>
+                                        <option value="Chọn loại topic">Chọn loại topic</option>
+                                        <option value="1">Học</option>
+                                        <option value="2">Thi 15p</option>
+                                        <option value="3">Thi 1 tiết</option>
+                                        <option value="4">Thi học kì</option>
+                                        <option value="5">Thi THPT Quốc gia</option>
+                                        <option value="6">Cuộc thi chung</option>
                                     </select>
                                     {errors.editTopicType && (
                                         <div
@@ -606,29 +604,31 @@ export default function ManageTopic() {
                                         </div>
                                     )}
                                 </Form.Item>
-                                <Form.Item>
-                                    <label>Lớp</label>
-                                    <select
-                                       name="createGrade"
-                                       value={editData.editGrade}
-                                       allowclear
-                                       className="form-control"
-                                       onChange={handleEditInputChange}
-                                    >
-                                    <option value="Chọn lớp">Chọn lớp</option>
-                                    <option value="10">10</option>
-                                    <option value="11">11</option>
-                                    <option value="12">12</option>
-                                    </select>
-                                    {errors.editGrade && (
-                                        <div
-                                            className="invalid-feedback"
-                                            style={{ display: "block", color: "red" }}
+                                {editData.editTopicType != 5 && editData.editTopicType != 6 &&
+                                    <Form.Item>
+                                        <label>Lớp</label>
+                                        <select
+                                            name="editGrade"
+                                            value={editData.editGrade}
+                                            allowclear
+                                            className="form-control"
+                                            onChange={handleEditInputChange}
                                         >
-                                            {errors.editGrade}
-                                        </div>
-                                    )}
-                                </Form.Item>
+                                            <option value="Chọn lớp">Chọn lớp</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                            <option value="12">12</option>
+                                        </select>
+                                        {errors.editGrade && (
+                                            <div
+                                                className="invalid-feedback"
+                                                style={{ display: "block", color: "red" }}
+                                            >
+                                                {errors.editGrade}
+                                            </div>
+                                        )}
+                                    </Form.Item>
+                                }
                                 <Form.Item>
                                     <label>Tên Topic</label>
                                     <Input
@@ -650,29 +650,55 @@ export default function ManageTopic() {
                                 </Form.Item>
                                 {editData.editTopicType != "1" && editData.editTopicType != "Chọn loại topic" && (
                                     <Form.Item>
-                                    <label>Thời gian làm bài</label>
-                                    <select
-                                       name="editDuration"
-                                       value={editData.editDuration}
-                                       allowclear
-                                       className="form-control"
-                                       onChange={handleEditInputChange}
-                                    >
-                                    <option value="Chọn lớp">Chọn thời gian </option>
-                                    <option value="15">15p</option>
-                                    <option value="45">45p</option>
-                                    <option value="60">60p</option>
-                                    <option value="120">120p</option>
-                                    </select>
-                                    {errors.editDuration && (
-                                        <div
-                                            className="invalid-feedback"
-                                            style={{ display: "block", color: "red" }}
+                                        <label>Thời gian làm bài</label>
+                                        <select
+                                            name="editDuration"
+                                            value={editData.editDuration}
+                                            allowclear
+                                            className="form-control"
+                                            onChange={handleEditInputChange}
                                         >
-                                            {errors.editDuration}
+                                            <option value="Chọn lớp">Chọn thời gian </option>
+                                            <option value="15">15p</option>
+                                            <option value="45">45p</option>
+                                            <option value="60">60p</option>
+                                            <option value="120">120p</option>
+                                        </select>
+                                        {errors.editDuration && (
+                                            <div
+                                                className="invalid-feedback"
+                                                style={{ display: "block", color: "red" }}
+                                            >
+                                                {errors.editDuration}
+                                            </div>
+                                        )}
+                                    </Form.Item>
+                                )}
+                                {editData.editTopicType == "6" && (
+                                    <Form.Item>
+                                        <div className="row">
+                                            <Form.Item>
+                                                <label>Thời gian bắt đầu và kết thúc</label>
+                                                <RangePicker
+                                                    showTime={{
+                                                        format: 'HH:mm',
+                                                    }}
+                                                    placeholder=""
+                                                    format="YYYY-MM-DD HH:mm"
+                                                    value={(editData.editStartDate && editData.editEndDate) ? [dayjs(editData.editStartDate, dayFormat), dayjs(editData.editEndDate, dayFormat)] : [null, null]}
+                                                    onChange={onEditInputStartDateAndEndDate}
+                                                />
+                                                {errors.editStartDate && (
+                                                    <div
+                                                        className="invalid-feedback"
+                                                        style={{ display: "block", color: "red" }}
+                                                    >
+                                                        {errors.editStartDate}
+                                                    </div>
+                                                )}
+                                            </Form.Item>
                                         </div>
-                                    )}
-                                </Form.Item>
+                                    </Form.Item>
                                 )}
                             </Form>
                         </Modal>

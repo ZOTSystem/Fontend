@@ -172,37 +172,39 @@ export default function Exam() {
                     {questions.map((item, index) =>
                         <div className='exam-left-quesion' id={item.questionId}>
                             <div className='exam-left-quesion-top'>
-                                <p style={{ fontWeight: 'bold', paddingLeft: 10, whiteSpace: 'nowrap' }}>Câu {index + 1}:</p>
+                                <p style={{ fontWeight: 'bold', paddingLeft: 10, whiteSpace: 'nowrap' }}>Câu {index + 1}:</p> &nbsp;
                                 <div className='exam-left-quesion-text'>
-                                    <p>{item.questionContext}</p>
+                                    <p style={{ paddingTop: 0, marginRight: 0 }} dangerouslySetInnerHTML={{ __html: item.questionContext }} ></p>
                                     {item.image != '' &&
                                         <img src={item.image}></img>
                                     }
                                 </div>
                             </div>
                             <div className='exam-left-quesion-bottom'>
-                                <div className='exam-left-quesion-answer'>
+                                <div className='exam-left-quesion-answer dl-flex' style={{ display: 'flex' }}>
                                     <input onClick={handleQuestion} type='radio' value='1' name={item.questionId} id={item.optionA}></input>
-                                    <div>
-                                        <label for={item.optionA} className=''>A. {item.optionA}</label><br></br>
-                                    </div>
-                                </div><div className='exam-left-quesion-answer'>
+                                    <label for={item.optionA} className='label-style' style={{ display: 'flex', alignItems: 'center', marginLeft: '8px' }}>
+                                        A. <span className='stypeExam' style={{ marginTop: '1px', marginRight: 0, marginLeft: '5px' }} dangerouslySetInnerHTML={{ __html: item.optionA }}></span>
+                                    </label>
+                                </div>
+
+                                <div className='exam-left-quesion-answer dl-flex' style={{ display: 'flex' }}>
                                     <input onClick={handleQuestion} type='radio' value='2' name={item.questionId} id={item.optionB}></input>
-                                    <div>
-                                        <label for={item.optionB} className=''>B. {item.optionB}</label><br></br>
-                                    </div>
+                                    <label for={item.optionB} className='label-style' style={{ display: 'flex', alignItems: 'center', marginLeft: '8px' }}>
+                                        B. <span className='stypeExam' style={{ marginTop: '1px', marginRight: 0, marginLeft: '5px' }} dangerouslySetInnerHTML={{ __html: item.optionB }}></span>
+                                    </label>
                                 </div>
-                                <div className='exam-left-quesion-answer'>
+                                <div className='exam-left-quesion-answer dl-flex' style={{ display: 'flex' }}>
                                     <input onClick={handleQuestion} type='radio' value='3' name={item.questionId} id={item.optionC}></input>
-                                    <div>
-                                        <label for={item.optionC} className=''>C. {item.optionC}</label><br></br>
-                                    </div>
+                                    <label for={item.optionC} className='label-style' style={{ display: 'flex', alignItems: 'center', marginLeft: '8px' }}>
+                                        C. <span className='stypeExam' style={{ marginTop: '1px', marginRight: 0, marginLeft: '5px' }} dangerouslySetInnerHTML={{ __html: item.optionC }}></span>
+                                    </label>
                                 </div>
-                                <div className='exam-left-quesion-answer'>
+                                <div className='exam-left-quesion-answer dl-flex' style={{ display: 'flex' }}>
                                     <input onClick={handleQuestion} type='radio' value='4' name={item.questionId} id={item.optionD}></input>
-                                    <div>
-                                        <label for={item.optionD} className=''>D. {item.optionD}</label><br></br>
-                                    </div>
+                                    <label for={item.optionD} className='label-style' style={{ display: 'flex', alignItems: 'center', marginLeft: '8px' }}>
+                                        D. <span className='stypeExam' style={{ marginTop: '1px', marginRight: 0, marginLeft: '5px' }} dangerouslySetInnerHTML={{ __html: item.optionD }}></span>
+                                    </label>
                                 </div>
                             </div>
                         </div>

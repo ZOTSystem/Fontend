@@ -72,7 +72,7 @@ export default function ManageNews() {
         {
             title: "Loại tin tức",
             dataIndex: "categoryName",
-            key: 3,
+            key: "categoryName",
             fixed: "left",
             filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
                 return (
@@ -104,7 +104,7 @@ export default function ManageNews() {
         {
             title: "Tiêu đề",
             dataIndex: "title",
-            key: 3,
+            key: "title",
             fixed: "left",
             filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
                 return (
@@ -136,7 +136,7 @@ export default function ManageNews() {
         {
             title: "Người tạo",
             dataIndex: "accountName",
-            key: 3,
+            key: "accountName",
             fixed: "left",
             filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
                 return (
@@ -338,7 +338,6 @@ export default function ManageNews() {
     //#region - Function -  Chỉnh sửa nội dung tin tức
     const handleViewEdit = (record) => {
         setImageUpload(record.image);
-        console.log(record);
         setEditData({
             editNewsId: record.newsId,
             editCategory: record.categoryName,
@@ -364,9 +363,9 @@ export default function ManageNews() {
                 content: convertedContent,
             }
             const result = await EditNewsService(data);
-            console.log(result);
             if (result.status === 200) {
                 handleGetAllNew();
+                setImageUpload(null);
                 openNotificationUpdateSuccess('topRight');
             }
         } catch {

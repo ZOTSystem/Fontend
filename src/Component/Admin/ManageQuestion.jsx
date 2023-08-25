@@ -124,32 +124,6 @@ export default function ManageQuestion() {
             dataIndex: "subjectName",
             key: 2,
             fixed: "left",
-            filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
-                return (
-                    <Input
-                        autoFocus
-                        placeholder="Nhập tên môn học"
-                        value={selectedKeys[0]}
-                        onChange={(e) => {
-                            setSelectedKeys(e.target.value ? [e.target.value] : []);
-                        }}
-                        onPressEnter={() => {
-                            confirm();
-                        }}
-                        onBlur={() => {
-                            confirm();
-                        }}
-                    ></Input>
-                );
-            },
-            filterIcon: () => {
-                return <SearchOutlined />;
-            },
-            onFilter: (value, record) => {
-                if (record.subjectName != null) {
-                    return record.subjectName.toLowerCase().includes(value.toLowerCase());
-                }
-            },
         },
         {
             title: "Nội dung",
@@ -276,32 +250,6 @@ export default function ManageQuestion() {
             dataIndex: "statusString",
             key: 6,
             fixed: "left",
-            filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
-                return (
-                    <Input
-                        autoFocus
-                        placeholder="Nhập trạng thái"
-                        value={selectedKeys[0]}
-                        onChange={(e) => {
-                            setSelectedKeys(e.target.value ? [e.target.value] : []);
-                        }}
-                        onPressEnter={() => {
-                            confirm();
-                        }}
-                        onBlur={() => {
-                            confirm();
-                        }}
-                    />
-                );
-            },
-            filterIcon: () => {
-                return <SearchOutlined />;
-            },
-            onFilter: (value, record) => {
-                if (record.statusString != null) {
-                    return record.statusString.toLowerCase().includes(value.toLowerCase());
-                }
-            },
         },
         {
             title: "Điều hướng",

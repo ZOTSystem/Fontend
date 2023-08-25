@@ -13,6 +13,7 @@ import { UpdateAdminService } from '../../services/SuperAdminService';
 import { hanldeValidationEditAdmin } from '../../assets/js/handleValidation';
 import { hanldeValidationCreateAdmin } from '../../assets/js/handleValidation';
 import { AddAdminService } from '../../services/SuperAdminService';
+import { GetAllPhoneService, GetPhoneWithoutThisPhonedService } from '../../services/userService';
 
 const { Content } = Layout;
 
@@ -95,30 +96,6 @@ export default function ManageAdmin() {
             dataIndex: 'phone',
             key: 1,
             fixed: 'left',
-            filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
-                return (
-                    <Input
-                        autoFocus
-                        placeholder='Nhập số điện thoại'
-                        value={selectedKeys[0]}
-                        onChange={(e) => {
-                            setSelectedKeys(e.target.value ? [e.target.value] : []);
-                        }}
-                        onPressEnter={() => {
-                            confirm();
-                        }}
-                        onBlur={() => {
-                            confirm();
-                        }}
-                    ></Input>
-                );
-            },
-            filterIcon: () => {
-                return <SearchOutlined />;
-            },
-            onFilter: (value, record) => {
-                return record.phoneNumber.toLowerCase().includes(value.toLowerCase());
-            },
         },
         {
             title: 'Mật khẩu',
@@ -178,6 +155,7 @@ export default function ManageAdmin() {
     const [show, setShow] = useState(false);
     const [showCreate, setShowCreate] = useState(false);
     const [emailList, setEmailList] = useState('');
+    const [originPhone, setOriginPhone] = useState('');
     const pagination = {
         pageSize: 5,
         total: dataSource.length,
@@ -351,6 +329,7 @@ export default function ManageAdmin() {
             editPhoneNumber: record.phone,
             editPassword: record.password,
         });
+        setOriginPhone(record.phone);
         setShow(true);
     };
 
@@ -363,7 +342,8 @@ export default function ManageAdmin() {
             phone: editData.editPhoneNumber,
             password: editData.editPassword,
         };
-        hanldeValidationEditAdmin(editData, errors);
+        const phoneCheck = await GetPhoneWithoutThisPhonedService(originPhone);
+        hanldeValidationEditAdmin(editData, errors, phoneCheck.data);
         if (Object.keys(errors).length === 0) {
             const result = await UpdateAdminService(data);
             if (result.status === 200) {
@@ -391,7 +371,8 @@ export default function ManageAdmin() {
             phone: createData.createPhoneNumber,
             password: createData.createPassword,
         };
-        hanldeValidationCreateAdmin(createData, errors, emailList);
+        const checkPhone = await GetAllPhoneService();
+        hanldeValidationCreateAdmin(createData, errors, emailList, checkPhone);
         if (Object.keys(errors).length === 0) {
             const result = await AddAdminService(data);
             if (result.status === 200) {

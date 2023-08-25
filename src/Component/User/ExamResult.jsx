@@ -62,54 +62,54 @@ export default function ExamResult() {
                             <div className='exam-left-quesion-top'>
                                 <p style={{ fontWeight: 'bold', paddingLeft: 10, width: 60 }}>Câu {index + 1}:</p>
                                 <div className='exam-left-quesion-text'>
-                                    <p>{item.questionContext}</p>
+                                    <p style={{ paddingTop: 0, marginRight: 0 }} dangerouslySetInnerHTML={{ __html: item.questionContext }} ></p>
                                     <img src={item.image}></img>
                                 </div>
                             </div>
                             <div className='exam-left-quesion-bottom'>
-                                <div className='exam-left-quesion-answer'>
+                                <div className='exam-left-quesion-answer dl-flex' style={{ display: 'flex' }}>
                                     {item.answerUserChoose == 1
                                         ?
                                         <input type='radio' value='1' name='topic' id='1' checked="checked" disabled></input>
                                         :
                                         <input type='radio' value='1' name='topic' id='1' disabled></input>
                                     }
-                                    <div>
-                                        <label for='1' style={{ color: item.answerRightByQuestion == 1 ? 'green' : item.answerUserChoose == 1 && item.answerRightByQuestion != 1 ? 'red' : '', fontWeight: item.answerUserChoose == 1 || item.answerRightByQuestion == 1 ? 'bold' : '' }}>A. {item.optionA}</label><br></br>
-                                    </div>
+                                    <label for={item.optionA} className='label-style' style={{ display: 'flex', alignItems: 'center', marginLeft: '8px', color: item.answerRightByQuestion == 1 ? 'green' : item.answerUserChoose == 1 && item.answerRightByQuestion != 1 ? 'red' : '', fontWeight: item.answerUserChoose == 1 || item.answerRightByQuestion == 1 ? 'bold' : '' }}>
+                                        A. <span className='styleP' style={{ marginTop: '1px', marginRight: 0, marginLeft: '5px' }} dangerouslySetInnerHTML={{ __html: item.optionA }}></span>
+                                    </label>
                                 </div>
-                                <div className='exam-left-quesion-answer'>
+                                <div className='exam-left-quesion-answer dl-flex' style={{ display: 'flex' }}>
                                     {item.answerUserChoose == 2
                                         ?
                                         <input type='radio' value='2' name='topic' id='2' checked="checked" disabled></input>
                                         :
                                         <input type='radio' value='2' name='topic' id='2' disabled></input>
                                     }
-                                    <div>
-                                        <label for='2' style={{ color: item.answerRightByQuestion == 2 ? 'green' : item.answerUserChoose == 2 && item.answerRightByQuestion != 2 ? 'red' : '', fontWeight: item.answerUserChoose == 2 || item.answerRightByQuestion == 2 ? 'bold' : '' }}>B. {item.optionB}</label><br></br>
-                                    </div>
+                                    <label for={item.optionB} className='label-style' style={{ display: 'flex', alignItems: 'center', marginLeft: '8px', color: item.answerRightByQuestion == 2 ? 'green' : item.answerUserChoose == 2 && item.answerRightByQuestion != 2 ? 'red' : '', fontWeight: item.answerUserChoose == 2 || item.answerRightByQuestion == 2 ? 'bold' : '' }}>
+                                        B. <span className='styleP' style={{ marginTop: '1px', marginRight: 0, marginLeft: '5px' }} dangerouslySetInnerHTML={{ __html: item.optionB }}></span>
+                                    </label>
                                 </div>
-                                <div className='exam-left-quesion-answer'>
+                                <div className='exam-left-quesion-answer dl-flex' style={{ display: 'flex' }}>
                                     {item.answerUserChoose == 3
                                         ?
                                         <input type='radio' value='3' name='topic' id='3' checked="checked" disabled></input>
                                         :
                                         <input type='radio' value='3' name='topic' id='3' disabled></input>
                                     }
-                                    <div>
-                                        <label for='3' style={{ color: item.answerRightByQuestion == 3 ? 'green' : item.answerUserChoose == 3 && item.answerRightByQuestion != 3 ? 'red' : '', fontWeight: item.answerUserChoose == 3 || item.answerRightByQuestion == 3 ? 'bold' : '' }}>C. {item.optionC}</label><br></br>
-                                    </div>
+                                    <label for={item.optionC} className='label-style' style={{ display: 'flex', alignItems: 'center', marginLeft: '8px', color: item.answerRightByQuestion == 3 ? 'green' : item.answerUserChoose == 3 && item.answerRightByQuestion != 3 ? 'red' : '', fontWeight: item.answerUserChoose == 3 || item.answerRightByQuestion == 3 ? 'bold' : '' }}>
+                                        C. <span className='styleP' style={{ marginTop: '1px', marginRight: 0, marginLeft: '5px' }} dangerouslySetInnerHTML={{ __html: item.optionC }}></span>
+                                    </label>
                                 </div>
-                                <div className='exam-left-quesion-answer'>
+                                <div className='exam-left-quesion-answer dl-flex' style={{ display: 'flex' }}>
                                     {item.answerUserChoose == 4
                                         ?
                                         <input type='radio' value='4' name='topic' id='4' checked="checked" disabled></input>
                                         :
                                         <input type='radio' value='4' name='topic' id='4' disabled></input>
                                     }
-                                    <div>
-                                        <label for='4' style={{ color: item.answerRightByQuestion == 4 ? 'green' : item.answerUserChoose == 4 && item.answerRightByQuestion != 4 ? 'red' : '', fontWeight: item.answerUserChoose == 4 || item.answerRightByQuestion == 4 ? 'bold' : '' }}>D. {item.optionD}</label><br></br>
-                                    </div>
+                                     <label for={item.optionD} className='label-style' style={{ display: 'flex', alignItems: 'center', marginLeft: '8px', color: item.answerRightByQuestion == 4 ? 'green' : item.answerUserChoose == 4 && item.answerRightByQuestion != 4 ? 'red' : '', fontWeight: item.answerUserChoose == 4 || item.answerRightByQuestion == 4 ? 'bold' : '' }}>
+                                        D. <span className='styleP' style={{ marginTop: '1px', marginRight: 0, marginLeft: '5px' }} dangerouslySetInnerHTML={{ __html: item.optionD }}></span>
+                                    </label>
                                 </div>
                             </div>
                         </div>
