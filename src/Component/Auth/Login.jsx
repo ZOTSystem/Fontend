@@ -178,10 +178,12 @@ export default function Login() {
             password: loginInput.inputPassword,
         };
         const result = await LoginService(data);
-        if (result.status === 200) {
+
+        if (result.status != undefined && result.status === 200) {
             onSetUser(result);
             // handleSetCookie(result.token);
             localStorage.setItem('authToken', result.token);
+            localStorage.setItem('user', result.data);
             if (result.roleId === 4) {
                 navigate('/');
             } else if (result.roleId === 2) {
@@ -195,6 +197,7 @@ export default function Login() {
             openNotificationLoginFailly('topRight');
         }
     };
+    
     //#endregion
 
     //#region - Function - Forgot Password

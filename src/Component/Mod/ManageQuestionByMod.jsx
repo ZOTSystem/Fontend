@@ -131,32 +131,6 @@ export default function ManageQuestionByMod() {
             dataIndex: "subjectName",
             key: 2,
             fixed: "left",
-            filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
-                return (
-                    <Input
-                        autoFocus
-                        placeholder="Nhập tên môn học"
-                        value={selectedKeys[0]}
-                        onChange={(e) => {
-                            setSelectedKeys(e.target.value ? [e.target.value] : []);
-                        }}
-                        onPressEnter={() => {
-                            confirm();
-                        }}
-                        onBlur={() => {
-                            confirm();
-                        }}
-                    ></Input>
-                );
-            },
-            filterIcon: () => {
-                return <SearchOutlined />;
-            },
-            onFilter: (value, record) => {
-                if (record.subjectName != null) {
-                    return record.subjectName.toLowerCase().includes(value.toLowerCase());
-                }
-            },
         },
         {
             title: "Nội dung",
@@ -283,32 +257,6 @@ export default function ManageQuestionByMod() {
             dataIndex: "statusString",
             key: 1,
             fixed: "left",
-            filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
-                return (
-                    <Input
-                        autoFocus
-                        placeholder="Nhập trạng thái"
-                        value={selectedKeys[0]}
-                        onChange={(e) => {
-                            setSelectedKeys(e.target.value ? [e.target.value] : []);
-                        }}
-                        onPressEnter={() => {
-                            confirm();
-                        }}
-                        onBlur={() => {
-                            confirm();
-                        }}
-                    />
-                );
-            },
-            filterIcon: () => {
-                return <SearchOutlined />;
-            },
-            onFilter: (value, record) => {
-                if (record.statusString != null) {
-                    return record.statusString.toLowerCase().includes(value.toLowerCase());
-                }
-            },
         },
         {
             title: "Điều hướng",
@@ -539,18 +487,18 @@ export default function ManageQuestionByMod() {
             if(result.status === 200){
                 handleGetAllQuestionByTopic();
                 setErrors([]);
-                setShowCreateForm(false);
                 setCreateData({
                     createLevelId: "Chọn cấp độ",
-                    createQuestionContent: "",
-                    createOptionA: "",
-                    createOptionB: "",
-                    createOptionC: "",
-                    createOptionD: "",
+                    createQuestionContent: null,
+                    createOptionA: null,
+                    createOptionB: null,
+                    createOptionC: null,
+                    createOptionD: null,
                     createAnswerId: "Chọn đáp án",
-                    createSolution: "",
-                    createLevelId: "",
+                    createSolution: null,
+                    createLevelId: null,
                 });
+                setShowCreateForm(false);
                 setImageUpload(null);
                 openNotificationAdd200("topRight");
             } else {

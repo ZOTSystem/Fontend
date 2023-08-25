@@ -13,8 +13,8 @@ import { UserContext } from "../../contexts/UserContext";
 import hanldeValidationEditUser from "../../assets/js/handleValidation";
 import { GetAllAccountUser } from "../../services/AccountUserService";
 import { UpdateUserService } from "../../services/AccountUserService";
-import { GettAllPhoneService } from "../../services/AccountUserService";
 import { ChangeStatusService } from "../../services/AccountUserService";
+import { GetPhoneWithoutThisPhonedService } from "../../services/userService";
 
 
 const { Content } = Layout;
@@ -131,30 +131,6 @@ export default function ManageUser() {
             dataIndex: "phone",
             key: 1,
             fixed: "left",
-            filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
-                return (
-                    <Input
-                        autoFocus
-                        placeholder="Nhập số điện thoại"
-                        value={selectedKeys[0]}
-                        onChange={(e) => {
-                            setSelectedKeys(e.target.value ? [e.target.value] : []);
-                        }}
-                        onPressEnter={() => {
-                            confirm();
-                        }}
-                        onBlur={() => {
-                            confirm();
-                        }}
-                    ></Input>
-                );
-            },
-            filterIcon: () => {
-                return <SearchOutlined />;
-            },
-            onFilter: (value, record) => {
-                return record.phoneNumber.toLowerCase().includes(value.toLowerCase());
-            },
         },
         {
             title: "Trạng thái",
@@ -205,7 +181,7 @@ export default function ManageUser() {
     const [dataSource, setDataSource] = useState('');
     const [show, setShow] = useState(false);
     const { render, onSetRender } = useContext(UserContext);
-    const [phoneList, setPhoneList] = useState([]);
+    const [originPhone, setOriginPhone] = useState("");
     const pagination = {
         pageSize: 5,
         total: dataSource != null ? dataSource.length : "",
@@ -332,12 +308,8 @@ export default function ManageUser() {
         const year = date.getFullYear().toString().padStart(4, "0");
         const month = (date.getMonth() + 1).toString().padStart(2, "0");
         const day = date.getDate().toString().padStart(2, "0");
-        const hours = "00";
-        const minutes = "00";
-        const seconds = "00";
-        const milliseconds = "000";
 
-        const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
+        const formattedDate = `${year}-${month}-${day}`;
 
         return formattedDate;
     };
@@ -354,7 +326,7 @@ export default function ManageUser() {
                 const status = "Đang khóa";
                 // const result = handleChangeStatus(record.accountId, status);
                 const result = await ChangeStatusService(record.accountId, status);
-                if(result.status === 200){
+                if (result.status === 200) {
                     openNotificationEnable("topRight");
                 }
                 onSetRender();
@@ -374,7 +346,7 @@ export default function ManageUser() {
                 const status = "Đang hoạt động";
                 // handleChangeStatus(record.accountId, status);
                 const result = await ChangeStatusService(record.accountId, status);
-                if(result.status === 200){
+                if (result.status === 200) {
                     openNotificationEnable("topRight");
                 }
                 onSetRender();
@@ -398,6 +370,7 @@ export default function ManageUser() {
             editGender: record.gender,
             editSchoolName: record.schoolName,
         });
+        setOriginPhone(record.phone);
         setShow(true);
     }
 
@@ -412,12 +385,13 @@ export default function ManageUser() {
             schoolName: editData.editSchoolName,
             gender: editData.editGender,
         }
-
-        hanldeValidationEditUser(editData, errors, phoneList);
+        console.log(data);
+        var result = await GetPhoneWithoutThisPhonedService(originPhone)
+        hanldeValidationEditUser(editData, errors, result.data);
         if (Object.keys(errors).length === 0) {
             setErrors([]);
             const result = await UpdateUserService(data);
-            if(result.status === 200){
+            if (result.status === 200) {
                 openNotificationUpdate("topRight");
             }
             onSetRender();
@@ -445,20 +419,6 @@ export default function ManageUser() {
         handleGetAllAccountUser();
     }, [render]);
 
-    const handleGetAllPhone = async () => {
-        try {
-            const result = await GettAllPhoneService();
-            if (result) {
-                setPhoneList(result);
-            }
-        } catch (error) {
-            console.error('Error fetching account user service:', error);
-        }
-    };
-
-    useEffect(() => {
-        handleGetAllPhone();
-    }, [render]);
     //#endregion
 
 
@@ -653,7 +613,7 @@ export default function ManageUser() {
                                     <label style={{ display: 'block' }}>Trường học</label>
                                     <Input
                                         type="phonenumber"
-                                        placeholder="Enter PhoneNumber"
+                                        placeholder="Nhập tên trường học"
                                         className="form-control"
                                         value={editData.editSchoolName}
                                         name="editSchoolName"

@@ -25,7 +25,7 @@ export const AddModService = async (data) => {
             },
             data: JSON.stringify(data),
         });
-        return respone.data;
+        return respone;
     } catch (e) {
         return e;
     }
@@ -40,7 +40,7 @@ export const ChangeStatusService = async (accountId, string) => {
                 'Content-Type': 'application/json',
             },
         });
-        return respone.data;
+        return respone;
     } catch (e) {
         return e;
     }
@@ -56,7 +56,7 @@ export const UpdateModService = async (accountId, data) => {
             },
             data: JSON.stringify(data),
         });
-        return respone.data;
+        return respone;
     } catch (e) {
         return e;
     }

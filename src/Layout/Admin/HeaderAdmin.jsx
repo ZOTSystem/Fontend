@@ -25,6 +25,8 @@ export default function HeaderAdmin() {
     const onLogOut = () => {
         // removeCookie('token', { path: '/' });
         localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        localStorage.clear();
         onSetUser({
             data: "",
             token: "",

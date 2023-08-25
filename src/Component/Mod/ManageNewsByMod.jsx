@@ -75,7 +75,7 @@ export default function ManageNewsByMod() {
         {
             title: "Loại tin tức",
             dataIndex: "categoryName",
-            key: 3,
+            key: "categoryName",
             fixed: "left",
             filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
                 return (
@@ -107,7 +107,7 @@ export default function ManageNewsByMod() {
         {
             title: "Tiêu đề",
             dataIndex: "title",
-            key: 3,
+            key: "title",
             fixed: "left",
             filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
                 return (
@@ -139,7 +139,7 @@ export default function ManageNewsByMod() {
         {
             title: "Người tạo",
             dataIndex: "accountName",
-            key: 3,
+            key: "accountName",
             fixed: "left",
             filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
                 return (
@@ -201,25 +201,7 @@ export default function ManageNewsByMod() {
                             type="primary"
                             icon={<EditOutlined />}
                         ></Button>{" "}
-                        {/* &nbsp;
-                        {record.status == "Đang hoạt động" ? (
-                            <Button
-                                onClick={() => handleChangeStatusDeActivate(record)}
-                                style={{ color: "white", backgroundColor: "red" }}
-                                icon={<PoweroffOutlined />}
-                            ></Button>
-                        ) : (
-                            <></>
-                        )}
-                        {record.status == "Đang khóa" ? (
-                            <Button
-                                onClick={() => handleChangeStatusActivate(record)}
-                                style={{ color: "white", backgroundColor: "green" }}
-                                icon={<PoweroffOutlined />}
-                            ></Button>
-                        ) : (
-                            <></>
-                        )} */}
+                        
                     </>
                 );
             },
@@ -405,8 +387,14 @@ export default function ManageNewsByMod() {
     //#region - Function -  Chỉnh sửa nội dung tin tức
     const handleViewEdit = (record) => {
         setImageUpload(record.image);
-        console.log(record);
-        setEditData('');
+        setEditData({
+            editNewsId: record.newsId,
+            editCategory: record.categoryName,
+            editTitle: record.title,
+            editSubTitle: record.subTitle,
+            editImage: record.image,
+            editContent: record.content,
+        });
         setShowEditForm(true);
     }
 
@@ -427,7 +415,6 @@ export default function ManageNewsByMod() {
                     content: convertedContent,
                 }
                 const result = await EditNewsService(data);
-                console.log(result);
                 if (result.status === 200) {
                     handleGetAllNew();
                     openNotificationUpdateSuccess('topRight');
@@ -436,7 +423,7 @@ export default function ManageNewsByMod() {
                 setErrors(errors);
             }
         } catch {
-            openNotificationUpdateFail('topRight');
+            console.log("errors");
         }
 
     }

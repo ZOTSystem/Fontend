@@ -1,5 +1,5 @@
 
-export default function hanldeValidationEditUser(editData, errors) {
+export default function hanldeValidationEditUser(editData, errors, phoneList) {
     const currentDate = new Date();
 
     const year = currentDate.getFullYear();
@@ -12,16 +12,48 @@ export default function hanldeValidationEditUser(editData, errors) {
     if (editData.editPhoneNumber == '' || editData.editPhoneNumber == null || editData.editPhoneNumber == " ") {
         errors.editPhoneNumber = "Số điện thoại không được để trống";
     }
-    // if (phoneList.includes(editData.editPhoneNumber)) {
-    //     errors.editPhoneNumber = "Số điện thoại này đã tồn tại";
-    // }
+    if (phoneList.includes(editData.editPhoneNumber)) {
+        errors.editPhoneNumber = "Số điện thoại đã được đăng ký";
+    }
 
     if (editData.editFullName == '' || editData.editFullName == null || editData.editFullName == " ") {
         errors.editFullName = "Tên không được để trống";
     }
-    // if (/^[a-zA-Z0-9ÀÁÂÃÈÉÊẾÌÍÒÓÔÕÙÚÝàáâãèéêếìíòóôõùúýĂăĐđĨĩŨũƠơƯưỠốộỐỘỒỚỜỬỨỮửỷỶỳỴỵỸỹ\s]+$/.test(editData.editFullName)) {
-    //     errors.editFullName = "Tên không chứa kí tự đặc biệt";
+    if (!/^[\p{L}\s]+$/u.test(editData.editFullName)) {
+        errors.editFullName = "Tên không chứa kí tự đặc biệt";
+    }
+    // if (editData.editBirthDay == '' || editData.editBirthDay == null || editData.editBirthDay == " ") {
+    //     errors.editBirthDay = "Ngày sinh không được để trống";
     // }
+    if (editData.editBirthDay > current == true) {
+        errors.editBirthDay = "Ngày sinh phải nhỏ hơn ngày hiện tại";
+    }
+
+}
+
+export function hanldeValidationEditMod(editData, errors, phoneList) {
+    const currentDate = new Date();
+
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const day = String(currentDate.getDate()).padStart(2, '0');
+    const current = `${year}-${month}-${day}`;
+    if (!/^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/.test(editData.editPhoneNumber)) {
+        errors.editPhoneNumber = 'Số điện thoại phải 10 chữ số';
+    }
+    if (editData.editPhoneNumber == '' || editData.editPhoneNumber == null || editData.editPhoneNumber == " ") {
+        errors.editPhoneNumber = "Số điện thoại không được để trống";
+    }
+    if (phoneList.includes(editData.editPhoneNumber)) {
+        errors.editPhoneNumber = "Số điện thoại đã được đăng ký";
+    }
+
+    if (editData.editFullName == '' || editData.editFullName == null || editData.editFullName == " ") {
+        errors.editFullName = "Tên không được để trống";
+    }
+    if (!/^[\p{L}\s]+$/u.test(editData.editFullName)) {
+        errors.editFullName = "Tên không chứa kí tự đặc biệt";
+    }
     // if (editData.editBirthDay == '' || editData.editBirthDay == null || editData.editBirthDay == " ") {
     //     errors.editBirthDay = "Ngày sinh không được để trống";
     // }
@@ -32,7 +64,7 @@ export default function hanldeValidationEditUser(editData, errors) {
 }
 
 
-export function hanldeValidationCreateMod(creataData, errors, emailList) {
+export function hanldeValidationCreateMod(creataData, errors, emailList, phoneList) {
     const currentDate = new Date();
 
     const year = currentDate.getFullYear();
@@ -45,10 +77,13 @@ export function hanldeValidationCreateMod(creataData, errors, emailList) {
     if (creataData.createPhoneNumber == '' || creataData.createPhoneNumber == null || creataData.createPhoneNumber == " ") {
         errors.createPhoneNumber = "Số điện thoại không được để trống";
     }
+    if (phoneList.includes(creataData.createPhoneNumber)) {
+        errors.createPhoneNumber = "Số điện thoại đã được đăng ký";
+    }
     if (creataData.createFullName == '' || creataData.createFullName == null || creataData.createFullName == " ") {
         errors.createFullName = "Tên không được để trống";
     }
-    if (/^[a-zA-Z0-9ÀÁÂÃÈÉÊẾÌÍÒÓÔÕÙÚÝàáâãèéêếìíòóôõùúýĂăĐđĨĩŨũƠơƯưỠốộỐỘỒỚỜỬỨỮửỷỶỳỴỵỸỹ\s]+$/.test(creataData.createFullName)) {
+    if (!/^[\p{L}\s]+$/u.test(creataData.createFullName)) {
         errors.createFullName = "Tên không chứa kí tự đặc biệt";
     }
     if (creataData.createEmail == '' || creataData.createEmail == null || creataData.createEmail == " ") {
@@ -98,17 +133,15 @@ export function handleValidationRegister(registerInput, errors, emailList, phone
     if (emailList.includes(registerInput.inputEmail)) {
         errors.inputEmail = "Email đã được đăng ký";
     }
-
-    // if (!/^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/.test(registerInput.inputPhone)) {
-    //     errors.inputPhone = 'Số điện thoại phải 10 chữ số';
-    // }
+    if (!/^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/.test(registerInput.inputPhone)) {
+        errors.inputPhone = 'Số điện thoại phải 10 chữ số';
+    }
     if (registerInput.inputPhone == '' || registerInput.inputPhone == null || registerInput.inputPhone == " ") {
         errors.inputPhone = "Số điện thoại không được để trống";
     }
     if (phoneList.includes(registerInput.inputPhone)) {
         errors.inputPhone = "Số điện thoại đã được đăng ký";
     }
-
 }
 
 export function handleValidationForgotPassword(emailforgot, errors, emailList) {
@@ -186,8 +219,10 @@ export function handleValidationCreateTopic(createData, errors) {
             errors.createStartDate = "Ngày bắt đầu hoặc ngày kết thúc không được để trống";
         }
     }
-    if (createData.createGrade == "Chọn lớp") {
-        errors.createGrade = "Lớp học không được để trống";
+    if (createData.createTopicType != 5 && createData.createTopicType != 6) {
+        if (createData.createGrade == "Chọn lớp") {
+            errors.createGrade = "Lớp học không được để trống";
+        }
     }
     if (createData.createTopicName == "" || createData.createTopicName == " " || createData.createTopicName == null) {
         errors.createTopicName = "Tên topic không được để trống";
@@ -205,6 +240,7 @@ export function handleValidationUpdateTopic(editData, errors) {
             errors.editDuration = "Thời gian không được để trống";
         }
     }
+
     if (editData.editGrade == "Chọn lớp") {
         errors.editGrade = "Lớp học không được để trống";
     }
@@ -212,7 +248,11 @@ export function handleValidationUpdateTopic(editData, errors) {
         errors.editTopicName = "Tên topic không được để trống";
     }
 
-
+    if (editData.editTopicType == 6) {
+        if (editData.editStartDate == "" || editData.editStartDate == null || editData.editStartDate == "" || editData.editStartDate == null) {
+            errors.editStartDate = "Ngày bắt đầu hoặc ngày kết thúc không được để trống";
+        }
+    }
 }
 
 export function handleValidationCreateQuestion(createData, errors) {
@@ -299,15 +339,21 @@ export function handleValidationEditNew(editData, errors, imageUpload) {
     }
 }
 
-export function hanldeValidationEditAdmin(editData, errors) {
+export function hanldeValidationEditAdmin(editData, errors, phoneList) {
     if (!/^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/.test(editData.editPhoneNumber)) {
         errors.editPhoneNumber = 'Số điện thoại phải 10 chữ số';
     }
     if (editData.editPhoneNumber == '' || editData.editPhoneNumber == null || editData.editPhoneNumber == " ") {
         errors.editPhoneNumber = "Số điện thoại không được để trống";
     }
+    if (phoneList.includes(editData.editPhoneNumber)) {
+        errors.editPhoneNumber = "Số điện thoại đã được đăng ký";
+    }
     if (editData.editFullName == '' || editData.editFullName == null || editData.editFullName == " ") {
         errors.editFullName = "Tên không được để trống";
+    }
+    if (!/^[\p{L}\s]+$/u.test(editData.editFullName )) {
+        errors.editFullName = "Tên không chứa kí tự đặc biệt";
     }
 
     if (editData.editPassword == "" || editData.editPassword == null || editData.editPassword == " ") {
@@ -316,16 +362,23 @@ export function hanldeValidationEditAdmin(editData, errors) {
 }
 
 
-export function hanldeValidationCreateAdmin(creataData, errors, emailList) {
+export function hanldeValidationCreateAdmin(creataData, errors, emailList, phoneList) {
     if (!/^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/.test(creataData.createPhoneNumber)) {
         errors.createPhoneNumber = 'Số điện thoại phải 10 chữ số';
     }
     if (creataData.createPhoneNumber == '' || creataData.createPhoneNumber == null || creataData.createPhoneNumber == " ") {
         errors.createPhoneNumber = "Số điện thoại không được để trống";
     }
+    if (phoneList.includes(creataData.createPhoneNumber)) {
+        errors.createPhoneNumber = "Số điện thoại đã được đăng ký";
+    }
     if (creataData.createFullName == '' || creataData.createFullName == null || creataData.createFullName == " ") {
         errors.createFullName = "Tên không được để trống";
     }
+    if (!/^[\p{L}\s]+$/u.test(creataData.createFullName)) {
+        errors.createFullName = "Tên không chứa kí tự đặc biệt";
+    }
+
     if (creataData.createEmail == '' || creataData.createEmail == null || creataData.createEmail == " ") {
         errors.createEmail = "Email không được để trống"
     } else {
@@ -337,6 +390,6 @@ export function hanldeValidationCreateAdmin(creataData, errors, emailList) {
         errors.createEmail = "Email đã được đăng ký";
     }
     if (creataData.createPassword == '' || creataData.createPassword == null || creataData.createPassword == " ") {
-        errors.createPassword = "Tên không được để trống";
+        errors.createPassword = "Mật khẩu không được để trống";
     }
 }

@@ -6,10 +6,11 @@ import reportWebVitals from './reportWebVitals';
 import UserContextProvider from './contexts/UserContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
 root.render(
   <UserContextProvider>
     <App />
- </UserContextProvider>
+  </UserContextProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function

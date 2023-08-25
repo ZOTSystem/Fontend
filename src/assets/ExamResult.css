@@ -96,6 +96,12 @@
     flex-wrap: wrap;
 }
 
+.label-style .styleP p{
+    margin-top: 0;
+    margin-right: 0;
+    margin-left: 5px;
+    padding: 0;
+}
 
 
 
