@@ -47,12 +47,12 @@ export default function ChooseSubject() {
                                 {subjects.map((item, index) =>
                                     <div className='sc-dlfnbm sc-eCssSg bpiLsA drBkXF' onClick={() => handleSubject(item)}>
                                         <div class="sc-laRPJI CxaAG">
-                                            {/* <span class="sc-jeGSBP heALfe icon">
-                                            <img src={item.imgLink} alt="" />
-                                            </span> */}
                                             <span class="sc-jeGSBP heALfe icon">
-                                                <img src="../Image/technology-svgrepo-com.svg" alt="" />
+                                            <img src={item.imgLink} alt="" />
                                             </span>
+                                            {/* <span class="sc-jeGSBP heALfe icon">
+                                                <img src="../Image/technology-svgrepo-com.svg" alt="" />
+                                            </span> */}
                                             <p>{item.subjectName}</p></div>
                                     </div>
                                 )}

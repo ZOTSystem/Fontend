@@ -24,7 +24,7 @@ export default function News() {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(3);
     const [totalPosts, setTotalPosts] = useState(0);
-
+    const [isLoading, setIsLoading] = useState(true);
     //#endregion
 
     //#region - Function - hiển thị thông báo
@@ -41,28 +41,33 @@ export default function News() {
     //#region - Function - hiển thị tin tức
     const handleGetAllNews = async () => {
         try {
-            const result = await GetNewsInUserPageService();
-            const result2 = await GetNewsInPageService(currentPage, pageSize);
-            console.log(result2);
-            if (result.status === 200) {
-                setDataSource({
-                    firstNew: result.firstNew,
-                    dailyNew: result.dailyNew,
-                    // otherNew: result.otherNew,
-                });
-            } else {
-                openNotificationGetData400("topRight")
-            }
-            if (result2.status === 200) {
-                setNewInPage(result2.data);
-                setTotalPosts(result2.totalCount);
-            } else {
-                openNotificationGetData400("topRight")
-            }
+            setTimeout(async () => {
+                const result = await GetNewsInUserPageService();
+                const result2 = await GetNewsInPageService(currentPage, pageSize);
+
+                if (result.status === 200) {
+                    setDataSource({
+                        firstNew: result.firstNew,
+                        dailyNew: result.dailyNew,
+                    });
+                } else {
+                    openNotificationGetData400("topRight")
+                }
+
+                if (result2.status === 200) {
+                    setNewInPage(result2.data);
+                    setTotalPosts(result2.totalCount);
+                } else {
+                    openNotificationGetData400("topRight")
+                }
+
+                setIsLoading(false);
+            }, 1000);
 
         } catch (error) {
             openNotificationGetData400("topRight");
-        }
+            setIsLoading(false);
+        } 
     }
 
     useEffect(() => {
@@ -94,7 +99,36 @@ export default function News() {
         <>
             {contextHolder}
             <Header />
-            <div className='m-auto news' style={{ width: '80%' }}>
+            {isLoading ? ( 
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 999,
+                    }}
+                >
+                    <div
+                        style={{
+                            backgroundColor: 'white',
+                            padding: '20px',
+                            borderRadius: '5px',
+                            boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.2)',
+                            textAlign: 'center',
+                        }}
+                    >
+                        Loading...
+                    </div>
+                </div>
+            ) : (
+                <div>
+                <div className='m-auto news' style={{ width: '80%' }}>
                 <h2 className="sc-cRoahL jMEXQr mb-5" style={{ color: '#black' }}>
                     <svg width="20" height="20" viewBox="0 0 18 18" fill="none" class="nav-icon"><path d="M9.52732 1.05469C9.44336 1.05469 8.35953 1.05469 7.94529 1.05469C7.94529 0.472183 7.47311 0 6.8906 0C6.3081 0 5.83592 0.472183 5.83592 1.05469C5.45328 1.05469 5.2377 1.05469 4.25389 1.05469C3.96266 1.05469 3.72655 1.32595 3.72655 1.61718V2.14453C3.72655 2.72703 4.19873 3.19921 4.78123 3.19921H8.99997C9.58248 3.19921 10.0547 2.72703 10.0547 2.14453V1.61718C10.0547 1.32595 9.81855 1.05469 9.52732 1.05469Z" fill="#000000">
                     </path>
@@ -181,7 +215,9 @@ export default function News() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>                </div>
+            )}
+
             <Footer />
         </>
     )

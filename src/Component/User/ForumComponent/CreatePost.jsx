@@ -189,22 +189,6 @@ export default function CreatePost() {
                             }}
                             className='form-item upload-image'
                         >
-                            <div className="w-100">
-                                {imageUpload == null || imageUpload == "" ? (
-                                    <></>
-                                ) : (
-                                    <>
-                                        {imageUpload && (
-                                            <img
-                                                src={imageUpload}
-                                                alt=''
-                                                className="w-100"
-                                                style={{ overflow: 'hidden', objectFit: 'cover' }}
-                                            />
-                                        )}
-                                    </>
-                                )}
-                            </div>
                             <input
                                 type='file'
                                 accept='image/*'

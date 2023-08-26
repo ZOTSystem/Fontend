@@ -19,7 +19,7 @@ export default function ActivityUser() {
     const openNotificationGet400 = (placement) => {
         api.error({
             message: `Thông báo`,
-            description: "Lấy số liệu activity thất bại",
+            description: "Lấy số liệu activity thất bại",  
             placement,
         });
     };
@@ -28,7 +28,9 @@ export default function ActivityUser() {
     //#region - Function - thống kê question
     const handleActivityUser = async () => {
         try {
-            const result1 = await ActivityOfUserService(user.accountId);
+            const result1 = await ActivityOfUserService(user.accountId); 
+
+
             //trả về kết quả trên 4 box
             if (result1.status === 200) {
                 setActivity({
@@ -36,8 +38,6 @@ export default function ActivityUser() {
                     totalScoreAverage: result1.totalScoreAverage,
                     totalTime: result1.totalTime,
                 });
-            } else {
-                openNotificationGet400("topRight")
             }
         } catch (e) {
             // console.log("catch")

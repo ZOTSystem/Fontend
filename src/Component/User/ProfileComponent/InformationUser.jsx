@@ -69,6 +69,8 @@ export default function     InformationUser() {
     const [imageUpload, setImageUpload] = useState(null);
     const [showUpdate, setShowUpdate] = useState(false);
     const [showForgotPassword, setShowForgotPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+
 
     const { token, user, onSetUser, render, onSetRender } = useContext(UserContext);
     const [cookies, setCookie, removeCookie] = useCookies([]);
