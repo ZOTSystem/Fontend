@@ -78,7 +78,6 @@ export default function ActivityInWeek() {
                     </div>
                 </div>
             </div>
-            // }
         </>
     )
 }

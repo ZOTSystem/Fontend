@@ -139,6 +139,12 @@ export default function ManageMod() {
             fixed: 'left',
         },
         {
+            title: 'Mật khẩu',
+            dataIndex: 'password',
+            key: 'password',
+            fixed: 'left',  
+        },
+        {
             title: 'Trạng thái',
             // width: 100,
             dataIndex: 'status',

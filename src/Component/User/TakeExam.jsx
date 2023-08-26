@@ -42,10 +42,18 @@ export default function TakeExam() {
     //#region  get topic list by grade and subjecId
     const [topicStudy, setTopicStudy] = useState([]);
     const [topicType, setTopicType] = useState('');
+    const [grade, setGrade] = useState('');
     const handleListTopic = async (grade, subjectId, topicType, accountId) => {
         try {
             setTopicType(topicType)
-            const result = grade === undefined ? await GetTopicByGrade('', subjectId, topicType, accountId) : await GetTopicByGrade(grade, subjectId, topicType, accountId)
+            setGrade(grade)
+            const result = grade === undefined && topicType === undefined
+                ? await GetTopicByGrade('', subjectId, '', accountId)
+                : grade === undefined
+                ? await GetTopicByGrade('', subjectId, topicType, accountId)
+                : topicType === undefined
+                ? await GetTopicByGrade(grade, subjectId, '', accountId)
+                : await GetTopicByGrade(grade, subjectId, topicType, accountId)
             if (result.status === 200) {
                 setTopicStudy(result.data);
             }
@@ -109,7 +117,7 @@ export default function TakeExam() {
                                 <select
                                     class='form-select form-select-lg mb-3'
                                     aria-label='.form-select-lg example'
-                                    onChange={(e) => handleListTopic(undefined, subjectId, e.target.value, user.accountId)}
+                                    onChange={(e) => handleListTopic(grade, subjectId, e.target.value, user.accountId)}
                                 >
                                     <option selected>Chọn bài kiểm tra</option>
                                     <option value='2'>Kiểm tra 15 phút</option>
