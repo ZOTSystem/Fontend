@@ -71,7 +71,7 @@ export default function Contest() {
     const { confirm } = Modal;
     const showConfirm = (item) => {
         confirm({
-            title: 'Vui lòng kiểm tra thật kĩ trước khi nộp làm bài',
+            title: 'Vui lòng kiểm tra thật kĩ trước khi làm bài',
             width: 600,
             icon: <ExclamationCircleFilled />,
             onOk() {
