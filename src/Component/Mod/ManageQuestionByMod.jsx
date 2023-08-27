@@ -23,10 +23,9 @@ import { handleValidationCreateQuestion } from "../../assets/js/handleValidation
 import { GetAllQuestionByTopicIdService } from "../../services/questionService";
 import { GetTopicByIdService } from "../../services/topicService";
 import { AddQuestionService } from "../../services/questionService";
-import { AddQuestionByExcelService } from "../../services/questionService";
 import axios from "axios";
 import Sider from "antd/es/layout/Sider";
-
+import { AddQuestionByExcelService } from "../../services/questionService";
 
 const { Content } = Layout;
 
@@ -425,7 +424,6 @@ export default function ManageQuestionByMod() {
         try {
             if (file) {
                 const rows = await readXlsxFile(file);
-                console.log(rows);
                 setIsModalOpen(!isModalOpen);
                 setFile();
                 const data = {
@@ -434,22 +432,24 @@ export default function ManageQuestionByMod() {
                     topicId: topic.topicId,
                     records: rows,
                 };
-                await axios.post("https://localhost:7207/api/Question/addQuestionByExcel", data,{
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: "Bearer YOUR_AUTH_TOKEN",
-                    },
-                });
-
-                setIsModalOpen(!isModalOpen);
-                setFile();
-                CommonNotification(
-                    "Thông báo",
-                    "Thêm questions bằng file excel thành công!",
-                    "success"
-                );
-                handleGetAllQuestionByTopic();
-                onSetRender();
+                // await axios.post("https://localhost:7207/api/Question/addQuestionByExcel", data,{
+                //     headers: {
+                //         "Content-Type": "application/json",
+                //         Authorization: "Bearer YOUR_AUTH_TOKEN",
+                //     },
+                // });
+                var result = await AddQuestionByExcelService(data);
+                if(result.status === 200) {
+                    setIsModalOpen(!isModalOpen);
+                    setFile();
+                    CommonNotification(
+                        "Thông báo",
+                        "Thêm questions bằng file excel thành công!",
+                        "success"
+                    );
+                    handleGetAllQuestionByTopic();
+                    onSetRender();
+                }
             } else {
                 console.log("Chọn file để upload.");
             }

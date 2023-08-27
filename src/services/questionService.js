@@ -78,23 +78,6 @@ export const ChangeStatusQuestionService = async (questionId, status) => {
     }
 };
 
-export const AddQuestionByExcelService = async (rows) => {
-    try {
-        const response = await Request({
-            method: 'post',
-            url: 'Question/addQuestionByExcel',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer YOUR_AUTH_TOKEN',
-            },
-            data: rows,
-        });
-        return response;
-    } catch (error) {
-        return error;
-    }
-}
-
 export const ApproveAllQuestionService = async (topicId) => {
     try {
         const response = await Request({
@@ -103,6 +86,23 @@ export const ApproveAllQuestionService = async (topicId) => {
             headers: {
                 'Content-Type': 'application/json',
             },
+        });
+        return response;
+    } catch (error) {
+        return error;
+    }
+}
+
+export const AddQuestionByExcelService = async (data) => {
+    try {
+        const response = await Request({
+            method: 'post',
+            url: `Question/addQuestionByExcel`,
+            headers: {
+                'Content-Type': 'application/json',
+                 Authorization: "Bearer YOUR_AUTH_TOKEN",
+            },
+            data: data,
         });
         return response;
     } catch (error) {
