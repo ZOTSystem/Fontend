@@ -313,7 +313,7 @@ export default function Login() {
                             </p>
                             <div>
                                 <div style={{ display: 'flex', justifyContent: 'center', margin: '7px 0' }}>
-                                    <GoogleOAuthProvider clientId='1052205370596-76sbqeq3ccbljcj1ac238pv1bp3ddsb7.apps.googleusercontent.com'>
+                                    {/* <GoogleOAuthProvider clientId='1052205370596-76sbqeq3ccbljcj1ac238pv1bp3ddsb7.apps.googleusercontent.com'>
                                         <GoogleLogin
                                             locale='en'
                                             onSuccess={(token) => {
@@ -323,7 +323,7 @@ export default function Login() {
                                                 openNotificationLoginFailly('topRight');
                                             }}
                                         />
-                                    </GoogleOAuthProvider>
+                                    </GoogleOAuthProvider> */}
                                 </div>
                                 <p style={{ textAlign: 'center' }}>
                                     Bạn chưa có tài khoản?{' '}

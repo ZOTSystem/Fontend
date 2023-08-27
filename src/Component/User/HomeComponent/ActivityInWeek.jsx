@@ -61,7 +61,7 @@ export default function ActivityInWeek() {
                                         <span class="sc-jeGSBP heALfe icon" style={{ color: "black", fontWeight: 'bold', background: 'none', fontSize: '40px' }}>
                                             {activity.totalTest}
                                         </span>
-                                        <p style={{ color: "black", fontWeight: 'bold' }}>Bài kiếm tra</p></div>
+                                        <p style={{ color: "black", fontWeight: 'bold' }}>Bài kiểm tra</p></div>
                                 </div>
                                 <div className='sc-dlfnbm sc-eCssSg bpiLsA drBkXF bpiLsASpace'>
                                     <div class="sc-laRPJI CxaAG" style={{ background: 'white' }}>
